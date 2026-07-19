@@ -1,0 +1,8 @@
+file '/home/alisco/afrospeak-studio/automation/build/v0.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v1.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v2.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v3.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v4.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v5.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v6.mp3'
+file '/home/alisco/afrospeak-studio/automation/build/v7.mp3'

@@ -1,0 +1,7 @@
+/build/
+/cache/
+__pycache__/
+*.mp4
+*.mp3
+*.png
+!.gitkeep

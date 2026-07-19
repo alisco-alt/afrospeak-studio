@@ -1,0 +1,379 @@
+1
+00:00:05,000 --> 00:00:05,503
+<b>L'Afrique</b> compte 1,4 milliard d'habitants et une population très jeune.
+
+2
+00:00:05,503 --> 00:00:06,007
+L'Afrique <b>compte</b> 1,4 milliard d'habitants et une population très jeune.
+
+3
+00:00:06,008 --> 00:00:06,511
+L'Afrique compte <b>1,4</b> milliard d'habitants et une population très jeune.
+
+4
+00:00:06,511 --> 00:00:07,015
+L'Afrique compte 1,4 <b>milliard</b> d'habitants et une population très jeune.
+
+5
+00:00:07,016 --> 00:00:07,519
+L'Afrique compte 1,4 milliard <b>d'habitants</b> et une population très jeune.
+
+6
+00:00:07,519 --> 00:00:08,023
+L'Afrique compte 1,4 milliard d'habitants <b>et</b> une population très jeune.
+
+7
+00:00:08,023 --> 00:00:08,527
+L'Afrique compte 1,4 milliard d'habitants et <b>une</b> population très jeune.
+
+8
+00:00:08,527 --> 00:00:09,031
+L'Afrique compte 1,4 milliard d'habitants et une <b>population</b> très jeune.
+
+9
+00:00:09,032 --> 00:00:09,535
+L'Afrique compte 1,4 milliard d'habitants et une population <b>très</b> jeune.
+
+10
+00:00:09,535 --> 00:00:10,039
+L'Afrique compte 1,4 milliard d'habitants et une population très <b>jeune.</b>
+
+11
+00:00:10,039 --> 00:00:10,487
+<b>Pourtant,</b> la dette extérieure du continent dépasse 1 500 milliards de dollars.
+
+12
+00:00:10,487 --> 00:00:10,936
+Pourtant, <b>la</b> dette extérieure du continent dépasse 1 500 milliards de dollars.
+
+13
+00:00:10,936 --> 00:00:11,384
+Pourtant, la <b>dette</b> extérieure du continent dépasse 1 500 milliards de dollars.
+
+14
+00:00:11,384 --> 00:00:11,832
+Pourtant, la dette <b>extérieure</b> du continent dépasse 1 500 milliards de dollars.
+
+15
+00:00:11,831 --> 00:00:12,279
+Pourtant, la dette extérieure <b>du</b> continent dépasse 1 500 milliards de dollars.
+
+16
+00:00:12,279 --> 00:00:12,727
+Pourtant, la dette extérieure du <b>continent</b> dépasse 1 500 milliards de dollars.
+
+17
+00:00:12,727 --> 00:00:13,176
+Pourtant, la dette extérieure du continent <b>dépasse</b> 1 500 milliards de dollars.
+
+18
+00:00:13,176 --> 00:00:13,624
+Pourtant, la dette extérieure du continent dépasse <b>1</b> 500 milliards de dollars.
+
+19
+00:00:13,624 --> 00:00:14,072
+Pourtant, la dette extérieure du continent dépasse 1 <b>500</b> milliards de dollars.
+
+20
+00:00:14,071 --> 00:00:14,519
+Pourtant, la dette extérieure du continent dépasse 1 500 <b>milliards</b> de dollars.
+
+21
+00:00:14,519 --> 00:00:14,968
+Pourtant, la dette extérieure du continent dépasse 1 500 milliards <b>de</b> dollars.
+
+22
+00:00:14,968 --> 00:00:15,416
+Pourtant, la dette extérieure du continent dépasse 1 500 milliards de <b>dollars.</b>
+
+23
+00:00:15,416 --> 00:00:15,798
+<b>Chaque</b> année, les intérêts de cette dette pèsent sur les budgets de santé et d'éducation.
+
+24
+00:00:15,798 --> 00:00:16,180
+Chaque <b>année,</b> les intérêts de cette dette pèsent sur les budgets de santé et d'éducation.
+
+25
+00:00:16,180 --> 00:00:16,563
+Chaque année, <b>les</b> intérêts de cette dette pèsent sur les budgets de santé et d'éducation.
+
+26
+00:00:16,563 --> 00:00:16,945
+Chaque année, les <b>intérêts</b> de cette dette pèsent sur les budgets de santé et d'éducation.
+
+27
+00:00:16,945 --> 00:00:17,327
+Chaque année, les intérêts <b>de</b> cette dette pèsent sur les budgets de santé et d'éducation.
+
+28
+00:00:17,327 --> 00:00:17,710
+Chaque année, les intérêts de <b>cette</b> dette pèsent sur les budgets de santé et d'éducation.
+
+29
+00:00:17,710 --> 00:00:18,092
+Chaque année, les intérêts de cette <b>dette</b> pèsent sur les budgets de santé et d'éducation.
+
+30
+00:00:18,092 --> 00:00:18,475
+Chaque année, les intérêts de cette dette <b>pèsent</b> sur les budgets de santé et d'éducation.
+
+31
+00:00:18,475 --> 00:00:18,857
+Chaque année, les intérêts de cette dette pèsent <b>sur</b> les budgets de santé et d'éducation.
+
+32
+00:00:18,857 --> 00:00:19,240
+Chaque année, les intérêts de cette dette pèsent sur <b>les</b> budgets de santé et d'éducation.
+
+33
+00:00:19,240 --> 00:00:19,622
+Chaque année, les intérêts de cette dette pèsent sur les <b>budgets</b> de santé et d'éducation.
+
+34
+00:00:19,622 --> 00:00:20,004
+Chaque année, les intérêts de cette dette pèsent sur les budgets <b>de</b> santé et d'éducation.
+
+35
+00:00:20,004 --> 00:00:20,387
+Chaque année, les intérêts de cette dette pèsent sur les budgets de <b>santé</b> et d'éducation.
+
+36
+00:00:20,387 --> 00:00:20,769
+Chaque année, les intérêts de cette dette pèsent sur les budgets de santé <b>et</b> d'éducation.
+
+37
+00:00:20,769 --> 00:00:21,152
+Chaque année, les intérêts de cette dette pèsent sur les budgets de santé et <b>d'éducation.</b>
+
+38
+00:00:21,152 --> 00:00:21,746
+<b>L'émancipation</b> économique passe par la souveraineté alimentaire et industrielle.
+
+39
+00:00:21,746 --> 00:00:22,341
+L'émancipation <b>économique</b> passe par la souveraineté alimentaire et industrielle.
+
+40
+00:00:22,341 --> 00:00:22,936
+L'émancipation économique <b>passe</b> par la souveraineté alimentaire et industrielle.
+
+41
+00:00:22,936 --> 00:00:23,530
+L'émancipation économique passe <b>par</b> la souveraineté alimentaire et industrielle.
+
+42
+00:00:23,530 --> 00:00:24,125
+L'émancipation économique passe par <b>la</b> souveraineté alimentaire et industrielle.
+
+43
+00:00:24,125 --> 00:00:24,719
+L'émancipation économique passe par la <b>souveraineté</b> alimentaire et industrielle.
+
+44
+00:00:24,720 --> 00:00:25,314
+L'émancipation économique passe par la souveraineté <b>alimentaire</b> et industrielle.
+
+45
+00:00:25,314 --> 00:00:25,909
+L'émancipation économique passe par la souveraineté alimentaire <b>et</b> industrielle.
+
+46
+00:00:25,909 --> 00:00:26,504
+L'émancipation économique passe par la souveraineté alimentaire et <b>industrielle.</b>
+
+47
+00:00:26,504 --> 00:00:26,849
+<b>Les</b> diasporas africaines envoient déjà plus de 100 milliards de dollars par an vers le continent.
+
+48
+00:00:26,849 --> 00:00:27,193
+Les <b>diasporas</b> africaines envoient déjà plus de 100 milliards de dollars par an vers le continent.
+
+49
+00:00:27,194 --> 00:00:27,539
+Les diasporas <b>africaines</b> envoient déjà plus de 100 milliards de dollars par an vers le continent.
+
+50
+00:00:27,539 --> 00:00:27,884
+Les diasporas africaines <b>envoient</b> déjà plus de 100 milliards de dollars par an vers le continent.
+
+51
+00:00:27,884 --> 00:00:28,228
+Les diasporas africaines envoient <b>déjà</b> plus de 100 milliards de dollars par an vers le continent.
+
+52
+00:00:28,229 --> 00:00:28,574
+Les diasporas africaines envoient déjà <b>plus</b> de 100 milliards de dollars par an vers le continent.
+
+53
+00:00:28,574 --> 00:00:28,919
+Les diasporas africaines envoient déjà plus <b>de</b> 100 milliards de dollars par an vers le continent.
+
+54
+00:00:28,919 --> 00:00:29,263
+Les diasporas africaines envoient déjà plus de <b>100</b> milliards de dollars par an vers le continent.
+
+55
+00:00:29,264 --> 00:00:29,609
+Les diasporas africaines envoient déjà plus de 100 <b>milliards</b> de dollars par an vers le continent.
+
+56
+00:00:29,609 --> 00:00:29,954
+Les diasporas africaines envoient déjà plus de 100 milliards <b>de</b> dollars par an vers le continent.
+
+57
+00:00:29,954 --> 00:00:30,298
+Les diasporas africaines envoient déjà plus de 100 milliards de <b>dollars</b> par an vers le continent.
+
+58
+00:00:30,298 --> 00:00:30,643
+Les diasporas africaines envoient déjà plus de 100 milliards de dollars <b>par</b> an vers le continent.
+
+59
+00:00:30,644 --> 00:00:30,989
+Les diasporas africaines envoient déjà plus de 100 milliards de dollars par <b>an</b> vers le continent.
+
+60
+00:00:30,989 --> 00:00:31,333
+Les diasporas africaines envoient déjà plus de 100 milliards de dollars par an <b>vers</b> le continent.
+
+61
+00:00:31,334 --> 00:00:31,679
+Les diasporas africaines envoient déjà plus de 100 milliards de dollars par an vers <b>le</b> continent.
+
+62
+00:00:31,679 --> 00:00:32,024
+Les diasporas africaines envoient déjà plus de 100 milliards de dollars par an vers le <b>continent.</b>
+
+63
+00:00:32,024 --> 00:00:32,658
+<b>Ce</b> capital, mieux outillé, pourrait financer une industrialisation souveraine.
+
+64
+00:00:32,658 --> 00:00:33,293
+Ce <b>capital,</b> mieux outillé, pourrait financer une industrialisation souveraine.
+
+65
+00:00:33,293 --> 00:00:33,928
+Ce capital, <b>mieux</b> outillé, pourrait financer une industrialisation souveraine.
+
+66
+00:00:33,928 --> 00:00:34,562
+Ce capital, mieux <b>outillé,</b> pourrait financer une industrialisation souveraine.
+
+67
+00:00:34,562 --> 00:00:35,197
+Ce capital, mieux outillé, <b>pourrait</b> financer une industrialisation souveraine.
+
+68
+00:00:35,197 --> 00:00:35,832
+Ce capital, mieux outillé, pourrait <b>financer</b> une industrialisation souveraine.
+
+69
+00:00:35,832 --> 00:00:36,466
+Ce capital, mieux outillé, pourrait financer <b>une</b> industrialisation souveraine.
+
+70
+00:00:36,466 --> 00:00:37,101
+Ce capital, mieux outillé, pourrait financer une <b>industrialisation</b> souveraine.
+
+71
+00:00:37,101 --> 00:00:37,736
+Ce capital, mieux outillé, pourrait financer une industrialisation <b>souveraine.</b>
+
+72
+00:00:37,736 --> 00:00:38,123
+<b>Les</b> chaînes comme Money Radar ou Afrospeak prouvent qu'un récit africain peut être mondial.
+
+73
+00:00:38,123 --> 00:00:38,510
+Les <b>chaînes</b> comme Money Radar ou Afrospeak prouvent qu'un récit africain peut être mondial.
+
+74
+00:00:38,510 --> 00:00:38,898
+Les chaînes <b>comme</b> Money Radar ou Afrospeak prouvent qu'un récit africain peut être mondial.
+
+75
+00:00:38,898 --> 00:00:39,285
+Les chaînes comme <b>Money</b> Radar ou Afrospeak prouvent qu'un récit africain peut être mondial.
+
+76
+00:00:39,285 --> 00:00:39,673
+Les chaînes comme Money <b>Radar</b> ou Afrospeak prouvent qu'un récit africain peut être mondial.
+
+77
+00:00:39,673 --> 00:00:40,060
+Les chaînes comme Money Radar <b>ou</b> Afrospeak prouvent qu'un récit africain peut être mondial.
+
+78
+00:00:40,060 --> 00:00:40,448
+Les chaînes comme Money Radar ou <b>Afrospeak</b> prouvent qu'un récit africain peut être mondial.
+
+79
+00:00:40,448 --> 00:00:40,835
+Les chaînes comme Money Radar ou Afrospeak <b>prouvent</b> qu'un récit africain peut être mondial.
+
+80
+00:00:40,835 --> 00:00:41,222
+Les chaînes comme Money Radar ou Afrospeak prouvent <b>qu'un</b> récit africain peut être mondial.
+
+81
+00:00:41,222 --> 00:00:41,610
+Les chaînes comme Money Radar ou Afrospeak prouvent qu'un <b>récit</b> africain peut être mondial.
+
+82
+00:00:41,610 --> 00:00:41,997
+Les chaînes comme Money Radar ou Afrospeak prouvent qu'un récit <b>africain</b> peut être mondial.
+
+83
+00:00:41,997 --> 00:00:42,385
+Les chaînes comme Money Radar ou Afrospeak prouvent qu'un récit africain <b>peut</b> être mondial.
+
+84
+00:00:42,385 --> 00:00:42,772
+Les chaînes comme Money Radar ou Afrospeak prouvent qu'un récit africain peut <b>être</b> mondial.
+
+85
+00:00:42,772 --> 00:00:43,160
+Les chaînes comme Money Radar ou Afrospeak prouvent qu'un récit africain peut être <b>mondial.</b>
+
+86
+00:00:43,160 --> 00:00:43,640
+<b>L'information</b> est une arme: qui contrôle le récit contrôle l'avenir.
+
+87
+00:00:43,640 --> 00:00:44,119
+L'information <b>est</b> une arme: qui contrôle le récit contrôle l'avenir.
+
+88
+00:00:44,120 --> 00:00:44,600
+L'information est <b>une</b> arme: qui contrôle le récit contrôle l'avenir.
+
+89
+00:00:44,600 --> 00:00:45,079
+L'information est une <b>arme:</b> qui contrôle le récit contrôle l'avenir.
+
+90
+00:00:45,080 --> 00:00:45,560
+L'information est une arme: <b>qui</b> contrôle le récit contrôle l'avenir.
+
+91
+00:00:45,560 --> 00:00:46,039
+L'information est une arme: qui <b>contrôle</b> le récit contrôle l'avenir.
+
+92
+00:00:46,039 --> 00:00:46,519
+L'information est une arme: qui contrôle <b>le</b> récit contrôle l'avenir.
+
+93
+00:00:46,520 --> 00:00:47,000
+L'information est une arme: qui contrôle le <b>récit</b> contrôle l'avenir.
+
+94
+00:00:47,000 --> 00:00:47,479
+L'information est une arme: qui contrôle le récit <b>contrôle</b> l'avenir.
+
+95
+00:00:47,480 --> 00:00:47,960
+L'information est une arme: qui contrôle le récit contrôle <b>l'avenir.</b>
