@@ -25,6 +25,9 @@ W, H, FPS = 1080, 1920, 30  # vertical
 
 def _run(cmd):
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    if r.returncode != 0:
+        print("    [ffmpeg err]", r.stderr[-150:])
+        print("    [cmd]", " ".join(cmd)[:200])
     return r.returncode == 0
 
 
@@ -77,13 +80,15 @@ def download_clip(url, out_path, dur=8):
 # ---------------------------------------------------------------------------
 def transform(raw_path, out_path, dur, source_label="Source: Archive"):
     """Applique recadrage 9:16 + filtre couleur + zoom + bandeau source."""
+    # on remplace ':' par '-' (ffmpeg drawtext casse sur ':')
+    safe = source_label.replace(":", "-")
     vf = (
         f"scale={W}:{H}:force_original_aspect_ratio=increase,"
         f"crop={W}:{H},"
         f"zoom=1.12:eval=init:w={W}:h={H},"
         f"colorbalance=rs=0.06:gs=0.0:bs=-0.06,"
         f"eq=contrast=1.08:brightness=-0.02,"
-        f"drawtext=text='{source_label}':fontcolor=white:"
+        f"drawtext=text='{safe}':fontcolor=white:"
         f"fontsize=26:box=1:boxcolor=black@0.5:boxborderw=8:"
         f"x=(w-text_w-20):y=(h-text_h-20):alpha=0.85"
     )
@@ -116,11 +121,68 @@ def download_wikimedia_video(query, out_path, dur=8):
             tmp = out_path.with_suffix(".wm.mp4")
             if _run(["ffmpeg", "-y", "-i", url, "-t", str(dur),
                      "-c", "copy", str(tmp)]):
-                transform(tmp, out_path, dur, f"Source: {title}")
+                transform(tmp, out_path, dur, f"Source - {title}")
                 tmp.unlink(missing_ok=True)
                 return True
     except Exception as e:
         print(f"    [wm video warn] {e}")
+    return False
+
+
+# ---------------------------------------------------------------------------
+# 3c. WIKIMEDIA IMAGE (libre de droits, fonctionne sans cle)
+#     NOTE: requests Python est bloque par le proxy WSL (429/403) ->
+#     on utilise curl (passe mieux).
+# ---------------------------------------------------------------------------
+def download_wikimedia_still(query, out_path, dur=8):
+    """Telecharge une IMAGE pertinente (pas video) depuis Wikimedia Commons."""
+    import requests, subprocess
+    try:
+        api = "https://commons.wikimedia.org/w/api.php"
+        # recherche courte (2-3 mots max, sinon 0 resultat)
+        short_q = " ".join(query.split()[:2])
+        params = {"action": "query", "generator": "search",
+                  "gsrsearch": short_q, "gsrlimit": "8", "gsrnamespace": "6",
+                  "prop": "imageinfo", "iiprop": "url", "format": "json"}
+        r = requests.get(api, params=params,
+                         headers={"User-Agent": "AfrospeakStudio/4.0"}, timeout=20)
+        data = r.json()
+        cands = []
+        for p in data.get("query", {}).get("pages", {}).values():
+            ii = p.get("imageinfo")
+            if not ii:
+                continue
+            url = ii[0].get("url") or ii[0].get("thumburl")
+            if not url or not url.lower().endswith((".jpg", ".jpeg", ".png")):
+                continue
+            cands.append((url, p.get("title", "Wikimedia").replace("File:", "")))
+        if not cands:
+            return False
+        url, title = random.choice(cands)
+        tmp = out_path.with_suffix(".wm.jpg")
+        # curl (passe le proxy WSL mieux que requests)
+        cr = subprocess.run(["curl", "-s", "-L", "-A", "Mozilla/5.0",
+                             "--max-time", "60", "-o", str(tmp), url],
+                            capture_output=True, text=True, timeout=70)
+        if cr.returncode != 0 or not tmp.exists() or tmp.stat().st_size < 5 * 1024:
+            return False
+        # transform image -> video verticale (ken burns + label source)
+        # label: on nettoie (enleve tout sauf alphanum/espace/-)
+        import re as _re
+        clean_title = _re.sub(r"[^a-zA-Z0-9 \-]", "", title[:40])
+        label = f"Source - {clean_title}"
+        vf = (f"scale={W}:{H}:force_original_aspect_ratio=increase,"
+              f"crop={W}:{H},"
+              f"drawtext=text='{label}':fontcolor=white:"
+              f"fontsize=26:box=1:boxcolor=black@0.5:boxborderw=8:"
+              f"x=(w-text_w-20):y=(h-text_h-20):alpha=0.85")
+        if _run(["ffmpeg", "-y", "-loop", "1", "-i", str(tmp), "-t", str(dur),
+                 "-vf", vf, "-r", str(FPS), "-c:v", "libx264",
+                 "-pix_fmt", "yuv420p", str(out_path)]):
+            tmp.unlink(missing_ok=True)
+            return True
+    except Exception as e:
+        print(f"    [wm still warn] {e}")
     return False
 
 
@@ -153,9 +215,10 @@ def download_archive_video(query, out_path, dur=8):
             tmp = out_path.with_suffix(".ia.mp4")
             if _run(["ffmpeg", "-y", "-i", dl, "-t", str(dur),
                      "-c", "copy", str(tmp)]):
-                transform(tmp, out_path, dur, f"Source: Internet Archive/{ident[:25]}")
+                ok = transform(tmp, out_path, dur, f"Source - Internet Archive/{ident[:25]}")
                 tmp.unlink(missing_ok=True)
-                return True
+                if ok and out_path.exists():
+                    return True
     except Exception as e:
         print(f"    [archive warn] {e}")
     return False
@@ -202,12 +265,15 @@ def get_broll(phrase, out_path, dur=8):
         if q in tried:
             continue
         tried.add(q)
-        # 1. Internet Archive (libre de droits, API stable)
+        # 1. Internet Archive video (libre de droits, API stable)
         if download_archive_video(q, out_path, dur):
-            return f"Source: Internet Archive/{q[:25]}"
-        # 2. Wikimedia video (sur 1er mot-cle)
+            return f"Source - Internet Archive/{q[:25]}"
+        # 2. Wikimedia VIDEO (si dispo)
         if download_wikimedia_video(q, out_path, dur):
-            return f"Source: Wikimedia/{q[:30]}"
+            return f"Source - Wikimedia/{q[:30]}"
+        # 3. Wikimedia IMAGE (reelle, marche sans cle)
+        if download_wikimedia_still(q, out_path, dur):
+            return f"Source - Wikimedia/{q[:30]}"
     # yt-dlp desactive temporairement (timeout 60s sur WSL instable)
     return None
 

@@ -67,26 +67,40 @@ def make_bar_chart(data, out, dur=6):
 
 def make_counter(value, label, out, dur=5):
     sp = Path(out).with_suffix(".py")
-    sp.write_text(f'''
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-fig, ax = plt.subplots(figsize=(10.8,19.2), dpi=100)
-fig.patch.set_facecolor("#0f1226"); ax.set_facecolor("#0f1226")
-ax.axis("off")
-txt = ax.text(0.5, 0.55, "0", ha="center", va="center", color="#E8710A",
-              fontsize=140, fontweight="bold")
-lab = ax.text(0.5, 0.35, "{label}", ha="center", va="center", color="white",
-              fontsize=44)
-def upd(i):
-    prog = i/({dur}*{FPS}-1)
-    val = int({value}*prog)
-    txt.set_text(f"{{val:,}}")
-    return txt,
-ani = FuncAnimation(fig, upd, frames={dur}*{FPS}, blit=True, interval=1000/{FPS})
-ani.save(r"{out}", writer="ffmpeg", fps={FPS}, dpi=100)
-'''.replace("{dur}", str(dur)).replace("{FPS}", str(FPS)).replace("{value}", str(value)).replace("{label}", label).replace("{out}", str(out)))
+    # slide pro: fond degrade brande, chiffre orange geant, barre progression
+    lines = ["import matplotlib", "matplotlib.use('Agg')",
+             "import matplotlib.pyplot as plt",
+             "from matplotlib.animation import FuncAnimation",
+             "import numpy as np", "",
+             "fig, ax = plt.subplots(figsize=(10.8, 19.2), dpi=100)",
+             "fig.patch.set_facecolor('#0f1226')",
+             "ax.set_facecolor('#0f1226')",
+             "ax.set_xlim(0,1); ax.set_ylim(0,1); ax.axis('off')",
+             "# fond degrade",
+             "grad = np.linspace(0,1,100)",
+             "for i,yy in enumerate(np.linspace(0,1,100)):",
+             "    c = (16/255 + yy*0.25, 18/255 + yy*0.1, 38/255 + yy*0.05)",
+             "    ax.add_patch(plt.Rectangle((0,yy/100),1,0.01,color=c,zorder=0))",
+             "# bandeau haut orange",
+             "ax.add_patch(plt.Rectangle((0,0.93),1,0.07,color='#E8710A',zorder=1))",
+             "ax.text(0.5,0.965,'AFROSPEAK',ha='center',va='center',color='white',fontsize=38,fontweight='bold',zorder=2)",
+             "# symbole monetaire",
+             "sym = '$' if 'milliard' in %r or 'dollar' in %r else ''" % (label, label),
+             "txt = ax.text(0.5, 0.58, '', ha='center', va='center', color='#E8710A', fontsize=170, fontweight='bold', zorder=3)",
+             "lab = ax.text(0.5, 0.40, %r, ha='center', va='center', color='white', fontsize=48, zorder=3, wrap=True)" % label,
+             "# barre progression bas",
+             "bar_bg = ax.add_patch(plt.Rectangle((0.1,0.18),0.8,0.03,color='#333355',zorder=2))",
+             "bar = ax.add_patch(plt.Rectangle((0.1,0.18),0.0,0.03,color='#E8710A',zorder=3))",
+             "def upd(i):",
+             "    total = %d*%d" % (dur, FPS),
+             "    prog = i/(total-1)",
+             "    val = int(%f*prog)" % value,
+             "    txt.set_text(sym + f'{val:,}')",
+             "    bar.set_width(0.8*prog)",
+             "    return txt, bar,",
+             "ani = FuncAnimation(fig, upd, frames=%d*%d, blit=True, interval=1000.0/%d)" % (dur, FPS, FPS),
+             "ani.save(%r, writer='ffmpeg', fps=%d, dpi=100)" % (str(out), FPS)]
+    sp.write_text("\n".join(lines))
     return _render_mpl(str(sp), out)
 
 

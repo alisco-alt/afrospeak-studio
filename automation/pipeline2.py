@@ -130,21 +130,35 @@ def produce(script_text, out_path, title="AFROSPEAK"):
             anim.make_counter(val, s[:40], str(clip), dur=int(dur)+1)
             print(f"      -> animation counter ({val})")
         else:
-            # B-ROLL video (yt-dlp) ou fallback image
+            # B-ROLL: image Wikimedia reelle (get_broll deja tente video+image)
             br = WORK / f"br{i}.mp4"
             label = broll.get_broll(s, br, dur=int(dur)+1)
             if label and br.exists():
-                # re-brûle la source sur la video deja transformee
                 print(f"      -> b-roll: {label}")
                 clip = br
             else:
-                # fallback: image Wikimedia + ken burns (studio legacy)
-                img = WORK / f"img{i}.jpg"
-                found = broll.download_wikimedia_still(s, img) if hasattr(broll, "download_wikimedia_still") else None
-                if not found:
+                # fallback: image Wikimedia reelle directement en mp4
+                img_clip = WORK / f"img{i}.mp4"
+                found = broll.download_wikimedia_still(s, img_clip)
+                if found:
+                    print(f"      -> image Wikimedia")
+                    clip = img_clip
+                else:
+                    # dernier recours: image degrade + texte (jamais bleu uni)
+                    img = WORK / f"img{i}.jpg"
                     from PIL import Image, ImageDraw, ImageFont
-                    im = Image.new("RGB", (W, H), (16, 18, 38))
+                    im = Image.new("RGB", (W, H))
+                    px = im.load()
+                    for y in range(H):
+                        for x in range(0, W, 8):
+                            t = y / H
+                            r = int(16 + t * 200); g = int(18 + t * 80); b = int(38 + t * 20)
+                            for dx in range(8):
+                                if x + dx < W:
+                                    px[x + dx, y] = (r, g, b)
+                    from PIL import ImageDraw
                     d = ImageDraw.Draw(im)
+                    d.ellipse([W//2-300, H//2-300, W//2+300, H//2+300], outline=(232,113,10,180), width=4)
                     f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
                     words = s.split(); lines, cur = [], ""
                     for w in words:
@@ -159,14 +173,12 @@ def produce(script_text, out_path, title="AFROSPEAK"):
                         d.text(((W-(bbox[2]-bbox[0]))//2, y), ln, fill=(235,238,245), font=f)
                         y += 60
                     im.save(img)
-                subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", str(img),
-                                "-t", str(dur), "-vf",
-                                f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
-                                f"zoompan=z='min(zoom+0.0015,1.15)':d=1:"
-                                f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS}",
-                                "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                                str(clip)], check=True, stdout=subprocess.DEVNULL,
-                               stderr=subprocess.DEVNULL)
+                    subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", str(img),
+                                    "-t", str(dur), "-vf",
+                                    f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+                                    "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                                    str(clip)], check=True, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL)
                 print(f"      -> fallback image")
         clips.append(clip)
     # audio concat
