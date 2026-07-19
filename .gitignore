@@ -5,3 +5,7 @@ __pycache__/
 *.mp3
 *.png
 !.gitkeep
+# API keys (NEVER commit)
+.hermes/pexels_key
+pexels_key
+*.key

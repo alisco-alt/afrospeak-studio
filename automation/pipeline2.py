@@ -69,25 +69,36 @@ def extract_number(s):
 
 
 def make_wordlevel_srt(sentences, timings, srt_path, offset=0.0):
+    """Clean phrase-level SRT: one block per sentence (no word-by-word karaoke).
+
+    The full phrase is shown for its whole duration and wrapped to at most 2
+    lines so the burned subtitle stays unobtrusive (bottom-centered block).
+    """
     def fmt(s):
         h = int(s // 3600); m = int((s % 3600) // 60)
         s2 = int(s % 60); ms = int((s % 1) * 1000)
         return f"{h:02}:{m:02}:{s2:02},{ms:03}"
+    # Wrap a phrase into at most 2 lines using a real newline (\n -> ASS \N).
+    def wrap2(text, limit=40):
+        text = text.strip()
+        if len(text) <= limit:
+            return text
+        words = text.split()
+        mid = len(words) // 2
+        best = mid
+        for b in range(mid, 0, -1):
+            if len(" ".join(words[:b])) <= limit:
+                best = b
+                break
+        return " ".join(words[:best]) + "\n" + " ".join(words[best:])
     blocks, idx = [], 1
     for si, sent in enumerate(sentences):
         start = offset + timings[si][0]
         end = offset + timings[si][1]
-        words = sent.split()
-        if not words:
+        if not sent.strip():
             continue
-        step = (end - start) / len(words)
-        for wi, wrd in enumerate(words):
-            ws = start + wi * step
-            we = ws + step
-            line = " ".join(f"<b>{words[j]}</b>" if j == wi else words[j]
-                            for j in range(len(words)))
-            blocks.append(f"{idx}\n{fmt(ws)} --> {fmt(we)}\n{line}\n")
-            idx += 1
+        blocks.append(f"{idx}\n{fmt(start)} --> {fmt(end)}\n{wrap2(sent)}\n")
+        idx += 1
     Path(srt_path).write_text("\n".join(blocks), encoding="utf-8")
 
 
@@ -101,7 +112,7 @@ def srt_to_ass(srt, ass):
         "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, "
         "Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
         "Style: Default,DejaVu Sans Bold,58,&H00FFFFFF,&H000000FF,"
-        "&H00000000,&HAA000000,1,0,0,0,100,100,0,0,4,8,2,2,40,40,120,1\n\n"
+        "&H00000000,&H80000000,1,0,0,0,100,100,0,0,4,0,0,2,40,40,120,1\n\n"
         "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, "
         "MarginV, Effect, Text\n"
     )
