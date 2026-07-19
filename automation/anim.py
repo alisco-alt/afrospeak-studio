@@ -320,6 +320,51 @@ def make_bar_chart(data_dict, out, dur=6):
     return Path(out).exists()
 
 
+def make_text_card(title, subtitle, out, dur=5):
+    """Slide texte percutant sur fond brande (style Brut/Veritasium).
+    title   : gros texte d'accent (ex: 'LA VERITE')
+    subtitle: contexte sous le titre
+    out     : mp4 sortie"""
+    out = str(out)
+    frames = max(2, int(round(dur * FPS)))
+    fig = plt.figure(figsize=FIGSIZE, dpi=DPI)
+    fig.patch.set_facecolor(BG_DARK)
+    _brand_background(fig)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
+    _wordmark(ax)
+    # bandeau orange haut
+    ax.add_patch(plt.Rectangle((0.0, 0.90), 1.0, 0.012,
+                               color=ORANGE, zorder=5))
+    # titre (wrap 2 lignes)
+    tlines = _wrap(title, max_chars=16)
+    ty = 0.66 - (len(tlines) - 1) * 0.10
+    for ln in tlines:
+        ax.text(0.5, ty, ln, color=ORANGE, fontsize=120,
+                fontweight="bold", ha="center", va="center", zorder=6)
+        ty -= 0.12
+    # sous-titre
+    slines = _wrap(subtitle, max_chars=28)
+    sy = 0.34 - (len(slines) - 1) * 0.06
+    for ln in slines:
+        ax.text(0.5, sy, ln, color=WHITE, fontsize=46,
+                fontweight="bold", ha="center", va="center", zorder=6,
+                linespacing=1.2)
+        sy -= 0.07
+    ani = FuncAnimation(fig, lambda f: [], frames=frames, blit=True,
+                        interval=1000.0 / FPS)
+    tmp = out + ".low.mp4"
+    ani.save(tmp, writer="ffmpeg", fps=FPS, dpi=DPI)
+    plt.close(fig)
+    import subprocess
+    subprocess.run(["ffmpeg", "-y", "-i", tmp, "-vf",
+                    f"scale={W}:{H}:flags=lanczos", "-c:v", "libx264",
+                    "-pix_fmt", "yuv420p", str(out)],
+                   capture_output=True, text=True, timeout=120)
+    Path(tmp).unlink(missing_ok=True)
+    return Path(out).exists()
+
+
 # --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
