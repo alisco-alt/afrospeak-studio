@@ -253,3 +253,9 @@
 [2026-07-19 16:59:19]   [trend warn] Expecting value: line 1 column 1 (char 0)
 [2026-07-19 16:59:19] Sujet: nigeria economie explique en 2026
 [2026-07-19 16:59:19]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_165919.txt'
+[2026-07-19 17:04:35]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 17:04:35] Sujet: afrique dette explique en 2026
+[2026-07-19 17:04:35]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_170435.txt'
+[2026-07-19 17:04:54]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 17:04:54] Sujet: afrique economie explique en 2026
+[2026-07-19 17:04:54]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_170454.txt'
