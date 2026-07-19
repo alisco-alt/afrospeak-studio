@@ -34,6 +34,8 @@ def split_sentences(text):
 
 def tts_sentence(text, out_mp3):
     import asyncio
+    out_mp3 = Path(out_mp3)
+    out_mp3.parent.mkdir(parents=True, exist_ok=True)
     # utilise le venv qui a edge_tts
     r = subprocess.run([str(VENV_PY), "-c",
                         f"import asyncio,edge_tts;"
