@@ -322,3 +322,9 @@
 [2026-07-19 18:35:05]   [trend warn] Expecting value: line 1 column 1 (char 0)
 [2026-07-19 18:35:05] Sujet: franc CFA 2026 explique en 2026
 [2026-07-19 18:35:05]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_183505.txt'
+[2026-07-19 18:44:27]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 18:44:27] Sujet: remises africains explique en 2026
+[2026-07-19 18:44:27]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_184427.txt'
+[2026-07-19 18:45:07]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 18:45:07] Sujet: startup africaine explique en 2026
+[2026-07-19 18:45:07]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_184507.txt'

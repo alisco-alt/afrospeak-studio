@@ -149,6 +149,7 @@ def srt_to_ass(srt, ass):
 
 
 def produce(script_text, out_path, title="AFROSPEAK"):
+    WORK.mkdir(parents=True, exist_ok=True)
     sentences = split_sentences(script_text)
     print(f"[1] {len(sentences)} phrases")
     audio_segs, timings, clips = [], [], []
