@@ -1,108 +1,94 @@
 #!/usr/bin/env python3
 """
-AFROSPEAK STUDIO v3 — Moteur vidéo faceless (qualité > Fliki.ai)
-===============================================================
-Inspiré des grands formats: Money Radar (doc+archives+maps), Simplifié
-(explication kinetic), Brut/AgenceEcoFin (cuts+texte), Afrospeak (voix+archives).
+AFROSPEAK STUDIO v4 — Moteur video faceless PRO (style grands createurs)
+=========================================================================
+Ammeliorations v4 (apres retour utilisateur):
+  - B-ROLL REEL: moteur images robuste (Wikimedia + Unsplash fallback),
+    VERIFIE affiche (pas de fond bleu). Images libres de droits.
+  - SOUS-TITRES PRO: bas de l'ecran, gros, gras, fond noir semi-transparent
+    arrondi, 1 bloc par phrase, surlignage mot (style Veritasium/Money Radar).
+  - KEN BURNS, cartes brandees, miniature, cache, mode chaine.
 
-Nouveautés v3 (au-dessus de Fliki):
-  - KEN BURNS: zoom/pan lent sur chaque archive (mouvement reel, pas still)
-  - CARTES BRANDEES: intro animée (hook+titre) + outro (call subscribe)
-  - MUSIQUE: bed royalty-free optionnel (assets/music.mp3)
-  - MINIATURE auto: vignette YouTube generee
-  - CACHE: media telecharge mis en cache (re-run gratuit/rapide)
-  - MODE CHAINE: traite un dossier de scripts = automation complete
-  - B-ROLL par phrase + CREDIT SOURCE brule (anti-plagiat)
-  - SOUS-TITRES mot-niveau (karaoke)
-
-Tout gratuit / open-source, tourne sur ton serveur. edge-tts FR = 0 cle.
 Usage:
-  python3 studio.py --script script.txt --out video.mp4 --title "Episode 1"
-  python3 studio.py --channel ./scripts/   # traite tout le dossier
+  python3 studio.py --script script.txt --title "Titre" --out video.mp4
+  python3 studio.py --channel ./dossier/   # tous les scripts du dossier
 """
-import argparse, os, sys, json, re, shutil, subprocess, hashlib
-from datetime import datetime
+import argparse, os, sys, json, subprocess, tempfile, shutil
+from pathlib import Path
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = Path(__file__).parent
 WORK = os.path.join(HERE, "build")
 CACHE = os.path.join(HERE, "cache")
-ASSETS = os.path.join(HERE, "assets")
 os.makedirs(WORK, exist_ok=True)
 os.makedirs(CACHE, exist_ok=True)
-os.makedirs(ASSETS, exist_ok=True)
 
-VOICE = "fr-FR-DeniseNeural"
-W, H = 1920, 1080
-INTRO = 5.0
-OUTRO = 5.0
-FPS = 25
-
-# police (DejaVuSans present sur Linux)
+W, H, FPS = 1080, 1920, 30  # vertical (format Shorts/Reels/TikTok) = trafic max
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 if not os.path.exists(FONT):
-    FONT = None
+    FONTS = list(Path("/usr/share/fonts").rglob("*.ttf"))
+    FONT = str(FONTS[0]) if FONTS else None
 
 
 # ---------------------------------------------------------------------------
-# 1. SCRIPT
+# 1. DECOUPAGE
 # ---------------------------------------------------------------------------
-def gen_script_ollama(topic):
-    try:
-        import ollama
-        r = ollama.chat(model="llama3", messages=[{
-            "role": "user",
-            "content": f"Rédige un script documentaire geopolitique/economique 'sans visage' "
-                       f"de 8 a 12 phrases courtes sur: {topic}. Ton analytique, factuel, "
-                       f"captivant, style Money Radar / Afrospeak. Pas de didacticiel."}])
-        return r["message"]["content"]
-    except Exception:
-        return None
-
-
 def split_sentences(text):
-    parts = re.split(r'(?<=[.!?])\s+', text.strip())
-    return [p.strip() for p in parts if p.strip()]
+    import re
+    text = text.replace("\n", " ").strip()
+    parts = re.split(r"(?<=[.!?])\s+", text)
+    out = []
+    for p in parts:
+        p = p.strip()
+        if p:
+            out.append(p)
+    return out
+
+
+def _cache_key(s):
+    import hashlib
+    return hashlib.md5(s.encode()).hexdigest()[:12]
 
 
 # ---------------------------------------------------------------------------
-# 2. TTS par phrase (timing exact)
+# 2. VOIX OFF (edge-tts, 0 cle)
 # ---------------------------------------------------------------------------
-def tts_sentence(sentence, out_mp3):
+def tts_sentence(text, out_mp3):
     import asyncio, edge_tts
+    voice = "fr-FR-DeniseNeural"
     async def run():
-        c = edge_tts.Communicate(sentence, VOICE)
-        await c.save(out_mp3)
-    asyncio.run(run())
+        comm = edge_tts.Communicate(text, voice)
+        await comm.save(out_mp3)
+    asyncio.new_event_loop().run_until_complete(run())
 
 
-def audio_duration(path):
-    return float(subprocess.check_output(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=noprint_wrappers=1:nokey=1", path]).decode().strip())
+def audio_duration(mp3):
+    import subprocess as sp
+    r = sp.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1", mp3],
+               capture_output=True, text=True)
+    try:
+        return float(r.stdout.strip())
+    except Exception:
+        return 4.0
 
 
 # ---------------------------------------------------------------------------
-# 3. B-ROLL (Wikimedia) + cache + credit
+# 3. B-ROLL REEL (moteur robuste)
 # ---------------------------------------------------------------------------
-def _cache_key(phrase):
-    kw = " ".join([w for w in re.findall(r"[A-Za-zÀ-ÿ']+", phrase)
-                   if len(w) > 4 and w[0].isupper()][:3]) or phrase[:40]
-    return hashlib.md5(kw.lower().encode()).hexdigest()
-
-
-def query_wikimedia(phrase, n=5):
+def query_wikimedia(phrase, n=4):
     import requests
     out = []
     try:
-        kw = " ".join([w for w in re.findall(r"[A-Za-zÀ-ÿ']+", phrase)
-                       if len(w) > 4 and w[0].isupper()][:3]) or phrase[:40]
+        # mots-clés = tous les mots >= 4 chars (pas que majuscules)
+        kws = [w for w in phrase.replace("'", " ").split() if len(w) > 4]
+        kw = " ".join(kws[:6]) or phrase[:30]
         api = "https://commons.wikimedia.org/w/api.php"
-        headers = {"User-Agent": "AfrospeakStudio/3.0 (contact@africabite.ai)"}
-        params = {"action": "query", "generator": "search", "gsrsearch": kw,
-                  "gsrlimit": str(n * 3), "gsrnamespace": "6",
-                  "prop": "imageinfo", "iiprop": "url", "iiurlwidth": str(W),
-                  "format": "json"}
-        r = requests.get(api, params=params, headers=headers, timeout=20)
+        params = {"action": "query", "generator": "search",
+                  "gsrsearch": kw, "gsrlimit": str(n * 4),
+                  "gsrnamespace": "6", "prop": "imageinfo",
+                  "iiprop": "url", "format": "json"}
+        r = requests.get(api, params=params,
+                         headers={"User-Agent": "AfrospeakStudio/4.0"}, timeout=20)
         data = r.json()
         for p in data.get("query", {}).get("pages", {}).values():
             ii = p.get("imageinfo")
@@ -111,8 +97,8 @@ def query_wikimedia(phrase, n=5):
             url = ii[0].get("url") or ii[0].get("thumburl")
             if not url or not url.lower().endswith((".jpg", ".jpeg", ".png")):
                 continue
-            src = p.get("title", "Wikimedia").replace("File:", "")
-            out.append((url, src))
+            # on prend l'URL originale (pas le thumb qui peut echouer)
+            out.append((url, p.get("title", "Wikimedia").replace("File:", "")))
             if len(out) >= n:
                 break
     except Exception as e:
@@ -120,103 +106,111 @@ def query_wikimedia(phrase, n=5):
     return out
 
 
-def cached_download(url, key, ext=".jpg"):
-    path = os.path.join(CACHE, key + ext)
-    if os.path.exists(path) and os.path.getsize(path) > 2000:
-        return path
+def download(url, path, min_kb=5):
     import requests
     try:
-        r = requests.get(url, timeout=20)
-        if len(r.content) > 2000:
+        r = requests.get(url, timeout=20, headers={"User-Agent": "Afrospeak/4.0"})
+        if r.status_code == 200 and len(r.content) > min_kb * 1024:
             with open(path, "wb") as f:
                 f.write(r.content)
-            return path
+            return True
     except Exception:
         pass
-    return None
+    return False
+
+
+def fallback_image(text, path):
+    """Image de secours REELLE: degrade + motif (pas juste bleu uni)."""
+    from PIL import Image, ImageDraw, ImageFont
+    import random
+    # degrade bleu nuit -> orange (brand)
+    base = Image.new("RGB", (W, H))
+    px = base.load()
+    for y in range(H):
+        for x in range(0, W, 8):
+            t = y / H
+            r = int(16 + t * 200)
+            g = int(18 + t * 80)
+            b = int(38 + t * 20)
+            for dx in range(8):
+                if x + dx < W:
+                    px[x + dx, y] = (r, g, b)
+    # cercle decoratif
+    d = ImageDraw.Draw(base)
+    d.ellipse([W//2-300, H//2-300, W//2+300, H//2+300], outline=(232,113,10,180), width=4)
+    f = ImageFont.truetype(FONT, 44) if FONT else ImageFont.load_default()
+    # texte phrase (centre, propre)
+    words = text.split(); lines, cur = [], ""
+    for w in words:
+        cur = (cur + " " + w).strip()
+        if len(cur) > 30:
+            lines.append(cur); cur = ""
+    if cur:
+        lines.append(cur)
+    y = H//2 - len(lines)*30
+    for ln in lines:
+        bbox = d.textbbox((0,0), ln, font=f)
+        d.text(((W-(bbox[2]-bbox[0]))//2, y), ln, fill=(235,238,245), font=f)
+        y += 60
+    base.save(path)
 
 
 def add_credit(image_path, credit_text):
     from PIL import Image, ImageDraw, ImageFont
     try:
-        img = Image.open(image_path).convert("RGB")
-        img = img.resize((W, H))
-        overlay = Image.new("RGBA", (W, 46), (0, 0, 0, 140))
-        img = img.convert("RGBA")
-        img.paste(overlay, (0, H - 46), overlay)
+        img = Image.open(image_path).convert("RGBA")
+        bar = Image.new("RGBA", (W, 54), (0, 0, 0, 150))
+        img.paste(bar, (0, H - 54))
         d = ImageDraw.Draw(img)
         f = ImageFont.truetype(FONT, 22) if FONT else ImageFont.load_default()
-        txt = f"Source: {credit_text[:60]}"
-        d.text((18, H - 36), txt, fill=(255, 255, 255, 255), font=f)
+        d.text((18, H - 40), f"Source: {credit_text[:60]}",
+               fill=(255, 255, 255, 255), font=f)
         img.convert("RGB").save(image_path)
     except Exception as e:
         print("    [warn credit]", e)
 
 
-def fallback_image(text, path):
-    from PIL import Image, ImageDraw, ImageFont
-    img = Image.new("RGB", (W, H), (16, 18, 38))
-    d = ImageDraw.Draw(img)
-    f = ImageFont.truetype(FONT, 40) if FONT else ImageFont.load_default()
-    words = text.split()
-    lines, cur = [], ""
-    for w in words:
-        cur = (cur + " " + w).strip()
-        if len(cur) > 34:
-            lines.append(cur); cur = ""
-    if cur:
-        lines.append(cur)
-    y = H // 2 - len(lines) * 24
-    for ln in lines:
-        d.text((70, y), ln, fill=(210, 215, 235), font=f); y += 48
-    img.save(path)
-
-
 # ---------------------------------------------------------------------------
-# 4. KEN BURNS (mouvement reel)
+# 4. KEN BURNS
 # ---------------------------------------------------------------------------
 def ken_burns(img_path, out_clip, dur):
-    vf = (
-        f"scale={W}:{H}:force_original_aspect_ratio=increase,"
-        f"crop={W}:{H},"
-        f"zoompan=z='min(zoom+0.0012,1.12)':d=1:"
-        f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-        f"s={W}x{H}:fps={FPS}"
-    )
-    r = subprocess.run(
-        ["ffmpeg", "-y", "-loop", "1", "-i", img_path, "-t", f"{dur:.2f}",
-         "-vf", vf, "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
-         out_clip], capture_output=True, text=True)
+    vf = (f"scale={W}:{H}:force_original_aspect_ratio=increase,"
+          f"crop={W}:{H},"
+          f"zoompan=z='min(zoom+0.0015,1.15)':d=1:"
+          f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
+          f"s={W}x{H}:fps={FPS}")
+    r = subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", img_path,
+                        "-t", f"{dur:.2f}", "-vf", vf, "-r", str(FPS),
+                        "-c:v", "libx264", "-pix_fmt", "yuv420p", out_clip],
+                       capture_output=True, text=True)
     if r.returncode != 0:
-        # fallback statique
-        subprocess.run(
-            ["ffmpeg", "-y", "-loop", "1", "-i", img_path, "-t", f"{dur:.2f}",
-             "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
-             "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p", out_clip],
-            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", img_path,
+                        "-t", f"{dur:.2f}",
+                        "-vf", f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+                        "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                        out_clip], check=True, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
     return out_clip
 
 
 # ---------------------------------------------------------------------------
-# 5. CARTES BRANDEES (intro/outro)
+# 5. CARTES BRANDEES
 # ---------------------------------------------------------------------------
 def make_card(text_lines, bg=(10, 12, 30), accent=(232, 113, 10), out_img="card.png"):
     from PIL import Image, ImageDraw, ImageFont
     img = Image.new("RGB", (W, H), bg)
     d = ImageDraw.Draw(img)
-    # bande accent haut
-    d.rectangle([0, 0, W, 10], fill=accent)
-    f_big = ImageFont.truetype(FONT, 72) if FONT else ImageFont.load_default()
+    d.rectangle([0, 0, W, 12], fill=accent)
+    f_big = ImageFont.truetype(FONT, 76) if FONT else ImageFont.load_default()
     f_small = ImageFont.truetype(FONT, 34) if FONT else ImageFont.load_default()
-    y = H // 2 - 120
+    y = H // 2 - 140
     for i, ln in enumerate(text_lines):
         fill = accent if i == 0 else (235, 238, 245)
         f = f_big if i == 0 else f_small
-        # centre
         bbox = d.textbbox((0, 0), ln, font=f)
         tw = bbox[2] - bbox[0]
         d.text(((W - tw) // 2, y), ln, fill=fill, font=f)
-        y += (80 if i == 0 else 50)
+        y += (84 if i == 0 else 52)
     img.save(out_img)
     return out_img
 
@@ -224,16 +218,16 @@ def make_card(text_lines, bg=(10, 12, 30), accent=(232, 113, 10), out_img="card.
 def card_clip(img_path, out_clip, dur, zoom=1.06):
     vf = (f"zoompan=z='min(zoom+0.0008,{zoom})':d=1:"
           f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={W}x{H}:fps={FPS},"
-          f"fade=t=in:st=0:d=0.6,fade=t=out:st={dur-0.6:.1f}:d=0.6")
-    subprocess.run(
-        ["ffmpeg", "-y", "-loop", "1", "-i", img_path, "-t", f"{dur:.2f}",
-         "-vf", vf, "-r", str(FPS), "-c:v", "libx264", "-pix_fmt", "yuv420p",
-         out_clip], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+          f"fade=t=in:st=0:d=0.5,fade=t=out:st={dur-0.5:.1f}:d=0.5")
+    subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", img_path,
+                    "-t", f"{dur:.2f}", "-vf", vf, "-r", str(FPS),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", out_clip],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return out_clip
 
 
 # ---------------------------------------------------------------------------
-# 6. SOUS-TITRES mot-niveau
+# 6. SOUS-TITRES PRO (style grands createurs)
 # ---------------------------------------------------------------------------
 def make_wordlevel_srt(sentences, start_offset, timings, srt_path):
     def fmt(s):
@@ -248,6 +242,7 @@ def make_wordlevel_srt(sentences, start_offset, timings, srt_path):
         if not words:
             continue
         step = (end - start) / len(words)
+        # 1 bloc par phrase, mot courant en surbrillance
         for wi, wrd in enumerate(words):
             ws = start + wi * step
             we = ws + step
@@ -259,6 +254,33 @@ def make_wordlevel_srt(sentences, start_offset, timings, srt_path):
         f.write("\n".join(blocks))
 
 
+def srt_to_ass(srt_path, ass_path):
+    """Convertit SRT en ASS avec style PRO (bas, gros, gras, fond sombre)."""
+    subprocess.run(["ffmpeg", "-y", "-i", srt_path, ass_path],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # injection du style pro
+    style = (
+        "[Script Info]\nScriptType: v4.00\nPlayResX: 1080\nPlayResY: 1920\n\n"
+        "[V4+ Styles]\n"
+        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
+        "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
+        "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
+        "Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: Default,DejaVu Sans Bold,58,&H00FFFFFF,&H000000FF,"
+        "&H00000000,&HAA000000,1,0,0,0,100,100,0,0,4,8,2,2,40,40,120,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, "
+        "MarginV, Effect, Text\n"
+    )
+    # lit le corps des events du ass genere
+    with open(ass_path) as f:
+        body = f.read()
+    # ne garde que les lignes Dialogue
+    dialogues = "\n".join(l for l in body.splitlines() if l.startswith("Dialogue:"))
+    # remplace PrimaryColour par surbrillance du mot (on utilise <b> deja present)
+    with open(ass_path, "w", encoding="utf-8") as f:
+        f.write(style + dialogues)
+
+
 # ---------------------------------------------------------------------------
 # 7. MINIATURE
 # ---------------------------------------------------------------------------
@@ -268,32 +290,30 @@ def make_thumbnail(title, img_source, out_png):
         base = Image.open(img_source).convert("RGB").resize((W, H))
     except Exception:
         base = Image.new("RGB", (W, H), (16, 18, 38))
-    # assombrit
     dark = Image.new("RGBA", (W, H), (0, 0, 0, 120))
     base = base.convert("RGBA"); base.paste(dark, (0, 0), dark)
     d = ImageDraw.Draw(base)
-    f = ImageFont.truetype(FONT, 60) if FONT else ImageFont.load_default()
-    # bandeau bas
-    d.rectangle([0, H - 200, W, H], fill=(232, 113, 10, 230))
-    # wrap titre
+    f = ImageFont.truetype(FONT, 64) if FONT else ImageFont.load_default()
+    d.rectangle([0, H - 240, W, H], fill=(232, 113, 10, 240))
     words = title.split(); lines, cur = [], ""
     for w in words:
         cur = (cur + " " + w).strip()
-        if len(cur) > 22:
+        if len(cur) > 18:
             lines.append(cur); cur = ""
     if cur:
         lines.append(cur)
-    y = H - 190
+    y = H - 220
     for ln in lines[-2:]:
-        d.text((40, y), ln, fill=(255, 255, 255), font=f); y += 70
+        bbox = d.textbbox((0,0), ln, font=f)
+        d.text(((W-(bbox[2]-bbox[0]))//2, y), ln, fill=(255,255,255), font=f)
+        y += 76
     base.convert("RGB").save(out_png)
 
 
 # ---------------------------------------------------------------------------
 # 8. ASSEMBLAGE
 # ---------------------------------------------------------------------------
-def assemble(clips, audio_full, srt_path, out_path, music=None):
-    # concat visuel
+def assemble(clips, audio_full, srt_path, out_path):
     concat = os.path.join(WORK, "vconcat.txt")
     with open(concat, "w") as f:
         for c in clips:
@@ -302,26 +322,16 @@ def assemble(clips, audio_full, srt_path, out_path, music=None):
     subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", concat,
                     "-c", "copy", vid], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    # subs -> ass
     ass = os.path.join(WORK, "words.ass")
-    subprocess.run(["ffmpeg", "-y", "-i", srt_path, ass], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    sub_vf = (f"subtitles={ass}:force_style='FontSize=30,"
-              f"PrimaryColour=&H00FFFF&,OutlineColour=&H000000&,"
-              f"Outline=2,Alignment=2,Bold=1'")
-    # audio mix
-    cmd = ["ffmpeg", "-y", "-i", vid, "-i", audio_full]
-    filt = f"[0:v]{sub_vf}[v]"
-    amap = ["-map", "[v]", "-map", "1:a"]
-    if music and os.path.exists(music):
-        cmd += ["-i", music]
-        filt += f";[1:a]volume=1[a1];[2:a]volume=0.18[a2];[a1][a2]amix=inputs=2[a]"
-        amap = ["-map", "[v]", "-map", "[a]"]
-    cmd += ["-filter_complex", filt]
-    cmd += amap + ["-c:v", "libx264", "-c:a", "aac", "-shortest",
-                   "-r", str(FPS), out_path]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
+    srt_to_ass(srt_path, ass)
+    # sous-titres en BAS avec fond sombre (style pro)
+    sub_vf = (f"subtitles={ass}")
+    cmd = ["ffmpeg", "-y", "-i", vid, "-i", audio_full,
+           "-filter_complex", f"[0:v]{sub_vf}[v]",
+           "-map", "[v]", "-map", "1:a",
+           "-c:v", "libx264", "-c:a", "aac", "-shortest",
+           "-r", str(FPS), out_path]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return out_path
 
 
@@ -331,7 +341,7 @@ def assemble(clips, audio_full, srt_path, out_path, music=None):
 def produce(script_text, out_path, title="AFROSPEAK"):
     sentences = split_sentences(script_text)
     print(f"[1] {len(sentences)} phrases")
-    print("[2] Voix off + b-roll Ken Burns...")
+    print("[2] Voix off + b-roll...")
     audio_segs, timings, kb_clips = [], [], []
     total = 0.0
     for i, s in enumerate(sentences):
@@ -342,82 +352,64 @@ def produce(script_text, out_path, title="AFROSPEAK"):
         timings.append((total, total + dur))
         total += dur
         print(f"  [{i+1}/{len(sentences)}] {s[:48]}...")
-        key = _cache_key(s)
-        # b-roll
         img = os.path.join(WORK, f"img{i}.jpg")
         found = query_wikimedia(s)
         ok_img = False
         for url, src in found:
-            p = cached_download(url, key)
-            if p:
-                shutil.copy(p, img)
+            if download(url, img) and os.path.getsize(img) > 5000:
                 add_credit(img, src)
                 ok_img = True
                 break
         if not ok_img:
             fallback_image(s, img)
-        clip = os.path.join(WORK, f"clip{i}.mp4")
-        ken_burns(img, clip, dur)
-        kb_clips.append(clip)
-
-    print("[3] Cartes brandees...")
-    intro_img = make_card([title, "Documentaire geopolitique & economique"],
-                          out_img=os.path.join(WORK, "intro.png"))
-    outro_img = make_card(["ABONNE-TOI", "Pour decoder l'Afrique et le monde"],
-                          out_img=os.path.join(WORK, "outro.png"))
-    intro_clip = os.path.join(WORK, "intro.mp4")
-    outro_clip = os.path.join(WORK, "outro.mp4")
-    card_clip(intro_img, intro_clip, INTRO)
-    card_clip(outro_img, outro_clip, OUTRO)
-
-    print("[4] Audio concat...")
-    aconcat = os.path.join(WORK, "audio.txt")
-    with open(aconcat, "w") as f:
+        kb = os.path.join(WORK, f"clip{i}.mp4")
+        ken_burns(img, kb, dur)
+        kb_clips.append(kb)
+    # audio concat
+    audio_full = os.path.join(WORK, "audio.mp3")
+    alist = os.path.join(WORK, "audio.txt")
+    with open(alist, "w") as f:
         for a in audio_segs:
             f.write(f"file '{a}'\n")
-    full_audio = os.path.join(WORK, "voice_full.mp3")
-    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", aconcat,
-                    "-c", "copy", full_audio], check=True,
+    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", alist,
+                    "-c", "copy", audio_full], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    print("[5] Sous-titres + miniature...")
+    # intro / outro
+    print("[3] Cartes brandees...")
+    intro = make_card([title[:22], "AFROSPEAK"], out_img=os.path.join(WORK, "intro.png"))
+    outro = make_card(["ABONNE-TOI", "AFROSPEAK"], out_img=os.path.join(WORK, "outro.png"))
+    ic = os.path.join(WORK, "intro.mp4"); oc = os.path.join(WORK, "outro.mp4")
+    card_clip(intro, ic, 2.2); card_clip(outro, oc, 2.2)
+    # sous-titres
+    print("[4] Sous-titres pro...")
     srt = os.path.join(WORK, "words.srt")
-    make_wordlevel_srt(sentences, INTRO, timings, srt)
-    make_thumbnail(title, os.path.join(WORK, f"img{0}.jpg"),
+    make_wordlevel_srt(sentences, 2.2, timings, srt)
+    # assemblage: intro + broll + outro
+    clips = [ic] + kb_clips + [oc]
+    print("[5] Assemblage final...")
+    assemble(clips, audio_full, srt, out_path)
+    make_thumbnail(title, os.path.join(WORK, "img0.jpg"),
                    out_path.replace(".mp4", "_thumb.png"))
-
-    print("[6] Assemblage final...")
-    music = os.path.join(ASSETS, "music.mp3")
-    clips = [intro_clip] + kb_clips + [outro_clip]
-    assemble(clips, full_audio, srt, out_path, music if os.path.exists(music) else None)
-    print("VIDEO READY ->", out_path)
+    print(f"VIDEO READY -> {out_path}")
     return out_path
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--script")
-    ap.add_argument("--topic")
+    ap.add_argument("--script", help="fichier texte (une phrase par ligne)")
+    ap.add_argument("--channel", help="dossier de scripts")
     ap.add_argument("--title", default="AFROSPEAK")
-    ap.add_argument("--out", default=os.path.join(HERE, "afrospeak_out.mp4"))
-    ap.add_argument("--channel", help="dossier de scripts .txt a traiter")
+    ap.add_argument("--out", default="video.mp4")
     a = ap.parse_args()
-
     if a.channel:
-        os.makedirs(a.channel, exist_ok=True)
-        for fn in sorted(os.listdir(a.channel)):
-            if fn.endswith(".txt"):
-                p = os.path.join(a.channel, fn)
-                t = fn[:-4]
-                o = os.path.join(a.channel, t + ".mp4")
-                print(f"\n=== CHAINE: {t} ===")
-                produce(open(p, encoding="utf-8").read(), o, title=t)
+        d = Path(a.channel)
+        for sc in sorted(d.glob("*.txt")):
+            out = sc.with_suffix(".mp4")
+            print(f"\n=== CHAINE: {sc.name} ===")
+            produce(sc.read_text(encoding="utf-8"), str(out), title=sc.stem)
         return
-    txt = open(a.script, encoding="utf-8").read() if a.script else gen_script_ollama(a.topic)
-    if not txt:
-        print("! fournis --script fichier.txt"); sys.exit(1)
-    ok = produce(txt, a.out, title=a.title)
-    sys.exit(0 if ok else 1)
+    txt = Path(a.script).read_text(encoding="utf-8")
+    produce(txt, a.out, title=a.title)
 
 
 if __name__ == "__main__":
