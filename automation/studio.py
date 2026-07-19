@@ -390,6 +390,11 @@ def produce(script_text, out_path, title="AFROSPEAK"):
     assemble(clips, audio_full, srt, out_path)
     make_thumbnail(title, os.path.join(WORK, "img0.jpg"),
                    out_path.replace(".mp4", "_thumb.png"))
+    # copie le SRT final a cote de la video (pour evaluation)
+    import shutil as _sh
+    srt_final = out_path.replace(".mp4", ".srt")
+    if os.path.exists(srt):
+        _sh.copy(srt, srt_final)
     print(f"VIDEO READY -> {out_path}")
     return out_path
 
