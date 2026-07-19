@@ -173,83 +173,85 @@ def produce(script_text, out_path, title="AFROSPEAK"):
         audio_segs.append(mp3)
         timings.append((total, total + dur))
         total += dur
-        print(f"  [{i+1}] {s[:45]}...")
         clip = WORK / f"clip{i}.mp4"
-        if has_number(s) and extract_number(s):
-            # ANIMATION pour les chiffres
-            nums = [int(x.replace(" ", "")) for x in re.findall(r"\d[\d ]*", s) if x.strip()]
-            nums = [n for n in nums if n < 10**12]  # filtre les années < 10M
-            if len(nums) >= 2:
-                # BAR CHART comparatif
+        nums = [int(x.replace(" ", "")) for x in re.findall(r"\d[\d ]*", s) if x.strip()]
+        nums = [n for n in nums if n < 10**12]  # filtre années < 10M
+        has_ace = any(k in s.lower() for k in
+                          ["verite", "decouverte", "secret", "revelation",
+                           "mystere", "choquant", "insolite", "urgent",
+                           "alerte", "enfin", "voici", "cest"])
+        if has_ace:
+            # TEXTE CARD rare (mot-ace percutant)
+            card = WORK / f"card{i}.mp4"
+            anim.make_text_card(s[:30].upper(), s[:50], str(card), dur=min(int(dur)+1, 4))
+            print(f"      -> text card")
+            clip = card
+        elif len(nums) >= 1:
+            # COUNTER court (2-3s max, pas bar chart sauf >=3 chiffres)
+            if len(nums) >= 3:
                 labels = re.findall(r"([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\-]+)", s)
-                data = {labels[i] if i < len(labels) else f"v{i+1}": nums[i] for i in range(min(len(nums), len(labels)))}
+                data = {labels[i] if i < len(labels) else f"v{i+1}": nums[i]
+                         for i in range(min(len(nums), len(labels)))}
                 if not data:
                     data = {f"v{i+1}": n for i, n in enumerate(nums[:5])}
-                anim.make_bar_chart(data, str(clip), dur=int(dur)+1)
+                anim.make_bar_chart(data, str(clip), dur=min(int(dur)+1, 5))
                 print(f"      -> bar chart ({len(nums)} chiffres)")
             else:
-                val = nums[0] if nums else extract_number(s)
-                anim.make_counter(val, s[:40], str(clip), dur=int(dur)+1)
-                print(f"      -> animation counter ({val})")
+                anim.make_counter(nums[0], s[:40], str(clip), dur=min(int(dur)+1, 3))
+                print(f"      -> counter ({nums[0]})")
         else:
-            # TEXTE CARD si mot-clé d'accent percutant
-            accents = ["verite", "decouverte", "secret", "revelation",
-                       "mystere", "choquant", "insolite", " urgent",
-                       "alerte", "enfin", "voici", "cest"]
-            if any(k in s.lower() for k in accents):
-                card = WORK / f"card{i}.mp4"
-                anim.make_text_card(s[:30].upper(), s[:50], str(card), dur=int(dur)+1)
-                print(f"      -> text card")
-                clip = card
+            # B-ROLL par defaut (style createur: 90% b-roll)
+            br = WORK / f"br{i}.mp4"
+            label = broll.get_broll(s, br, dur=int(dur)+1)
+            if label and br.exists():
+                print(f"      -> b-roll: {label}")
+                clip = br
             else:
-                # B-ROLL: Pexels video (priorité) OU Wikimedia image/video
-                br = WORK / f"br{i}.mp4"
-                label = broll.get_broll(s, br, dur=int(dur)+1)
-                if label and br.exists():
-                    print(f"      -> b-roll: {label}")
-                    clip = br
+                img_clip = WORK / f"img{i}.mp4"
+                found = broll.download_wikimedia_still(s, img_clip, dur=int(dur)+1)
+                if found:
+                    print(f"      -> image Wikimedia")
+                    clip = img_clip
                 else:
-                    # fallback OBLIGATOIRE: image Wikimedia reelle (jamais bleu uni)
-                    img_clip = WORK / f"img{i}.mp4"
-                    found = broll.download_wikimedia_still(s, img_clip, dur=int(dur)+1)
-                    if found:
-                        print(f"      -> image Wikimedia")
-                        clip = img_clip
-                    else:
-                        # dernier recours: image degrade + texte
-                        img = WORK / f"img{i}.jpg"
-                        img.parent.mkdir(parents=True, exist_ok=True)
-                        from PIL import Image, ImageDraw, ImageFont
-                        im = Image.new("RGB", (W, H))
-                        px = im.load()
-                        for y in range(H):
-                            for x in range(0, W, 8):
-                                t = y / H
-                                r = int(16 + t * 200); g = int(18 + t * 80); b = int(38 + t * 20)
-                                for dx in range(8):
-                                    if x + dx < W:
-                                        px[x + dx, y] = (r, g, b)
-                        d = ImageDraw.Draw(im)
-                        d.ellipse([W//2-300, H//2-300, W//2+300, H//2+300], outline=(232,113,10,180), width=4)
-                        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
-                        words = s.split(); lines, cur = [], ""
-                        for w in words:
-                            cur = (cur + " " + w).strip()
-                            if len(cur) > 30:
-                                lines.append(cur); cur = ""
-                        if cur: lines.append(cur)
-                        y = H//2 - len(lines)*30
-                        for ln in lines:
-                            bbox = d.textbbox((0,0), ln, font=f)
-                            d.text(((W-(bbox[2]-bbox[0]))//2, y), ln, fill=(235,238,245), font=f)
-                            y += 60
-                        im.save(img)
-                        subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", str(img),
-                                        "-t", str(dur), "-vf",
-                                        f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
-                                        "-r", str(FPS), "-c:v", "libx264",
-                                        "-pix_fmt", "yuv420p", str(clip)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                        print(f"      -> fallback image")
+                    # dernier recours: image degrade + texte
+                    img = WORK / f"img{i}.jpg"
+                    img.parent.mkdir(parents=True, exist_ok=True)
+                    from PIL import Image, ImageDraw, ImageFont
+                    im = Image.new("RGB", (W, H))
+                    px = im.load()
+                    for y in range(H):
+                        for x in range(0, W, 8):
+                            t = y / H
+                            r = int(16 + t * 200); g = int(18 + t * 80); b = int(38 + t * 20)
+                            for dx in range(8):
+                                if x + dx < W:
+                                    px[x + dx, y] = (r, g, b)
+                    d = ImageDraw.Draw(im)
+                    d.ellipse([W//2-300, H//2-300, W//2+300, H//2+300],
+                               outline=(232,113,10,180), width=4)
+                    f = ImageFont.truetype(
+                        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+                    words = s.split(); lines, cur = [], ""
+                    for w in words:
+                        cur = (cur + " " + w).strip()
+                        if len(cur) > 30:
+                            lines.append(cur); cur = ""
+                    if cur: lines.append(cur)
+                    y = H//2 - len(lines)*30
+                    for ln in lines:
+                        bbox = d.textbbox((0,0), ln, font=f)
+                        d.text(((W-(bbox[2]-bbox[0]))//2, y), ln,
+                               fill=(235,238,245), font=f)
+                        y += 60
+                    im.save(img)
+                    subprocess.run(["ffmpeg", "-y", "-loop", "1", "-i", str(img),
+                                    "-t", str(dur), "-vf",
+                                    f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H}",
+                                    "-r", str(FPS), "-c:v", "libx264",
+                                    "-pix_fmt", "yuv420p", str(clip)],
+                                   check=True, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL)
+                    print(f"      -> fallback image")
         clips.append(clip)
     # audio concat
     audio_full = WORK / "audio.mp3"
