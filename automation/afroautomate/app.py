@@ -21,8 +21,8 @@ from urllib.parse import urlparse, parse_qs
 
 HERE = Path(__file__).parent
 STUDIO = HERE.parent / "studio.py"
-# utiliser le venv qui a edge_ttts/pillow/requests
-VENV_PY = HERE.parent.parent.parent / ".hermes" / "venv" / "bin" / "python"
+# utiliser le venv qui a edge_tts/pillow/requests
+VENV_PY = Path.home() / ".hermes" / "venv" / "bin" / "python"
 if not VENV_PY.exists():
     VENV_PY = Path(sys.executable)
 OUTPUT_DIR = HERE / "generated"

@@ -20,6 +20,11 @@ SCRIPTS_DIR.mkdir(exist_ok=True)
 RESULTS_JSON = HERE / "results.json"
 RESULTS_LOG = HERE / "results.log"
 
+# venv avec edge_tts/pillow/requests
+VENV_PY = Path.home() / ".hermes" / "venv" / "bin" / "python"
+if not VENV_PY.exists():
+    VENV_PY = Path(sys.executable)
+
 SEEDS = [
     "afrique economie", "afrique dette", "diaspora africaine",
     "franc CFA 2026", "chine afrique", "intelligence artificielle afrique",
@@ -99,7 +104,7 @@ def iterate():
     script_path.write_text(script, encoding="utf-8")
     out = SCRIPTS_DIR / f"{stamp}.mp4"
     r = subprocess.run(
-        [sys.executable, str(HERE / "studio.py"),
+        [str(VENV_PY), str(HERE / "studio.py"),
          "--script", str(script_path), "--title", topic[:40],
          "--out", str(out)], capture_output=True, text=True)
     if out.exists():
