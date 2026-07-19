@@ -44,7 +44,7 @@ from matplotlib.animation import FuncAnimation
 # --------------------------------------------------------------------------
 W, H, FPS = 1080, 1920, 30
 FIGSIZE = (W / 100.0, H / 100.0)      # inches -> 1080x1920 at 100 dpi
-DPI = 100
+DPI = 50                               # rendu a 50 dpi (2x plus rapide), upscale ffmpeg
 
 BG_DARK = "#0f1226"
 BG_TOP = np.array([0.094, 0.110, 0.215])    # a touch lighter (top)
@@ -204,8 +204,15 @@ def make_counter(value, label, out, dur=5):
 
     ani = FuncAnimation(fig, upd, frames=frames, blit=True,
                         interval=1000.0 / FPS)
-    ani.save(out, writer="ffmpeg", fps=FPS, dpi=DPI)
+    tmp = out + ".low.mp4"
+    ani.save(tmp, writer="ffmpeg", fps=FPS, dpi=DPI)
     plt.close(fig)
+    import subprocess
+    subprocess.run(["ffmpeg", "-y", "-i", tmp, "-vf",
+                    f"scale={W}:{H}:flags=lanczos", "-c:v", "libx264",
+                    "-pix_fmt", "yuv420p", str(out)],
+                   capture_output=True, text=True, timeout=120)
+    Path(tmp).unlink(missing_ok=True)
     return Path(out).exists()
 
 
@@ -301,8 +308,15 @@ def make_bar_chart(data_dict, out, dur=6):
 
     ani = FuncAnimation(fig, upd, frames=frames, blit=True,
                         interval=1000.0 / FPS)
-    ani.save(out, writer="ffmpeg", fps=FPS, dpi=DPI)
+    tmp = out + ".low.mp4"
+    ani.save(tmp, writer="ffmpeg", fps=FPS, dpi=DPI)
     plt.close(fig)
+    import subprocess
+    subprocess.run(["ffmpeg", "-y", "-i", tmp, "-vf",
+                    f"scale={W}:{H}:flags=lanczos", "-c:v", "libx264",
+                    "-pix_fmt", "yuv420p", str(out)],
+                   capture_output=True, text=True, timeout=120)
+    Path(tmp).unlink(missing_ok=True)
     return Path(out).exists()
 
 
