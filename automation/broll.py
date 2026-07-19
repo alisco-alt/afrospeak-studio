@@ -125,6 +125,43 @@ def download_wikimedia_video(query, out_path, dur=8):
 
 
 # ---------------------------------------------------------------------------
+# 3b. INTERNET ARCHIVE (lien direct, API stable, pas de search lente)
+# ---------------------------------------------------------------------------
+def download_archive_video(query, out_path, dur=8):
+    """Recherche + download direct depuis Internet Archive (libre de droits)."""
+    import requests
+    try:
+        u = "https://archive.org/advancedsearch.php"
+        p = {"q": query, "fl[]": "identifier", "rows": "5", "output": "json"}
+        d = requests.get(u, params=p, timeout=20,
+                         headers={"User-Agent": "AfroSpeak/5.0"}).json()
+        for doc in d.get("response", {}).get("docs", []):
+            ident = doc.get("identifier")
+            if not ident:
+                continue
+            m = requests.get(f"https://archive.org/metadata/{ident}",
+                             timeout=15).json()
+            mp4 = [f for f in m.get("files", [])
+                   if f.get("name", "").endswith(".mp4")
+                   and f.get("format") in ("h.264", "MPEG4", "mp4")]
+            if not mp4:
+                mp4 = [f for f in m.get("files", [])
+                       if f.get("name", "").endswith(".mp4")]
+            if not mp4:
+                continue
+            dl = "https://archive.org/download/" + ident + "/" + mp4[0]["name"]
+            tmp = out_path.with_suffix(".ia.mp4")
+            if _run(["ffmpeg", "-y", "-i", dl, "-t", str(dur),
+                     "-c", "copy", str(tmp)]):
+                transform(tmp, out_path, dur, f"Source: Internet Archive/{ident[:25]}")
+                tmp.unlink(missing_ok=True)
+                return True
+    except Exception as e:
+        print(f"    [archive warn] {e}")
+    return False
+
+
+# ---------------------------------------------------------------------------
 # API PRINCIPALE
 # ---------------------------------------------------------------------------
 # mapping FR->EN pour recherche YouTube (archives majoritairement anglaises)
@@ -165,13 +202,13 @@ def get_broll(phrase, out_path, dur=8):
         if q in tried:
             continue
         tried.add(q)
-        urls = search_youtube(q, max_results=3)
-        for url, title in urls:
-            if download_clip(url, out_path, dur):
-                return f"Source: {title[:50]}"
-    # 2. Wikimedia video (sur 1er mot-cle)
-    if kws and download_wikimedia_video(kws[0], out_path, dur):
-        return f"Source: Wikimedia/{kws[0][:30]}"
+        # 1. Internet Archive (libre de droits, API stable)
+        if download_archive_video(q, out_path, dur):
+            return f"Source: Internet Archive/{q[:25]}"
+        # 2. Wikimedia video (sur 1er mot-cle)
+        if download_wikimedia_video(q, out_path, dur):
+            return f"Source: Wikimedia/{q[:30]}"
+    # yt-dlp desactive temporairement (timeout 60s sur WSL instable)
     return None
 
 
