@@ -33,10 +33,15 @@ def split_sentences(text):
 
 
 def tts_sentence(text, out_mp3):
-    import asyncio, edge_tts
-    async def run():
-        await edge_tts.Communicate(text, "fr-FR-DeniseNeural").save(out_mp3)
-    asyncio.new_event_loop().run_until_complete(run())
+    import asyncio
+    # utilise le venv qui a edge_tts
+    r = subprocess.run([str(VENV_PY), "-c",
+                        f"import asyncio,edge_tts;"
+                        f"asyncio.new_event_loop().run_until_complete("
+                        f"edge_tts.Communicate({text!r},'fr-FR-DeniseNeural').save({str(out_mp3)!r}))"],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr[-300:])
 
 
 def audio_duration(mp3):

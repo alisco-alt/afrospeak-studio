@@ -31,14 +31,14 @@ def _run(cmd):
 # ---------------------------------------------------------------------------
 # 1. YT-DLP (archives video)
 # ---------------------------------------------------------------------------
-def search_youtube(query, max_results=5):
+def search_youtube(query, max_results=3):
     """Retourne liste d'URLs video pertinantes (sans telecharger)."""
     try:
         out = subprocess.run(
             [str(VENV_PY), "-m", "yt_dlp", "--no-warnings",
              "--dump-json", "--no-playlist",
              f"ytsearch{max_results}:{query}"],
-            capture_output=True, text=True, timeout=180).stdout
+            capture_output=True, text=True, timeout=60).stdout
         urls = []
         for line in out.strip().splitlines():
             line = line.strip()
