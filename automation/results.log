@@ -142,3 +142,9 @@
 [2026-07-19 14:19:24]   [trend warn] Expecting value: line 1 column 1 (char 0)
 [2026-07-19 14:19:24] Sujet: chine afrique explique en 2026
 [2026-07-19 14:19:24]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_141924.txt'
+[2026-07-19 14:24:36]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 14:24:36] Sujet: diaspora africaine explique en 2026
+[2026-07-19 14:24:36]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_142436.txt'
+[2026-07-19 14:29:06]   [trend warn] Expecting value: line 1 column 1 (char 0)
+[2026-07-19 14:29:06] Sujet: intelligence artificielle afrique explique en 2026
+[2026-07-19 14:29:06]   EXC: [Errno 2] No such file or directory: '/home/alisco/afrospeak-studio/automation/scripts_autogen/20260719_142906.txt'

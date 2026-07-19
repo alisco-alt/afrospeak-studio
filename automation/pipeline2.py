@@ -146,6 +146,7 @@ def produce(script_text, out_path, title="AFROSPEAK"):
                 else:
                     # dernier recours: image degrade + texte (jamais bleu uni)
                     img = WORK / f"img{i}.jpg"
+                    img.parent.mkdir(parents=True, exist_ok=True)
                     from PIL import Image, ImageDraw, ImageFont
                     im = Image.new("RGB", (W, H))
                     px = im.load()

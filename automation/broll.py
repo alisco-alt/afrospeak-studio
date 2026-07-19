@@ -267,13 +267,13 @@ def get_broll(phrase, out_path, dur=8):
         tried.add(q)
         # 1. Internet Archive video (libre de droits, API stable)
         if download_archive_video(q, out_path, dur):
-            return f"Source - Internet Archive/{q[:25]}"
+            return "Source - Internet Archive"
         # 2. Wikimedia VIDEO (si dispo)
         if download_wikimedia_video(q, out_path, dur):
-            return f"Source - Wikimedia/{q[:30]}"
+            return "Source - Wikimedia"
         # 3. Wikimedia IMAGE (reelle, marche sans cle)
         if download_wikimedia_still(q, out_path, dur):
-            return f"Source - Wikimedia/{q[:30]}"
+            return "Source - Wikimedia"
     # yt-dlp desactive temporairement (timeout 60s sur WSL instable)
     return None
 
