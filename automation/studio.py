@@ -383,7 +383,7 @@ def produce(script_text, out_path, title="AFROSPEAK"):
     print("[5] Sous-titres + miniature...")
     srt = os.path.join(WORK, "words.srt")
     make_wordlevel_srt(sentences, INTRO, timings, srt)
-    make_thumbnail(title, kb_clips[0].replace(".mp4", ".jpg").replace("clip", "img"),
+    make_thumbnail(title, os.path.join(WORK, f"img{0}.jpg"),
                    out_path.replace(".mp4", "_thumb.png"))
 
     print("[6] Assemblage final...")
