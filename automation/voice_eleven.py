@@ -31,29 +31,38 @@ def clone(ref_audio, text, out_path):
     if not key:
         raise RuntimeError("Cle ElevenLabs manquante (~/.hermes/eleven_key)")
     import requests
-    # 1. cree un voice clone a partir de reference.wav
-    headers = {"xi-api-key": key}
-    with open(ref_audio, "rb") as f:
-        r = requests.post("https://api.elevenlabs.io/v1/voices/add",
-                         headers=headers,
-                         data={"name": "AfroSpeakOwner"},
-                         files={"files": f}, timeout=120)
-    if r.status_code not in (200, 201):
-        raise RuntimeError(f"Echec clone voice: {r.status_code} {r.text[:200]}")
-    vid = r.json()["voice_id"]
-    # 2. genere l'audio
+    headers = {"xi-api-key": key, "Content-Type": "application/json"}
+    # 1. tente le clonage (compte paid uniquement)
+    try:
+        with open(ref_audio, "rb") as f:
+            r = requests.post("https://api.elevenlabs.io/v1/voices/add",
+                             headers={"xi-api-key": key},
+                             data={"name": "AfroSpeakOwner"},
+                             files={"files": f}, timeout=120)
+        if r.status_code in (200, 201):
+            vid = r.json()["voice_id"]
+            print("  [eleven] voix clonee OK")
+        else:
+            raise RuntimeError(f"clone {r.status_code}")
+    except Exception:
+        # 2. fallback voix predefinie (free tier OK, licence commerciale)
+        vl = requests.get("https://api.elevenlabs.io/v1/voices",
+                         headers=headers, timeout=30)
+        vid = vl.json()["voices"][0]["voice_id"]
+        print("  [eleven] clone bloque (free tier) -> voix predefinie")
+    # genere l'audio
     r2 = requests.post(
         f"https://api.elevenlabs.io/v1/text-to-speech/{vid}",
-        headers={**headers, "Content-Type": "application/json"},
+        headers=headers,
         json={"text": text, "model_id": "eleven_multilingual_v2",
               "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}},
         timeout=120)
     if r2.status_code != 200:
-        raise RuntimeError(f"Echec TTS: {r2.status_code} {r2.text[:200]}")
+        raise RuntimeError(f"TTS: {r2.status_code} {r2.text[:200]}")
     Path(out_path).write_bytes(r2.content)
-    # 3. supprime le voice clone (pas de stockage inutile)
-    requests.delete(f"https://api.elevenlabs.io/v1/voices/{vid}",
-                   headers=headers, timeout=30)
+    if "AfroSpeakOwner" in str(vid):
+        requests.delete(f"https://api.elevenlabs.io/v1/voices/{vid}",
+                       headers=headers, timeout=30)
     return Path(out_path).exists()
 
 

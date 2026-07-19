@@ -36,38 +36,23 @@ VENV311_PY = Path.home() / ".hermes" / "venv311" / "bin" / "python"
 VOICE_REF = Path.home() / ".hermes" / "voice_ref" / "reference.wav"
 
 
-def tts_voice_clone(text, out_wav):
-    """Voix clonee (XTTS) si modele + reference dispo. Priority absolue."""
-    if not VOICE_REF.exists():
-        return False
-    if not VENV311_PY.exists():
+def tts_eleven(text, out_mp3):
+    """Voix ElevenLabs (qualité studio, licence commerciale).
+    Priorité absolue. Clonage si compte paid, sinon voix prédéfinie."""
+    key = Path.home() / ".hermes" / "eleven_key"
+    if not key.exists():
         return False
     try:
-        import importlib.util
-        # verifie TTS installé dans venv311
-        r = subprocess.run([str(VENV311_PY), "-c", "import TTS"],
-                           capture_output=True, text=True, timeout=20)
+        r = subprocess.run([str(VENV_PY), str(HERE / "voice_eleven.py"),
+                            "--ref", str(VOICE_REF), "--text", text,
+                            "--out", str(out_mp3)],
+                           capture_output=True, text=True, timeout=180)
         if r.returncode != 0:
+            print("    [eleven warn]", r.stderr[-150:])
             return False
-        script = (
-            "import torch\n"
-            "from TTS.api import TTS\n"
-            f"tts = TTS(model_name='tts_models/multilingual/multi-dataset/xtts_v2', progress_bar=False)\n"
-            f"tts.tts_to_file(text={text!r}, speaker_wav={str(VOICE_REF)!r}, "
-            f"language='fr', file_path={str(out_wav)!r})\n"
-        )
-        r2 = subprocess.run([str(VENV311_PY), "-c", script],
-                            capture_output=True, text=True, timeout=300)
-        if r2.returncode != 0:
-            print("    [xtts warn]", r2.stderr[-200:])
-            return False
-        # convertit wav -> mp3 (pour ffmpeg pipeline)
-        subprocess.run(["ffmpeg", "-y", "-i", str(out_wav),
-                        str(out_wav.with_suffix(".mp3"))],
-                       capture_output=True, text=True, timeout=60)
-        return Path(str(out_wav) + ".mp3").exists()
+        return Path(out_mp3).exists()
     except Exception as e:
-        print(f"    [xtts err] {e}")
+        print(f"    [eleven err] {e}")
         return False
 
 
@@ -75,14 +60,10 @@ def tts_sentence(text, out_mp3):
     import asyncio
     out_mp3 = Path(out_mp3)
     out_mp3.parent.mkdir(parents=True, exist_ok=True)
-    # 1. Voix clonee (XTTS) - priorite
-    wav = out_mp3.with_suffix(".cloned.wav")
-    if tts_voice_clone(text, wav):
-        cloned_mp3 = str(wav) + ".mp3"
-        if Path(cloned_mp3).exists():
-            Path(cloned_mp3).replace(out_mp3)
-            return
-    # 2. Fallback edge-tts (voix robotique mais marche)
+    # 1. Voix ElevenLabs (studio, commercial) - priorité
+    if tts_eleven(text, out_mp3):
+        return
+    # 2. Fallback edge-tts (robotique mais marche)
     r = subprocess.run([str(VENV_PY), "-c",
                         f"import asyncio,edge_tts;"
                         f"asyncio.new_event_loop().run_until_complete("
