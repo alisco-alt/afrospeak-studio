@@ -156,7 +156,19 @@ def produce(script_text, out_path, title="AFROSPEAK"):
     total = 0.0
     for i, s in enumerate(sentences):
         mp3 = WORK / f"v{i}.mp3"
-        tts_sentence(s, str(mp3))
+        # detecte text card (mot-ace) -> silence au lieu de voix
+        accents = ["verite", "decouverte", "secret", "revelation",
+                   "mystere", "choquant", "insolite", "urgent",
+                   "alerte", "enfin", "voici", "cest"]
+        is_card = any(k in s.lower() for k in accents)
+        if is_card:
+            # silence de ~3s (duree de la card)
+            subprocess.run(["ffmpeg", "-y", "-f", "lavfi",
+                            "-i", "anullsrc=r=44100:cl=1",
+                            "-t", "3", "-q:a", "0", str(mp3)],
+                           capture_output=True, text=True)
+        else:
+            tts_sentence(s, str(mp3))
         dur = audio_duration(str(mp3))
         audio_segs.append(mp3)
         timings.append((total, total + dur))
