@@ -45,11 +45,19 @@ def clone(ref_audio, text, out_path):
         else:
             raise RuntimeError(f"clone {r.status_code}")
     except Exception:
-        # 2. fallback voix predefinie (free tier OK, licence commerciale)
-        vl = requests.get("https://api.elevenlabs.io/v1/voices",
-                         headers=headers, timeout=30)
-        vid = vl.json()["voices"][0]["voice_id"]
-        print("  [eleven] clone bloque (free tier) -> voix predefinie")
+        # 2. fallback edge-tts FR (francais clair, pas voix anglaise)
+        print("  [eleven] clone bloque (free tier) -> edge-tts fr-FR")
+        import subprocess
+        from pathlib import Path as _P
+        r = subprocess.run([str(Path.home() / ".hermes" / "venv" / "bin" / "python"),
+                            "-c",
+                            f"import asyncio,edge_tts;"
+                            f"asyncio.new_event_loop().run_until_complete("
+                            f"edge_tts.Communicate({text!r},'fr-FR-DeniseNeural').save({str(out_path)!r}))"],
+                           capture_output=True, text=True, timeout=120)
+        if r.returncode != 0:
+            raise RuntimeError(f"edge-tts: {r.stderr[-200:]}")
+        return Path(out_path).exists()
     # genere l'audio
     r2 = requests.post(
         f"https://api.elevenlabs.io/v1/text-to-speech/{vid}",
