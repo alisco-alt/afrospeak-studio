@@ -18,9 +18,20 @@ from moviepy import (VideoFileClip, ImageClip, ColorClip, CompositeVideoClip,
 # b-roll + tts reutilises du pipeline existant
 import broll, voice_eleven
 
-W, H = 1080, 1920
+W, H = 1080, 1920          # defaut vertical 9:16
+ASPECT = "9:16"              # peut etre force a "16:9" via set_aspect()
 FPS = 30
 HERMES = Path.home() / ".hermes"
+
+
+def set_aspect(a):
+    """Bascule 9:16 <-> 16:9 (recale W,H et ancrages)."""
+    global W, H, ASPECT
+    if a == "16:9":
+        W, H = 1920, 1080
+    else:
+        W, H = 1080, 1920
+    ASPECT = a
 FONT_DIR = HERMES / "fonts"
 FONT_DIR.mkdir(parents=True, exist_ok=True)
 FONT = str(FONT_DIR / "Montserrat-Black.ttf")
@@ -306,7 +317,8 @@ def watermark_clip(total_dur):
 # -----------------------------------------------------------------------------
 #  ASSEMBLAGE FINAL
 # -----------------------------------------------------------------------------
-def produce(script_text, out_path, title="AFROSPEAK", dur_min=15.0):
+def produce(script_text, out_path, title="AFROSPEAK", dur_min=15.0, aspect="9:16"):
+    set_aspect(aspect)
     work = Path("/tmp/montage_work"); work.mkdir(parents=True, exist_ok=True)
     font = ensure_font()
     sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script_text)
@@ -341,13 +353,16 @@ def produce(script_text, out_path, title="AFROSPEAK", dur_min=15.0):
     clips.append(outro.with_start(t_cursor))
 
     # --- sous-titres (blocs 2-4 mots, data x2.5 rouge) ---
+    # 9:16 -> legerement sous centre (laisser l'action visible)
+    # 16:9 -> bas (rythme documentaire, habillage adapte)
+    sub_y = int(H * 0.60) if ASPECT == "9:16" else int(H * 0.82)
     subs = []
     for (txt, start, end, _) in blocks:
         png = work / f"sub_{start:.2f}.png"
         render_subtitle_png(txt, font, str(png))
         simg = ImageClip(str(png)).with_duration(end - start)
         simg = simg.with_start(start + 2.2)  # offset intro
-        simg = simg.with_position(("center", int(H * 0.60)))  # legerement sous centre
+        simg = simg.with_position(("center", sub_y))
         subs.append(simg)
 
     wm = watermark_clip(t_cursor + 2.2)
