@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AfroSpeak Studio — Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23F5A623'/><text y='72' x='50' font-size='58' font-family='sans-serif' font-weight='900' text-anchor='middle' fill='%23000'>A</text></svg>">
+<style>
+  body{display:grid;place-items:center;min-height:100vh;padding:22px}
+  .authwrap{width:100%;max-width:980px;display:grid;grid-template-columns:1.05fr .95fr;
+    gap:0;border:1px solid var(--line);border-radius:20px;overflow:hidden;
+    background:var(--card);box-shadow:0 26px 70px rgba(0,0,0,.5)}
+  .pitch{padding:42px 38px;background:
+    radial-gradient(700px 400px at 0% 0%,rgba(245,166,35,.14),transparent 60%),
+    radial-gradient(600px 400px at 100% 100%,rgba(0,166,81,.10),transparent 60%),var(--bg2)}
+  .pitch h1{font-size:31px;line-height:1.12;margin:20px 0 12px}
+  .pitch h1 span{color:var(--gold)}
+  .pitch p{color:var(--mut);font-size:14px;line-height:1.65;margin-bottom:22px}
+  .feat{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px;font-size:13px}
+  .feat b{display:block;margin-bottom:2px}
+  .feat small{color:var(--mut2);font-size:12px;line-height:1.5}
+  .feat .ic{width:30px;height:30px;border-radius:9px;background:rgba(245,166,35,.14);
+    display:grid;place-items:center;flex-shrink:0;font-size:15px}
+  .form{padding:42px 38px}
+  .tabs{display:flex;gap:6px;background:var(--bg2);padding:4px;border-radius:11px;margin-bottom:24px}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:8px;cursor:pointer;
+    font-weight:700;font-size:13.5px;color:var(--mut);transition:.15s;user-select:none}
+  .tab.on{background:var(--card2);color:var(--gold)}
+  .err{background:rgba(230,57,70,.11);border:1px solid rgba(230,57,70,.3);color:#ff9ba3;
+    padding:11px 13px;border-radius:10px;font-size:12.5px;margin-bottom:15px;display:none}
+  .err.on{display:block}
+  @media(max-width:860px){.authwrap{grid-template-columns:1fr}.pitch{display:none}}
+</style>
+</head>
+<body>
+<div class="authwrap">
+  <div class="pitch">
+    <div class="brand" style="padding:0">
+      <div class="mark">A</div>
+      <div><b>AfroSpeak</b><small>Studio</small></div>
+    </div>
+    <h1>L'Afrique décryptée,<br><span>en vidéo, automatiquement.</span></h1>
+    <p>Studio de production « faceless » : script panafricain, voix off synchronisée
+       mot à mot, images sourcées et créditées, montage complet. Vous donnez un sujet,
+       vous récupérez un master prêt pour YouTube.</p>
+
+    <div class="feat"><div class="ic">🧠</div><div>
+      <b>Écriture souveraine</b>
+      <small>Ligne éditoriale panafricaine : qui décide, qui possède, qui capte la valeur.</small></div></div>
+    <div class="feat"><div class="ic">🎬</div><div>
+      <b>Montage automatique</b>
+      <small>Ken Burns, transitions, mixage audio et sous-titres calés sur la voix.</small></div></div>
+    <div class="feat"><div class="ic">⚖️</div><div>
+      <b>Sources créditées</b>
+      <small>« Source : @compte / Réseau » incrusté sur chaque plan, crédits en description.</small></div></div>
+    <div class="feat"><div class="ic">💚</div><div>
+      <b>Entièrement gratuit</b>
+      <small>Aucune brique payante : IA, images, voix et hébergement sur paliers gratuits.</small></div></div>
+  </div>
+
+  <div class="form">
+    <div class="tabs">
+      <div class="tab on" data-t="login">Connexion</div>
+      <div class="tab" data-t="register">Créer un compte</div>
+    </div>
+
+    <div class="err" id="err"></div>
+
+    <form id="authForm">
+      <div class="field" id="nameField" style="display:none">
+        <label>Nom</label>
+        <input type="text" id="fName" placeholder="Kouassi" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="text" id="fEmail" placeholder="vous@exemple.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label>Mot de passe <span class="hint" id="pwHint"></span></label>
+        <input type="password" id="fPassword" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button class="btn pri blk" id="submitBtn" type="submit" style="margin-top:6px">Se connecter</button>
+    </form>
+
+    <div id="signupClosed" class="note warn" style="margin-top:16px;display:none">
+      Les inscriptions sont fermées sur cette instance.
+    </div>
+
+    <p style="color:var(--mut2);font-size:11.5px;margin-top:20px;line-height:1.6">
+      En créant un compte, vous acceptez d'utiliser les médias tiers dans le cadre du
+      <b>court extrait cité</b> à des fins d'information, et de retirer tout contenu
+      sur demande de son ayant droit.
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let mode = 'login';
+
+function toast(msg, kind = '') {
+  const el = document.createElement('div');
+  el.className = 'tst ' + kind; el.textContent = msg;
+  $('#toast').appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+function showErr(m) { const e = $('#err'); e.textContent = m; e.classList.add('on'); }
+function hideErr() { $('#err').classList.remove('on'); }
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  mode = t.dataset.t;
+  hideErr();
+  $('#nameField').style.display = mode === 'register' ? '' : 'none';
+  $('#submitBtn').textContent = mode === 'register' ? 'Créer mon compte' : 'Se connecter';
+  $('#pwHint').textContent = mode === 'register' ? '— 8 caractères minimum' : '';
+  $('#fPassword').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+}));
+
+$('#authForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideErr();
+  const btn = $('#submitBtn');
+  btn.disabled = true;
+  const prev = btn.textContent;
+  btn.innerHTML = '<span class="spin"></span> Un instant…';
+  try {
+    const body = { email: $('#fEmail').value.trim(), password: $('#fPassword').value };
+    if (mode === 'register') body.name = $('#fName').value.trim();
+    const r = await fetch('/api/auth/' + mode, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'Échec');
+    toast('Bienvenue ' + (j.user.name || j.user.email) + ' !', 'ok');
+    setTimeout(() => { location.href = '/'; }, 500);
+  } catch (err) {
+    showErr(err.message);
+    btn.disabled = false; btn.textContent = prev;
+  }
+});
+
+// Déjà connecté ? on va directement au studio.
+(async () => {
+  try {
+    const j = await (await fetch('/api/auth/me')).json();
+    if (j.user) { location.href = '/'; return; }
+    const p = await (await fetch('/api/platform')).json();
+    if (p.ok && p.limits && !p.limits.signupOpen) {
+      document.querySelector('.tab[data-t=register]').style.display = 'none';
+      $('#signupClosed').style.display = '';
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

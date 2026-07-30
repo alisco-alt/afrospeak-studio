@@ -1,0 +1,36 @@
+# Dépendances : réinstallées dans l'image (les binaires npm pèsent ~400 Mo)
+node_modules
+npm-debug.log*
+
+# Données locales et sorties : jamais dans l'image
+data/
+output/
+*.log
+run*.log
+srv.log
+final.log
+
+# Scripts de test
+test-*.sh
+
+# Git & éditeurs
+.git
+.gitignore
+.github
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Secrets — ne doivent JAMAIS entrer dans une image
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+data/cookies/
+data/auth-secret.json
+
+# Documentation lourde
+*.md
+!README.md

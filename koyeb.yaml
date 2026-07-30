@@ -1,0 +1,71 @@
+# ═══════════════════════════════════════════════════════════════════
+#  Koyeb — instance gratuite (512 Mo, 0,1 vCPU, Francfort ou Washington)
+#
+#  Déploiement :
+#    koyeb app init afrospeak --docker-build-context . --git-branch main
+#  ou via l'interface : Create Service → GitHub → Dockerfile détecté.
+#
+#  Particularité : scale-to-zero après 1 h sans trafic (non désactivable
+#  sur l'offre gratuite). Un rendu en cours survit tant que le trafic
+#  de polling du frontend maintient l'instance éveillée.
+# ═══════════════════════════════════════════════════════════════════
+app: afrospeak-studio
+
+services:
+  - name: web
+    type: web
+    instance_type: free          # 512 Mo / 0,1 vCPU
+    regions:
+      - fra                      # Francfort (latence correcte vers l'Afrique)
+    git:
+      branch: main
+      builder: dockerfile
+      dockerfile: Dockerfile
+    ports:
+      - port: 7860
+        protocol: http
+    routes:
+      - path: /
+        port: 7860
+    health_checks:
+      - http:
+          path: /api/health
+          port: 7860
+        grace_period: 60s
+        interval: 45s
+        timeout: 10s
+    scalings:
+      - min: 0                   # scale-to-zero imposé sur l'offre gratuite
+        max: 1
+    env:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "7860"
+      - key: DISABLE_OLLAMA
+        value: "1"
+      - key: RENDER_CONCURRENCY
+        value: "1"
+      - key: AFROSPEAK_THREADS
+        value: "1"
+      - key: MAX_MINUTES
+        value: "2"
+      - key: FORCE_QUALITY
+        value: draft
+      # Secrets Koyeb : koyeb secret create <nom> --value "<valeur>"
+      - key: AUTH_SECRET
+        secret: afrospeak-auth-secret
+      - key: DATABASE_URL
+        secret: afrospeak-database-url
+      - key: GROQ_API_KEY
+        secret: afrospeak-groq-key
+      - key: S3_ENDPOINT
+        secret: afrospeak-s3-endpoint
+      - key: S3_ACCESS_KEY_ID
+        secret: afrospeak-s3-key-id
+      - key: S3_SECRET_ACCESS_KEY
+        secret: afrospeak-s3-secret
+      - key: S3_BUCKET
+        secret: afrospeak-s3-bucket
+      - key: S3_PUBLIC_BASE
+        secret: afrospeak-s3-public-base

@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════
+#  Blueprint Render — déploiement en un clic
+#  https://render.com → New → Blueprint → pointez vers ce dépôt
+#
+#  Plan free : 750 h/mois, 512 Mo, mise en veille après 15 min
+#  d'inactivité (réveil en 30-60 s). Aucune carte bancaire requise.
+# ═══════════════════════════════════════════════════════════════════
+services:
+  - type: web
+    name: afrospeak-studio
+    runtime: docker
+    plan: free
+    region: frankfurt          # le plus proche de l'Afrique de l'Ouest
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+    envVars:
+      # Généré automatiquement par Render, jamais exposé
+      - key: AUTH_SECRET
+        generateValue: true
+
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "7860"
+
+      # ── Adapté aux 512 Mo du plan gratuit ──
+      - key: DISABLE_OLLAMA
+        value: "1"
+      - key: RENDER_CONCURRENCY
+        value: "1"
+      - key: AFROSPEAK_THREADS
+        value: "1"
+      - key: MAX_MINUTES
+        value: "2"
+      - key: FORCE_QUALITY
+        value: draft
+      - key: FREE_DAILY_QUOTA
+        value: "5"
+      - key: SOCIAL_BUDGET_MS
+        value: "90000"
+
+      # ── À renseigner dans le tableau de bord Render ──
+      # Base Neon (sinon : stockage local perdu à chaque redéploiement)
+      - key: DATABASE_URL
+        sync: false
+      # Au moins une clé LLM gratuite
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      # Stockage objet (indispensable : le disque Render est éphémère)
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_PUBLIC_BASE
+        sync: false
+      # Voix premium (facultatif)
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      # Banques d'images (facultatif)
+      - key: PEXELS_API_KEY
+        sync: false
+      - key: PIXABAY_API_KEY
+        sync: false
+      # Ferme les inscriptions après création de votre compte
+      - key: DISABLE_SIGNUP
+        value: "0"

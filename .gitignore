@@ -1,0 +1,21 @@
+# Dépendances
+node_modules/
+npm-debug.log*
+
+# Données locales & sorties (jamais versionnées)
+data/
+output/
+dist/
+*.log
+
+# Secrets — ne doivent JAMAIS être commités
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Système
+.DS_Store
+.vscode/
+.idea/
