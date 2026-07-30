@@ -64,7 +64,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libgbm1 libasound2 \
       curl \
  && pip3 install --break-system-packages --no-cache-dir \
-      "yt-dlp>=2025.1.1" "gallery-dl>=1.27" \
+      "yt-dlp>=2025.1.1" "gallery-dl>=1.27" "edge-tts>=7.0" \
  && apt-get purge -y python3-pip \
  && apt-get autoremove -y \
  && apt-get clean \
