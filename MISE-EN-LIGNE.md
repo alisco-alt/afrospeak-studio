@@ -30,22 +30,57 @@ Navigateur → Vercel (vitrine, CDN)
 
 ---
 
-## Étape 1 — Pousser sur GitHub (3 min)
+## Étape 1 — Écraser l'ancien dépôt Python (3 min)
 
-Le dépôt est déjà initialisé et commité localement. Il reste à le publier :
+Votre dépôt `afrospeak-studio` contient un ancien projet Python. Ces commandes
+le remplacent intégralement par le SaaS Node.js.
 
 ```bash
 cd afrospeak-studio
 
-# Créez d'abord un dépôt vide « afrospeak-studio » sur github.com/new
 git remote add origin https://github.com/VOTRE-PSEUDO/afrospeak-studio.git
 git branch -M main
-git push -u origin main
+git push -f origin main          # -f : écrase l'historique Python
 ```
 
-> Je n'ai pas pu le faire à votre place : ce bac à sable n'a ni token GitHub,
-> ni CLI `gh`, ni session ouverte. Publier un dépôt exige vos identifiants,
-> que je ne dois pas manipuler.
+Si le remote existe déjà :
+
+```bash
+git remote set-url origin https://github.com/VOTRE-PSEUDO/afrospeak-studio.git
+git push -f origin main
+```
+
+### ⚠️ Avant de lancer le push forcé
+
+`git push -f` **détruit définitivement** l'ancien code et son historique.
+Si vous voulez en garder une trace, sauvegardez-la d'abord :
+
+```bash
+# Depuis un dossier séparé
+git clone https://github.com/VOTRE-PSEUDO/afrospeak-studio.git ancien-python-backup
+```
+
+Ou conservez-le dans une branche du même dépôt :
+
+```bash
+cd afrospeak-studio
+git fetch origin main:ancien-python 2>/dev/null
+git push origin ancien-python      # l'ancien code survit sur cette branche
+git push -f origin main            # main reçoit le nouveau SaaS
+```
+
+### Ce qui sera poussé
+
+| | |
+|---|---|
+| Commits | 3 |
+| Fichiers versionnés | 50 |
+| Secrets inclus | **aucun** (`.env`, cookies et clés exclus par `.gitignore`) |
+| `node_modules` | exclu |
+
+> Je n'ai pas pu exécuter ce push moi-même : ce bac à sable n'a ni token
+> GitHub, ni CLI `gh`, ni session ouverte. Un push exige vos identifiants
+> personnels, que je ne dois pas manipuler.
 
 ---
 
