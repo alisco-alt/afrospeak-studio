@@ -77,20 +77,39 @@ RUN ffmpeg -hide_banner -filters 2>/dev/null | grep -q ' ass ' \
  && python3 -c "import edge_tts" \
  && echo "FFmpeg OK : libass + libx264 · edge-tts OK"
 
-# ── Utilisateur non privilégié (UID 1000 exigé par HF Spaces) ──
-RUN useradd -m -u 1000 -s /bin/bash appuser
-USER appuser
-ENV HOME=/home/appuser
-WORKDIR /home/appuser/app
+# ── Utilisateur non privilégié (UID 1000) ──
+# L'image node:20-slim fournit DÉJÀ un compte « node » en UID 1000.
+# Un `useradd -u 1000` échoue donc avec « exit 4 : UID already in use ».
+#
+# Cette étape rend l'UID 1000 utilisable quelle que soit l'image de base :
+#   • s'il est libre        → on crée « node » ;
+#   • s'il est pris par node→ on ne touche à rien ;
+#   • s'il porte un autre nom (ubuntu, debian…) → on le renomme en « node »
+#     et on déplace son foyer, pour que HOME et WORKDIR ci-dessous soient
+#     toujours exacts (Docker n'évalue aucune variable shell dans ENV/WORKDIR).
+RUN set -eux; \
+    if ! id -u 1000 >/dev/null 2>&1; then \
+      groupadd -g 1000 node 2>/dev/null || true; \
+      useradd -m -u 1000 -g 1000 -s /bin/bash node; \
+    elif [ "$(id -nu 1000)" != "node" ]; then \
+      usermod -l node -d /home/node -m "$(id -nu 1000)"; \
+      groupmod -n node "$(id -ng 1000)" 2>/dev/null || true; \
+    fi; \
+    install -d -o 1000 -g 1000 /home/node/app; \
+    id node
+
+USER 1000
+ENV HOME=/home/node
+WORKDIR /home/node/app
 
 # ── Dépendances puis code (ordre optimisé pour le cache Docker) ──
-COPY --chown=appuser:appuser --from=deps /build/node_modules ./node_modules
-COPY --chown=appuser:appuser package.json ./
-COPY --chown=appuser:appuser lib ./lib
-COPY --chown=appuser:appuser public ./public
-COPY --chown=appuser:appuser assets ./assets
-COPY --chown=appuser:appuser scripts ./scripts
-COPY --chown=appuser:appuser server.js index.js ./
+COPY --chown=1000:1000 --from=deps /build/node_modules ./node_modules
+COPY --chown=1000:1000 package.json ./
+COPY --chown=1000:1000 lib ./lib
+COPY --chown=1000:1000 public ./public
+COPY --chown=1000:1000 assets ./assets
+COPY --chown=1000:1000 scripts ./scripts
+COPY --chown=1000:1000 server.js index.js ./
 
 # Les polices du projet doivent être visibles de fontconfig (libass)
 RUN mkdir -p $HOME/.local/share/fonts \
