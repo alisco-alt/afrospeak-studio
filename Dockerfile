@@ -47,7 +47,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # ── Paquets système ──
 #  ffmpeg              : montage vidéo (avec libass pour les sous-titres)
 #  fonts-*             : rendu typographique correct (accents, emoji)
-#  python3 + pipx deps : yt-dlp & gallery-dl (scraping réseaux sociaux)
+#  python3             : edge-tts (voix neuronale + timings mot-à-mot)
+#                        + yt-dlp & gallery-dl (collecte réseaux sociaux)
 #  chromium            : scraping des pages nécessitant un rendu JS
 #  ca-certificates     : TLS sortant (Neon, R2, API LLM)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -73,7 +74,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Vérifie que FFmpeg dispose bien de libass (sous-titres) et libx264
 RUN ffmpeg -hide_banner -filters 2>/dev/null | grep -q ' ass ' \
  && ffmpeg -hide_banner -encoders 2>/dev/null | grep -q libx264 \
- && echo "FFmpeg OK : libass + libx264"
+ && python3 -c "import edge_tts" \
+ && echo "FFmpeg OK : libass + libx264 · edge-tts OK"
 
 # ── Utilisateur non privilégié (UID 1000 exigé par HF Spaces) ──
 RUN useradd -m -u 1000 -s /bin/bash appuser
@@ -87,6 +89,7 @@ COPY --chown=appuser:appuser package.json ./
 COPY --chown=appuser:appuser lib ./lib
 COPY --chown=appuser:appuser public ./public
 COPY --chown=appuser:appuser assets ./assets
+COPY --chown=appuser:appuser scripts ./scripts
 COPY --chown=appuser:appuser server.js index.js ./
 
 # Les polices du projet doivent être visibles de fontconfig (libass)
