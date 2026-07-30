@@ -35,19 +35,23 @@ Navigateur → Vercel (vitrine, CDN)
 Votre dépôt `afrospeak-studio` contient un ancien projet Python. Ces commandes
 le remplacent intégralement par le SaaS Node.js.
 
+**Le dépôt est déjà configuré** : remote `alisco-alt/afrospeak-studio`,
+branche `main`, 5 commits prêts. Une seule commande reste à lancer :
+
 ```bash
 cd afrospeak-studio
-
-git remote add origin https://github.com/VOTRE-PSEUDO/afrospeak-studio.git
-git branch -M main
-git push -f origin main          # -f : écrase l'historique Python
+git push -f origin main          # -f : écrase l'ancien projet Python
 ```
 
-Si le remote existe déjà :
+GitHub demandera vos identifiants. Le mot de passe classique n'est plus
+accepté : utilisez un **jeton d'accès personnel** —
+[github.com/settings/tokens](https://github.com/settings/tokens) →
+*Generate new token (classic)* → cochez **repo** → collez-le comme mot de passe.
+
+Pour ne pas le ressaisir à chaque fois :
 
 ```bash
-git remote set-url origin https://github.com/VOTRE-PSEUDO/afrospeak-studio.git
-git push -f origin main
+git config --global credential.helper store
 ```
 
 ### ⚠️ Avant de lancer le push forcé
