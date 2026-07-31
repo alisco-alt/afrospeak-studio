@@ -38,6 +38,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     # Un seul rendu simultané, un seul thread : évite l'OOM kill
     RENDER_CONCURRENCY=1 \
     AFROSPEAK_THREADS=1 \
+    MEM_LIMIT_MB=460 \
+    LOW_MEMORY=1 \
+    MAX_MEDIA_EDGE=2400 \
     # Chromium fourni par l'image, pas de téléchargement Puppeteer
     PUPPETEER_SKIP_DOWNLOAD=1 \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
@@ -126,5 +129,8 @@ EXPOSE 7860
 HEALTHCHECK --interval=45s --timeout=8s --start-period=25s --retries=3 \
   CMD curl -fsS http://127.0.0.1:${PORT}/api/health || exit 1
 
-# --max-old-space-size : borne le tas V8 pour laisser la RAM à FFmpeg
-CMD ["node", "--max-old-space-size=320", "server.js"]
+# Réglages mémoire pour un conteneur de 512 Mo :
+#   --max-old-space-size=192  tas V8 borné : le reste va à FFmpeg
+#   --expose-gc               permet la libération explicite entre les plans
+#   --max-semi-space-size=8   réduit la génération jeune (moins de pics)
+CMD ["node", "--max-old-space-size=192", "--max-semi-space-size=8", "--expose-gc", "server.js"]
