@@ -1,19 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "name": "afrospeak-studio",
-  "public": false,
-
-  "//": "Vitrine statique. Le moteur FFmpeg tourne sur Render : Vercel plafonne à 300 s d'exécution, interdit l'écriture disque et limite le bundle à 250 Mo.",
-
   "buildCommand": "node scripts/build-frontend.js",
   "outputDirectory": "dist",
   "framework": null,
-  "installCommand": "echo 'aucune dépendance nécessaire pour la vitrine'",
-
+  "installCommand": "echo skip",
   "cleanUrls": true,
   "trailingSlash": false,
-
   "headers": [
     {
       "source": "/(.*)",
@@ -37,7 +30,6 @@
       ]
     }
   ],
-
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
