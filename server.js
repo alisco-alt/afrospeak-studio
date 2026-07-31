@@ -114,7 +114,48 @@ app.use(async (req, res, next) => {
 app.use('/api', webapp.router);
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/output', express.static(DIRS.output));
+/* Téléchargement explicite : ?download=1 force l'enregistrement du fichier
+   sous son vrai nom, plutôt que son ouverture dans un onglet. */
+app.get('/output/:name', (req, res, next) => {
+  if (req.query.download !== '1') return next();
+  const name = path.basename(req.params.name);
+  const file = path.join(DIRS.output, name);
+  if (!file.startsWith(DIRS.output) || !fs.existsSync(file)) {
+    return res.status(404).json({ ok: false, error: 'Fichier introuvable' });
+  }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.download(file, name, err => { if (err && !res.headersSent) next(err); });
+});
+
+/* ══════════ SERVICE DES FICHIERS PRODUITS ══════════
+ * Deux modes de consultation pour un même fichier :
+ *   /output/nom.mp4           -> lecture en ligne (streaming, seek)
+ *   /output/nom.mp4?download=1-> téléchargement forcé
+ *
+ * Les en-têtes comptent : sans Content-Type explicite, un navigateur peut
+ * interpréter le flux de travers ; sans Content-Disposition, le clic sur
+ * « Télécharger » ouvre un lecteur au lieu d'enregistrer.
+ */
+app.use('/output', express.static(DIRS.output, {
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    const types = {
+      '.mp4': 'video/mp4',
+      '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+      '.srt': 'application/x-subrip; charset=utf-8',
+      '.vtt': 'text/vtt; charset=utf-8',
+      '.txt': 'text/plain; charset=utf-8',
+    };
+    if (types[ext]) res.setHeader('Content-Type', types[ext]);
+    // Indispensable pour que le lecteur puisse se déplacer dans la vidéo
+    res.setHeader('Accept-Ranges', 'bytes');
+    // La vitrine vit sur un autre domaine : sans cela, <video> reste muet
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  },
+}));
+
 app.use('/cache', express.static(DIRS.cache));
 
 const ok = (res, data) => res.json({ ok: true, ...data });

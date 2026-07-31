@@ -512,6 +512,23 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
   .pfill::before,.pfill::after{display:none}
 }
 
+
+/* ═══ MODALE (lecteur vidéo) ═══ */
+.modal{position:fixed;inset:0;background:rgba(3,5,8,.82);backdrop-filter:blur(10px);
+  z-index:900;display:none;place-items:center;padding:22px}
+.modal.on{display:grid;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.mbox{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);
+  padding:24px;max-width:940px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:var(--sh-lg);animation:modalIn .3s cubic-bezier(.16,1,.3,1)}
+@keyframes modalIn{from{transform:scale(.96) translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.mh h2{font-size:17px;line-height:1.35}
+.x{background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt-2);
+  width:30px;height:30px;border-radius:8px;font-size:17px;cursor:pointer;
+  display:grid;place-items:center;flex-shrink:0;transition:all var(--t-fast)}
+.x:hover{background:var(--surface-3);color:var(--txt)}
+
 </style>
 </head>
 <body>
@@ -843,6 +860,13 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="modal" id="modal">
+  <div class="mbox">
+    <div class="mh"><h2 id="modalTitle"></h2>
+      <button class="x" onclick="closeModal()" aria-label="Fermer">×</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -1004,6 +1028,37 @@ function staggerIn(sel) {
     }, 55 * i);
   });
 }
+
+
+/* ─── Modale ─── */
+function openModal(title, html){
+  var t = document.getElementById('modalTitle');
+  var b = document.getElementById('modalBody');
+  var m = document.getElementById('modal');
+  if(!t || !b || !m){ console.warn('modale absente du DOM'); return; }
+  t.textContent = title || '';
+  b.innerHTML = html || '';
+  m.classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  var m = document.getElementById('modal');
+  if(!m) return;
+  // Coupe la lecture : sinon le son continue derrière la modale fermée
+  var v = m.querySelector('video');
+  if(v){ try { v.pause(); v.removeAttribute('src'); v.load(); } catch(e){} }
+  m.classList.remove('on');
+  document.getElementById('modalBody').innerHTML = '';
+  document.body.style.overflow = '';
+}
+window.openModal = openModal;
+window.closeModal = closeModal;
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id === 'modal') closeModal();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeModal();
+});
 
 /* ─── Navigation par onglets ─── */
 function go(page){
@@ -1314,13 +1369,58 @@ function videoRow(v){
       (v.error ? '<div style="color:#ff9ba3;font-size:11.5px;margin-top:7px">'+esc(v.error)+'</div>' : '')+
       '<div class="btns" style="margin-top:10px">'+
         (v.status==='done' && v.videoUrl
-          ? '<a class="btn xs ok" href="'+esc(v.videoUrl)+'" target="_blank">▶ Voir</a>'+
-            '<a class="btn xs" href="'+esc(v.videoUrl)+'" download>⬇ MP4</a>'
+          ? '<button class="btn xs ok" onclick="playVideo(\''+v.id+'\')">▶ Voir</button>'+
+            '<a class="btn xs" href="'+esc(v.downloadUrl||v.videoUrl)+'" download="'+
+              esc((v.title||v.topic||'afrospeak').replace(/[^\w\s-]/g,'').trim().slice(0,60))+'.mp4">⬇ MP4</a>'+
+            (v.srtUrl?'<a class="btn xs ghost" href="'+esc(v.srtUrl)+'" download>SRT</a>':'')
           : '')+
         (active ? '<button class="btn xs dan" onclick="cancelVideo(\''+v.id+'\')">Arrêter</button>' : '')+
       '</div>'+
     '</div></div>';
 }
+
+/**
+ * Lecteur vidéo en modale.
+ * Auparavant un simple <a target="_blank"> vers une URL relative : servi
+ * depuis Vercel, ce lien retombait sur index.html — d'où le retour au Studio.
+ */
+window.playVideo = function(id){
+  var v = S.videos.filter(function(x){ return x.id === id; })[0];
+  if(!v){ toast('Vidéo introuvable.', 'err'); return; }
+  if(!v.videoUrl){ toast('Fichier non disponible.', 'err'); return; }
+
+  var vertical = v.format === 'vertical';
+  openModal(v.title || v.topic,
+    '<div style="display:grid;place-items:center;background:#000;border-radius:var(--r);overflow:hidden">'+
+      '<video id="playerEl" src="'+esc(v.videoUrl)+'" controls autoplay playsinline preload="metadata" '+
+        'crossorigin="anonymous" style="max-height:62vh;'+(vertical?'max-width:340px;':'width:100%;')+'display:block">'+
+        'Votre navigateur ne peut pas lire cette vidéo.'+
+      '</video>'+
+    '</div>'+
+    '<div id="playerErr"></div>'+
+    '<div class="btns" style="margin-top:16px">'+
+      '<a class="btn pri" href="'+esc(v.downloadUrl||v.videoUrl)+'" download>⬇ Télécharger le MP4</a>'+
+      (v.srtUrl?'<a class="btn" href="'+esc(v.srtUrl)+'" download>⬇ Sous-titres</a>':'')+
+      (v.metaUrl?'<a class="btn ghost" href="'+esc(v.metaUrl)+'" target="_blank" rel="noopener">📄 Description</a>':'')+
+      '<a class="btn ghost" href="'+esc(v.videoUrl)+'" target="_blank" rel="noopener">Ouvrir dans un onglet</a>'+
+    '</div>'+
+    '<div style="margin-top:14px;font-size:11.5px;color:var(--txt-3)">'+
+      (v.duration?fmtDur(v.duration)+' · ':'')+(v.size?fmtSize(v.size)+' · ':'')+
+      (vertical?'9:16':'16:9')+(v.ephemeral?' · stockage éphémère':'')+
+    '</div>');
+
+  // Diagnostic explicite plutôt qu'un lecteur noir et muet
+  var el = document.getElementById('playerEl');
+  if(el){
+    el.addEventListener('error', function(){
+      var box = document.getElementById('playerErr');
+      if(box) box.innerHTML = '<div class="note warn" style="margin-top:12px">'+
+        '<b>Lecture impossible.</b> Le moteur est peut-être en veille '+
+        '(le réveil prend 30 à 60 s) ou le fichier a expiré du stockage éphémère.<br>'+
+        '<span class="mono" style="font-size:11px">'+esc(v.videoUrl)+'</span></div>';
+    });
+  }
+};
 
 window.cancelVideo = function(id){
   apiTry('/api/videos/'+id+'/cancel', {
