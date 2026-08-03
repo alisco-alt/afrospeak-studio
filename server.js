@@ -3,6 +3,10 @@
  * AfroSpeak Studio — serveur.
  * API REST + SSE de progression + interface web.
  */
+// Le .env doit être lu AVANT tout autre module : config.js lit process.env
+// dès son chargement, et lirait sinon un environnement encore vide.
+require('./lib/env').chargerEnv();
+
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -498,11 +502,33 @@ async function bootstrap() {
   if (reaped) log.info(`${reaped} rendu(s) interrompu(s) marqué(s) en échec après redémarrage`);
   if (auth.singleUserEnabled()) await auth.ensureSingleUser().catch(() => {});
 
+  /* ── MOTEUR DE RÉDACTION : afficher lequel est RÉELLEMENT actif ──
+   * Auparavant rien n'indiquait au démarrage si les scripts allaient être
+   * écrits par un LLM ou par le moteur de repli local « AfroWriter ». On
+   * interroge donc l'état réel avant d'afficher la bannière. */
+  let ligneLLM = '  ║   Moteur  : AfroWriter (repli local, aucun LLM)';
+  try {
+    const st = await llm.status();
+    if (st.ollama && st.ollama.available) {
+      ligneLLM = `  ║   Moteur  : Ollama ${st.ollama.best || ''} (local)`;
+    } else if (st.cloudReady && st.cloudReady.length) {
+      const actif = st.cloud.find(c => c.id === st.cloudReady[0]);
+      const modele = actif && actif.models ? actif.models[0] : '';
+      ligneLLM = `  ║   Moteur  : ${actif ? actif.label : st.cloudReady[0]}`
+        + (modele ? ` · ${modele}` : '');
+    } else if (st.openaiCompat) {
+      ligneLLM = '  ║   Moteur  : serveur local compatible OpenAI';
+    }
+  } catch (e) {
+    ligneLLM = '  ║   Moteur  : indéterminé (' + String(e.message).slice(0, 24) + ')';
+  }
+
   app.listen(PORT, '0.0.0.0', () => {
     const l = [
       `  ║   AfroSpeak Studio  ▸  http://localhost:${PORT}`,
       `  ║   Base    : ${dbState.mode === 'neon' ? 'Neon Postgres' : 'locale (JSON)'}`,
       `  ║   Stockage: ${stState.mode === 's3' ? 'objet S3/R2' : 'disque local (éphémère)'}`,
+      ligneLLM,
       `  ║   Rendu   : ${queue.CONCURRENCY} tâche(s) en parallèle`,
     ];
     console.log('\n  ╔' + '═'.repeat(52) + '╗');

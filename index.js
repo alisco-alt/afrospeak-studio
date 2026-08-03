@@ -25,6 +25,10 @@
  *   node index.js --serve                   # interface web
  *   node index.js --doctor                  # diagnostic de l'environnement
  */
+// Le .env doit être lu AVANT tout autre module (config.js lit process.env
+// dès son chargement).
+require('./lib/env').chargerEnv();
+
 const fs = require('fs');
 const path = require('path');
 
@@ -153,7 +157,14 @@ async function doctor() {
   } else if (L.openaiCompat) {
     say.ok(`Serveur LLM local compatible OpenAI : ${L.openaiCompat}`);
   } else if (L.remote) {
-    say.warn('Aucun LLM local — une clé distante est configurée');
+    // Nommer le service et le modèle réellement retenus : « une clé distante
+    // est configurée » ne disait pas laquelle, ni si elle fonctionnait.
+    const actif = L.cloud.find(x => x.id === L.cloudReady[0]);
+    say.ok(`Moteur actif : ${c.b}${actif ? actif.label : L.cloudReady[0]}${c.r}`
+      + (actif && actif.models ? ` ${c.grey}· ${actif.models[0]}${c.r}` : ''));
+    if (L.cloudReady.length > 1) {
+      say.info(`Repli disponible : ${L.cloudReady.slice(1).join(', ')}`);
+    }
   } else {
     say.warn('Aucun LLM — le moteur local AfroWriter prendra le relais');
     console.log(`    ${c.grey}Pour des scripts nettement meilleurs, gratuitement :${c.r}`);

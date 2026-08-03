@@ -59,6 +59,35 @@ node index.js --topic "Le cacao ivoirien face à la flambée des prix" \
 **Aucune clé API n'est requise.** Le studio produit des vidéos complètes dès
 l'installation.
 
+### 🔑 Enregistrer sa clé Groq une fois pour toutes
+
+Sans clé, les scripts sont écrits par le moteur de repli **AfroWriter**. Avec
+une clé Groq (gratuite, ~14 400 requêtes/jour), ils sont écrits par un modèle
+70B — c'est le jour et la nuit sur la qualité rédactionnelle.
+
+```bash
+npm run cles -- --groq gsk_xxxxxxxxxxxx     # à faire UNE seule fois
+npm start
+```
+
+La clé est écrite dans un fichier `.env` local (permissions `600`), lu
+automatiquement à chaque démarrage : **plus besoin de la ressaisir dans le
+navigateur**. Vérification au lancement :
+
+```
+  ║   Moteur  : Groq · llama-3.3-70b-versatile
+```
+
+Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
+été prise en compte — relance `npm run cles` pour voir son état.
+
+> ⚠️ **Pourquoi la clé n'est-elle pas dans le dépôt ?**
+> Ce dépôt est **public**. GitHub reconnaît le format des clés Groq
+> (`groq_api_key`), avec *push protection* et *validity check* : une clé
+> poussée en clair est détectée, signalée à Groq et **révoquée**. Le studio
+> retomberait alors sur AfroWriter. Le `.env` reste donc sur ta machine, et
+> `.gitignore` empêche tout envoi accidentel.
+
 ---
 
 ## 🧠 Architecture

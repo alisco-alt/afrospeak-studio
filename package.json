@@ -11,7 +11,8 @@
     "serve": "node server.js",
     "doctor": "node index.js --doctor",
     "auto": "node index.js --auto",
-    "watch": "node index.js --watch"
+    "watch": "node index.js --watch",
+    "cles": "node scripts/configurer-cles.js"
   },
   "keywords": [
     "video",
