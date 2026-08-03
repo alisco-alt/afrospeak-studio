@@ -691,6 +691,23 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
         <div class="trend-skel"></div><div class="trend-skel"></div>
         <div class="trend-skel"></div><div class="trend-skel"></div>
       </div>
+
+      <!-- §5 · Sujets précédents : conservés d'une session à l'autre -->
+      <div id="histWrap" style="display:none;margin-top:22px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;
+                    margin-bottom:12px;flex-wrap:wrap">
+          <div>
+            <h2 style="display:flex;align-items:center;gap:9px;font-size:16px">
+              <span class="dot"></span> Sujets précédents
+              <span id="histCount" style="font-size:11px;color:var(--txt-3);font-weight:600"></span>
+            </h2>
+            <p style="color:var(--txt-3);font-size:12px;margin-top:3px">
+              Conservés d'une session à l'autre — rien ne disparaît au rafraîchissement.</p>
+          </div>
+          <button class="btn sm ghost" id="btnToggleHist">Afficher</button>
+        </div>
+        <div class="trend-scroll" id="histScroll" style="display:none"></div>
+      </div>
     </section>
 
     <!-- ═══ TABLEAU DE BORD ═══ -->
@@ -897,6 +914,7 @@ var S = {
   format: 'vertical',
   style: 'brut',
   trends: [],
+  history: [],        // §5 · sujets précédents, persistés côté serveur
   videos: [],
   polls: {},
   online: false
@@ -1135,6 +1153,42 @@ function renderTrends(list){
   staggerIn('#trendScroll .trend-card');
 }
 
+/* §5 · Sujets déjà vus — ils survivent au rafraîchissement de la page */
+function dateCourte(ms){
+  if(!ms) return '';
+  var d = new Date(ms), j = Math.floor((Date.now()-ms)/86400000);
+  if(j <= 0) return "aujourd'hui";
+  if(j === 1) return 'hier';
+  if(j < 7) return 'il y a '+j+' jours';
+  return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+}
+
+function renderHistory(list){
+  if(!list || !list.length){ $('#histWrap').style.display = 'none'; return; }
+  $('#histWrap').style.display = '';
+  $('#histCount').textContent = '(' + list.length + ')';
+  $('#histScroll').innerHTML = list.map(function(t, k){
+    return '<div class="trend-card" onclick="useHistTrend('+k+')">'+
+      '<div class="top"><span class="tag">'+esc(t.tag||'Afrique')+'</span>'+
+      '<span class="score" style="color:var(--txt-3)"><i style="background:var(--txt-3)"></i>'+
+        esc(dateCourte(t.derniereVue))+'</span></div>'+
+      '<b>'+esc(t.topic)+'</b>'+
+      '<p>'+esc(t.angle||t.why||'')+'</p>'+
+      (t.source ? '<div class="src">via '+esc(t.source)+'</div>' : '')+
+      '<div class="cta"><span>Produire cette vidéo</span><span>→</span></div></div>';
+  }).join('');
+}
+
+window.useHistTrend = function(k){
+  var t = S.history[k]; if(!t) return;
+  $('#fTopic').value = t.topic;
+  $('#fTopic').dispatchEvent(new Event('input'));
+  if(t.angle) $('#fAngle').value = t.angle;
+  $('#fTopic').scrollIntoView({ behavior:'smooth', block:'center' });
+  $('#fTopic').focus();
+  toast('Sujet repris de l\'historique.', 'ok');
+};
+
 function loadTrends(refresh){
   if(refresh) $('#trendScroll').innerHTML = new Array(4).fill('<div class="trend-skel"></div>').join('');
   apiTry('/api/trending' + (refresh ? '?refresh=1' : '')).then(function(j){
@@ -1143,6 +1197,9 @@ function loadTrends(refresh){
       S.trends = j.topics;
       $('#srvTxt').textContent = 'Backend connecté';
       $('#modeNote').textContent = '';
+      // Les sujets antérieurs restent consultables à côté des nouveaux
+      S.history = j.historyPrevious || j.history || [];
+      renderHistory(S.history);
     }else{
       S.trends = DEMO_TRENDS;
       $('#srvTxt').textContent = 'Mode aperçu';
@@ -1153,6 +1210,12 @@ function loadTrends(refresh){
   });
 }
 $('#btnRefreshTrends').addEventListener('click', function(){ loadTrends(true); });
+$('#btnToggleHist').addEventListener('click', function(){
+  var el = $('#histScroll'), ouvert = el.style.display !== 'none';
+  el.style.display = ouvert ? 'none' : '';
+  this.textContent = ouvert ? 'Afficher' : 'Masquer';
+  if(!ouvert) staggerIn('#histScroll .trend-card');
+});
 
 window.useTrend = function(k){
   var t = S.trends[k]; if(!t) return;
