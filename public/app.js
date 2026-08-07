@@ -302,6 +302,7 @@ function videoRow(v) {
   const st = {
     done: ['g', 'Terminée'], running: ['o', 'En cours'], queued: ['n', 'En file'],
     error: ['r', 'Erreur'], cancelled: ['n', 'Annulée'],
+    awaiting_review: ['o', 'Validation requise'],
   }[v.status] || ['n', v.status];
   const pct = Math.round((v.progress || 0) * 100);
   const active = ['queued', 'running'].includes(v.status);
@@ -334,7 +335,8 @@ function videoRow(v) {
           ${v.srtUrl ? `<a class="btn xs ghost" href="${esc(v.srtUrl)}" download>SRT</a>` : ''}
           ${v.metaUrl ? `<a class="btn xs ghost" href="${esc(v.metaUrl)}" target="_blank">Description</a>` : ''}` : ''}
         ${active ? `<button class="btn xs dan" onclick="cancelVideo('${v.id}')">Arrêter</button>` : ''}
-        ${!active ? `<button class="btn xs dan" onclick="deleteVideo('${v.id}')">✕</button>` : ''}
+        ${v.status === 'awaiting_review' ? `<button class="btn xs ok" onclick="reviewStoryboard('${v.id}')">🖼️ Valider les médias</button>` : ''}
+        ${!active && v.status !== 'awaiting_review' ? `<button class="btn xs dan" onclick="deleteVideo('${v.id}')">✕</button>` : ''}
       </div>
     </div>
   </div>`;
@@ -357,12 +359,15 @@ function pollVideo(id) {
       if (ps) ps.textContent = (v.status === 'queued' && q && q.position > 0)
         ? `En file — position ${q.position}${q.waitSeconds ? ` (~${Math.ceil(q.waitSeconds / 60)} min)` : ''}`
         : (v.step || '…');
-      if (['done', 'error', 'cancelled'].includes(v.status)) {
+      if (['done', 'error', 'cancelled', 'awaiting_review'].includes(v.status)) {
         clearInterval(iv); S.polls.delete(id);
-        toast(v.status === 'done' ? '✅ Vidéo terminée !'
-          : v.status === 'error' ? '❌ ' + (v.error || 'échec')
-            : 'Production annulée', v.status === 'done' ? 'ok' : 'err');
-        loadDash();
+        if (v.status === 'done') { toast('✅ Vidéo terminée !', 'ok'); loadDash(); }
+        else if (v.status === 'awaiting_review') {
+          toast('🖼️ Médias prêts à valider — cliquez pour vérifier.', 'ok');
+          loadDash();
+        }
+        else if (v.status === 'error') { toast('❌ ' + (v.error || 'échec'), 'err'); loadDash(); }
+        else { toast('Production annulée', 'err'); loadDash(); }
       }
       fails = 0;
     } catch (e) {
@@ -823,6 +828,150 @@ $('#btnSaveBrand').addEventListener('click', async () => {
     toast('Identité enregistrée.', 'ok');
   } catch (e) { toast(e.message, 'err'); }
 });
+
+/* ═══════════ VALIDATION DES MÉDIAS ═══════════ */
+window.reviewStoryboard = async function(id) {
+  try {
+    const { storyboard: sb } = await api('/api/projects/' + id + '/storyboard');
+    const shots = sb.shots || [];
+    const totalDur = sb.timeline ? fmtDur(sb.timeline.duration) : '—';
+
+    const shotHtml = shots.map(s => {
+      const hasAsset = s.asset && s.asset.file;
+      const isModified = s.asset && s.asset.replacedAt;
+      const thumbUrl = hasAsset
+        ? '/api/media/file?p=' + encodeURIComponent(s.asset.file)
+        : null;
+      const providerTag = s.asset
+        ? (s.asset.genereParIA ? '<span class="tag o">IA</span>'
+           : s.asset.provider ? `<span class="tag n">${esc(s.asset.provider)}</span>` : '')
+        : '<span class="tag r">manquant</span>';
+
+      return `<div class="rev-shot" id="rev-shot-${s.index}">
+        <div class="rev-shot-num">Plan ${s.index + 1}</div>
+        <div class="rev-shot-preview" onclick="expandShot(${s.index})">
+          ${thumbUrl
+            ? `<img src="${esc(thumbUrl)}" alt="" loading="lazy"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+               <div class="rev-noimg" style="display:none">📷<br>Erreur</div>`
+            : `<div class="rev-noimg">📷<br>Aucun visuel</div>`}
+        </div>
+        <div class="rev-shot-info">
+          <div class="rev-shot-narr">${esc((s.narration || '').slice(0, 120))}${(s.narration||'').length > 120 ? '…' : ''}</div>
+          <div class="rev-shot-meta">
+            ${providerTag}
+            <span class="tag n">${fmtDur(s.duration || 0)}</span>
+            ${isModified ? '<span class="tag g">✓ Modifié</span>' : ''}
+          </div>
+          ${s.query ? `<div class="rev-shot-query">🔍 ${esc(s.query)}</div>` : ''}
+          <div class="rev-shot-btns">
+            <button class="btn xs" onclick="replaceShotPrompt('${id}', ${s.index})">
+              🔁 Remplacer
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    openModal('Validation des médias — ' + esc(sb.title || ''), `
+      <div class="rev-summary">
+        <div class="rev-stat"><b>${shots.length}</b><span>plans</span></div>
+        <div class="rev-stat"><b>${totalDur}</b><span>durée</span></div>
+        <div class="rev-stat"><b>${shots.filter(s => s.asset && s.asset.file).length}/${shots.length}</b><span>visuels trouvés</span></div>
+      </div>
+      <div class="rev-grid">${shotHtml}</div>
+      <div class="hr"></div>
+      <div class="rev-actions">
+        <button class="btn pri" onclick="approveProject('${id}')">
+          ✅ Approuver et lancer le rendu
+        </button>
+        <button class="btn ghost" onclick="closeModal()">Annuler</button>
+      </div>
+    `);
+
+    // Store storyboard for expand/replace
+    S._reviewShots = shots;
+    S._reviewProjectId = id;
+  } catch (e) {
+    toast('Erreur: ' + e.message, 'err');
+  }
+};
+
+window.expandShot = function(idx) {
+  const s = (S._reviewShots || [])[idx];
+  if (!s) return;
+  const hasAsset = s.asset && s.asset.file;
+  const thumbUrl = hasAsset
+    ? '/api/media/file?p=' + encodeURIComponent(s.asset.file)
+    : null;
+  openModal('Plan ' + (idx + 1) + ' — détail', `
+    <div class="rev-expand">
+      ${thumbUrl
+        ? `<img src="${esc(thumbUrl)}" alt="" style="max-width:100%;border-radius:var(--r);margin-bottom:16px"
+            onerror="this.style.display='none'">`
+        : '<div class="rev-noimg" style="height:200px">📷 Aucun visuel</div>'}
+      <div class="kv"><span>Durée</span><b>${fmtDur(s.duration || 0)}</b></div>
+      <div class="kv"><span>Visuel prévu</span><b>${esc(s.visual || '—')}</b></div>
+      <div class="kv"><span>Recherche</span><b>${esc(s.query || '—')}</b></div>
+      <div class="kv"><span>Source</span><b>${s.asset ? esc(s.asset.provider || '—') : 'manquant'}</b></div>
+      ${s.credit ? `<div class="kv"><span>Crédit</span><b>${esc(s.credit)}</b></div>` : ''}
+      <div class="hr"></div>
+      <p style="color:var(--txt-2);font-size:14px;line-height:1.6">${esc(s.narration || '')}</p>
+      <div class="btns" style="margin-top:16px">
+        <button class="btn xs" onclick="replaceShotPrompt('${S._reviewProjectId}', ${idx})">🔁 Remplacer l'image</button>
+        <button class="btn ghost" onclick="reviewStoryboard('${S._reviewProjectId}')">← Retour</button>
+      </div>
+    </div>
+  `);
+};
+
+window.replaceShotPrompt = function(id, shotIdx) {
+  const s = (S._reviewShots || [])[shotIdx];
+  const label = s ? 'Plan ' + (shotIdx + 1) : 'Plan';
+  openModal('Remplacer — ' + label, `
+    <div class="rev-replace">
+      <p style="color:var(--txt-2);margin-bottom:16px">
+        Collez l'URL d'une image ou vidéo de remplacement.
+        Le fichier sera téléchargé et remplacera le visuel actuel.
+      </p>
+      <input type="url" id="replaceUrl" placeholder="https://exemple.com/image.jpg"
+        style="width:100%;padding:12px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-size:15px;margin-bottom:12px">
+      <div class="btns">
+        <button class="btn pri" onclick="doReplaceShot('${id}', ${shotIdx})">Télécharger & remplacer</button>
+        <button class="btn ghost" onclick="reviewStoryboard('${id}')">← Retour</button>
+      </div>
+    </div>
+  `);
+};
+
+window.doReplaceShot = async function(id, shotIdx) {
+  const url = $('#replaceUrl').value.trim();
+  if (!url) { toast('URL requise', 'err'); return; }
+  try {
+    toast('Téléchargement…');
+    await api('/api/projects/' + id + '/storyboard/' + shotIdx + '/replace', {
+      body: JSON.stringify({ url })
+    });
+    toast('✅ Visuel remplacé', 'ok');
+    // Refresh the review modal
+    await reviewStoryboard(id);
+  } catch (e) {
+    toast('Erreur: ' + e.message, 'err');
+  }
+};
+
+window.approveProject = async function(id) {
+  try {
+    closeModal();
+    toast('Lancement du rendu…');
+    await api('/api/projects/' + id + '/approve', { body: '{}' });
+    toast('✅ Rendu lancé !', 'ok');
+    loadDash();
+    pollVideo(id);
+  } catch (e) {
+    toast('Erreur: ' + e.message, 'err');
+  }
+};
 
 /* Rafraîchissement discret du tableau de bord */
 setInterval(() => { if ($('#p-dash').classList.contains('on')) loadDash(); }, 30000);
