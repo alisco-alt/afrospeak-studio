@@ -389,6 +389,54 @@ app.post('/api/projects/:id/shot/:index/media', wrap(async (req, res) => {
   ok(res, { shot: s });
 }));
 
+/* ── Validation des médias (checkpoint avant rendu) ── */
+
+/** Récupère le storyboard complet pour prévisualisation. */
+app.get('/api/projects/:id/storyboard', (req, res) => {
+  try {
+    ok(res, { storyboard: pipeline.getStoryboard(req.params.id) });
+  } catch (e) { fail(res, e, 404); }
+});
+
+/** Remplace le visuel d'un plan via la nouvelle API de validation. */
+app.post('/api/projects/:id/storyboard/:shotIdx/replace', wrap(async (req, res) => {
+  const b = req.body || {};
+  // Si une URL est fournie, on télécharge/importe le média
+  if (b.url) {
+    const got = await mediaLib.importUrl(b.url, b.meta || {});
+    const shot = pipeline.replaceStoryAsset(req.params.id, Number(req.params.shotIdx), {
+      file: got.file, provider: got.provider, author: got.author,
+      pageUrl: got.pageUrl, license: got.license, licenseUrl: got.licenseUrl,
+      title: got.title, url: got.url, info: got.info,
+    });
+    ok(res, { shot });
+  } else if (b.asset) {
+    // Asset déjà téléchargé (Pexels/Pixabay)
+    const got = await mediaLib.download(b.asset);
+    const shot = pipeline.replaceStoryAsset(req.params.id, Number(req.params.shotIdx), {
+      file: got.file, provider: got.provider, author: got.author,
+      pageUrl: got.pageUrl, license: got.license, licenseUrl: got.licenseUrl,
+      title: got.title, url: got.url, info: got.info,
+    });
+    ok(res, { shot });
+  } else if (b.file) {
+    // Fichier local déjà dans le workspace
+    const shot = pipeline.replaceStoryAsset(req.params.id, Number(req.params.shotIdx), {
+      file: b.file, provider: b.provider || 'manual',
+      genereParIA: false, info: b.info || null,
+    });
+    ok(res, { shot });
+  } else {
+    fail(res, new Error('url, asset ou file requis'), 400);
+  }
+}));
+
+/** Approuve le storyboard et relance le rendu. */
+app.post('/api/projects/:id/approve', wrap(async (req, res) => {
+  const p = await pipeline.resumeFromReview(req.params.id);
+  ok(res, { project: p, resumed: true });
+}));
+
 /* ------------------------------ SSE ------------------------------ */
 
 app.get('/api/projects/:id/stream', (req, res) => {
