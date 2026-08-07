@@ -1,7 +1,7 @@
 {
   "name": "afrospeak-studio",
   "version": "1.0.0",
-  "description": "Studio de génération de vidéos YouTube faceless autonome — script IA locale, voix off synchronisée mot à mot, scraping réseaux sociaux avec crédits, montage FFmpeg",
+  "description": "Studio de g\u00e9n\u00e9ration de vid\u00e9os YouTube faceless autonome \u2014 script IA locale, voix off synchronis\u00e9e mot \u00e0 mot, scraping r\u00e9seaux sociaux avec cr\u00e9dits, montage FFmpeg",
   "main": "index.js",
   "bin": {
     "afrospeak": "./index.js"
@@ -38,6 +38,7 @@
     "express": "^4.21.2",
     "ffmpeg-static": "^5.2.0",
     "ffprobe-static": "^3.1.0",
-    "jose": "^5.10.0"
+    "jose": "^5.10.0",
+    "playwright": "^1.49.0"
   }
 }
