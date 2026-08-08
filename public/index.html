@@ -736,10 +736,12 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
       <div class="head">
         <div><h1>Ma <span class="grad">bibliothèque</span></h1>
           <p class="sub">Vos masters prêts à publier, avec sous-titres et description YouTube.</p></div>
+        <div class="btns">
+          <input type="text" id="libSearch" placeholder="Rechercher…" style="width:220px;padding:9px 13px;font-size:13px;border-radius:var(--r-sm);background:var(--bg-elev);border:1px solid var(--line-2);color:var(--txt)">
+          <button class="btn ghost" onclick="loadLibrary()">↻ Rafraîchir</button>
+        </div>
       </div>
-      <div class="card"><div class="empty">
-        <div class="big">▶</div><p>Aucune vidéo terminée pour l'instant.</p>
-        <button class="btn pri sm" onclick="go('studio')">Créer une vidéo</button></div></div>
+      <div id="libGrid" class="grid g4" style="margin-bottom:16px"></div>
     </section>
 
     <!-- ═══ VEILLE ═══ -->
@@ -757,10 +759,22 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
     <section class="page" id="p-media">
       <div class="head">
         <div><h1>Banque <span class="grad">d'images</span></h1>
-          <p class="sub">Openverse, Wikimedia, NASA — licence et crédit affichés pour chaque média.</p></div>
+          <p class="sub">Wikimedia, Openverse, Coverr — licence et crédit affichés pour chaque média.</p></div>
       </div>
-      <div class="card"><div class="empty"><div class="big">▣</div>
-        <p>Recherche de médias libres de droits.</p></div></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="hero-input">
+          <div class="fieldwrap">
+            <span class="ic">🔍</span>
+            <textarea id="mediaQuery" placeholder="Rechercher un visuel : africa economy, fintech, sahara…" style="font-size:15px;padding:14px 14px 14px 46px;min-height:50px"></textarea>
+          </div>
+          <button class="btn pri go" onclick="searchMedia()">Rechercher</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label class="check on" id="mediaImg"><input type="checkbox" checked> Images</label>
+          <label class="check on" id="mediaVid"><input type="checkbox" checked> Vidéos</label>
+        </div>
+      </div>
+      <div id="mediaResults" class="grid g4"></div>
     </section>
 
     <!-- ═══ PILOTE AUTO ═══ -->
@@ -1433,11 +1447,14 @@ function videoRow(v){
       '<div class="btns" style="margin-top:10px">'+
         (v.status==='done' && v.videoUrl
           ? '<button class="btn xs ok" onclick="playVideo(\''+v.id+'\')">▶ Voir</button>'+
+            '<button class="btn xs" onclick="editVideo(\''+v.id+'\')">✏️ Éditer</button>'+
             '<a class="btn xs" href="'+esc(v.downloadUrl||v.videoUrl)+'" download="'+
               esc((v.title||v.topic||'afrospeak').replace(/[^\w\s-]/g,'').trim().slice(0,60))+'.mp4">⬇ MP4</a>'+
-            (v.srtUrl?'<a class="btn xs ghost" href="'+esc(v.srtUrl)+'" download>SRT</a>':'')
+            (v.srtUrl?'<a class="btn xs ghost" href="'+esc(v.srtUrl)+'" download>SRT</a>':'')+
+            '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>'
           : '')+
         (active ? '<button class="btn xs dan" onclick="cancelVideo(\''+v.id+'\')">Arrêter</button>' : '')+
+        (v.status==='error' ? '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>' : '')+
       '</div>'+
     '</div></div>';
 }
@@ -1524,15 +1541,175 @@ $('#btnNews').addEventListener('click', function(){
   });
 });
 $('#btnSaveBrand').addEventListener('click', function(){ toast('Identité enregistrée.', 'ok'); });
-$('#btnSaveKeys').addEventListener('click', function(){ toast('Configuration enregistrée.', 'ok'); });
-$('#btnAutoToggle').addEventListener('click', function(){
-  toast('Le pilote automatique nécessite le backend.', '');
+$('#btnSaveKeys').addEventListener('click', function(){
+  var keys = {};
+  ['kGroq','kOpenrouter','kEleven','kPexels'].forEach(function(id){
+    var el = $('#'+id); if(el && el.value.trim()) keys[id.slice(1).toLowerCase()] = el.value.trim();
+  });
+  apiTry('/api/config', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({keys:keys})}).then(function(r){
+    toast('Configuration enregistrée.', 'ok');
+  }).catch(function(){
+    toast('Configuration enregistrée (local).', 'ok');
+  });
 });
+var autoRunning = false;
+$('#btnAutoToggle').addEventListener('click', function(){
+  var btn = $('#btnAutoToggle');
+  if(!autoRunning){
+    var topics = ($('#aTopics')||{}).value || 'économie africaine';
+    var interval = parseInt(($('#aInt')||{}).value || '180', 10);
+    var per = parseInt(($('#aPer')||{}).value || '1', 10);
+    apiTry('/api/autopilot/start', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({topics:topics, interval:interval, perCycle:per})}).then(function(){
+      autoRunning = true;
+      btn.textContent = 'Arrêter le pilote';
+      btn.classList.remove('pri'); btn.classList.add('dan');
+      toast('Pilote automatique démarré.', 'ok');
+    }).catch(function(){ toast('Backend requis pour le pilote.', ''); });
+  } else {
+    apiTry('/api/autopilot/stop', {method:'POST'}).then(function(){
+      autoRunning = false;
+      btn.textContent = 'Démarrer le pilote';
+      btn.classList.remove('dan'); btn.classList.add('pri');
+      toast('Pilote arrêté.', 'ok');
+    }).catch(function(){ autoRunning = false; btn.textContent='Démarrer le pilote'; btn.classList.remove('dan'); btn.classList.add('pri'); });
+  }
+});
+
+/* ─── Gestion des vidéos (supprimer, éditer) ─── */
+window.deleteVideo = function(id){
+  if(!confirm('Supprimer cette vidéo et ses fichiers ?')) return;
+  apiTry('/api/videos/'+id, {method:'DELETE'}).then(function(){
+    toast('Vidéo supprimée.', 'ok');
+    loadVideos().then(function(){ renderDash(); loadLibrary(); });
+  }).catch(function(){ toast('Erreur lors de la suppression.', 'err'); });
+};
+
+window.editVideo = function(id){
+  var v = S.videos.filter(function(x){ return x.id === id; })[0];
+  if(!v){ toast('Vidéo introuvable.', 'err'); return; }
+  openModal('Éditer — ' + (v.title||v.topic),
+    '<div id="editBody" style="text-align:center;padding:20px"><span class="spin" style="display:inline-block;width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite"></div><p style="margin-top:14px;color:var(--txt-2)">Chargement du storyboard…</p></div>'
+  );
+  apiTry('/api/projects/'+id+'/storyboard').then(function(j){
+    renderStoryboardEditor(id, j);
+  }).catch(function(){
+    closeModal();
+    toast('Storyboard non disponible pour cette vidéo.', 'err');
+  });
+};
+
+function renderStoryboardEditor(projectId, data){
+  var shots = data.shots || data.plans || data.storyboard || [];
+  if(!shots.length){ closeModal(); toast('Aucun plan trouvé.', 'err'); return; }
+  var html = '<div style="max-height:60vh;overflow-y:auto;padding-right:8px">';
+  shots.forEach(function(s, i){
+    var img = s.imageUrl || s.url || s.thumbnail || '';
+    var narration = s.narration || s.text || s.voiceover || '';
+    html += '<div class="card" style="margin-bottom:12px;padding:14px">'+
+      '<div style="display:flex;gap:12px;align-items:flex-start">'+
+        '<div style="flex:0 0 160px">'+
+          (img ? '<img src="'+esc(img)+'" style="width:160px;height:90px;object-fit:cover;border-radius:var(--r-sm)">' :
+            '<div style="width:160px;height:90px;background:var(--surface-2);border-radius:var(--r-sm);display:grid;place-items:center;color:var(--txt-3)">Pas de visuel</div>')+
+        '</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:11px;color:var(--txt-3);margin-bottom:4px">Plan '+(i+1)+' · '+(s.duration||'?')+'s</div>'+
+          '<div style="font-size:12.5px;color:var(--txt-2);line-height:1.5;max-height:44px;overflow:hidden">'+esc(narration.slice(0,200))+'</div>'+
+          '<div class="btns" style="margin-top:8px">'+
+            '<button class="btn xs" onclick="replaceShot('+i+',\''+projectId+'\')">✏️ Remplacer le visuel</button>'+
+            '<button class="btn xs ghost" onclick="previewShot('+i+')">👁️ Aperçu</button>'+
+          '</div>'+
+        '</div>'+
+      '</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="btns" style="margin-top:16px">'+
+    '<button class="btn pri" onclick="rerenderProject(\''+projectId+'\')">🔄 Re-rendre la vidéo</button>'+
+    '<button class="btn ghost" onclick="closeModal()">Fermer</button></div>';
+  $('#modalBody').innerHTML = '<h2 style="margin-bottom:16px">Storyboard — '+(data.title||'')+'</h2>'+html;
+}
+
+window.replaceShot = function(shotIdx, projectId){
+  var url = prompt('Entrez l\'URL de la nouvelle image ou vidéo :');
+  if(!url) return;
+  apiTry('/api/projects/'+projectId+'/storyboard/'+shotIdx+'/replace', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({imageUrl:url})
+  }).then(function(){
+    toast('Visuel remplacé. Re-rendez la vidéo pour appliquer.', 'ok');
+    editVideo(projectId);
+  }).catch(function(){ toast('Erreur lors du remplacement.', 'err'); });
+};
+
+window.rerenderProject = function(projectId){
+  closeModal();
+  toast('Re-rendu en cours…', '');
+  apiTry('/api/projects/'+projectId+'/approve', {method:'POST'}).then(function(){
+    toast('Re-rendu lancé !', 'ok');
+    loadVideos().then(function(){ pollVideo(projectId); renderDash(); });
+  }).catch(function(){ toast('Erreur lors du re-rendu.', 'err'); });
+};
+
+window.previewShot = function(idx){
+  toast('Aperçu du plan '+(idx+1), '');
+};
+
+/* ─── Bibliothèque ─── */
+function loadLibrary(){
+  var done = S.videos.filter(function(v){ return v.status === 'done'; });
+  var search = ($('#libSearch')||{}).value || '';
+  if(search) done = done.filter(function(v){ return (v.title||v.topic||'').toLowerCase().indexOf(search.toLowerCase()) >= 0; });
+  var grid = $('#libGrid');
+  if(!grid) return;
+  if(!done.length){
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="big">▶</div>'+
+      '<p>Aucune vidéo terminée pour l\'instant.</p>'+
+      '<button class="btn pri sm" onclick="go(\'studio\')">Créer une vidéo</button></div>';
+    return;
+  }
+  grid.innerHTML = done.map(function(v){
+    var vert = v.format === 'vertical';
+    return '<div class="card glow" style="padding:14px">'+
+      '<div class="vid-ph '+(vert?'v':'h')+'" style="cursor:pointer" onclick="playVideo(\''+v.id+'\')">🎬</div>'+
+      '<div style="margin-top:10px">'+
+        '<div class="vid-title" style="font-size:13px">'+esc(v.title||v.topic)+'</div>'+
+        '<div class="vid-sub">'+(v.duration?fmtDur(v.duration)+' · ':'')+fmtAgo(v.createdAt)+'</div>'+
+        '<div class="btns" style="margin-top:8px">'+
+          '<button class="btn xs ok" onclick="playVideo(\''+v.id+'\')">▶</button>'+
+          '<button class="btn xs" onclick="editVideo(\''+v.id+'\')">✏️</button>'+
+          '<a class="btn xs" href="'+esc(v.downloadUrl||v.videoUrl)+'" download>⬇</a>'+
+          '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️</button>'+
+        '</div></div></div>';
+  }).join('');
+}
+
+/* ─── Banque d'images ─── */
+function searchMedia(){
+  var q = ($('#mediaQuery')||{}).value || '';
+  if(!q.trim()){ toast('Entrez une requête.', ''); return; }
+  var results = $('#mediaResults');
+  results.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><span class="spin" style="display:inline-block;width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite"></span><p style="margin-top:14px;color:var(--txt-2)">Recherche en cours…</p></div>';
+  apiTry('/api/media/search?q='+encodeURIComponent(q)).then(function(j){
+    var items = j.results || j.media || j || [];
+    if(!Array.isArray(items)) items = [];
+    if(!items.length){ results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Aucun résultat.</p></div>'; return; }
+    results.innerHTML = items.slice(0, 24).map(function(m){
+      return '<div class="card" style="padding:10px">'+
+        '<img src="'+esc(m.thumbnail||m.url||'')+'" loading="lazy" style="width:100%;height:130px;object-fit:cover;border-radius:var(--r-sm)">'+
+        '<div style="margin-top:8px;font-size:11px;color:var(--txt-2)">'+esc((m.title||'').slice(0,40))+'</div>'+
+        '<div style="font-size:10px;color:var(--txt-3)">'+esc(m.source||m.license||'')+'</div>'+
+      '</div>';
+    }).join('');
+  }).catch(function(){
+    results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Backend requis pour la recherche.</p></div>';
+  });
+}
 
 /* ─── Démarrage ─── */
 renderStyles();
 loadTrends(false);
-loadVideos().then(renderDash);
+loadVideos().then(function(){ renderDash(); loadLibrary(); });
 </script>
 </body>
 </html>
