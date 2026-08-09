@@ -352,6 +352,12 @@ app.post('/api/projects/:id/run', wrap(async (req, res) => {
 }));
 
 app.post('/api/projects/:id/cancel', (req, res) => ok(res, { cancelled: pipeline.cancel(req.params.id) }));
+
+/* Reprend le rendu d'un projet interrompu (skip script/media/voice). */
+app.post('/api/projects/:id/resume', wrap(async (req, res) => {
+  pipeline.resumeRender(req.params.id).catch(() => {});
+  ok(res, { started: true });
+}));
 app.delete('/api/projects/:id', (req, res) => ok(res, { deleted: pipeline.deleteProject(req.params.id) }));
 
 /** Édition manuelle du script/storyboard. */
@@ -548,6 +554,8 @@ async function bootstrap() {
   const stState = storage.init();
   const reaped = await db.reapStaleJobs();
   if (reaped) log.info(`${reaped} rendu(s) interrompu(s) marqué(s) en échec après redémarrage`);
+  const staleProjects = pipeline.reapStaleProjects();
+  if (staleProjects) log.info(`${staleProjects} projet(s) pipeline interrompu(s) — reprise possible`);
   if (auth.singleUserEnabled()) await auth.ensureSingleUser().catch(() => {});
 
   /* ── MOTEUR DE RÉDACTION : afficher lequel est RÉELLEMENT actif ──
