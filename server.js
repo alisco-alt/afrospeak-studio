@@ -579,6 +579,19 @@ async function bootstrap() {
     ligneLLM = '  ║   Moteur  : indéterminé (' + String(e.message).slice(0, 24) + ')';
   }
 
+  // Diagnostic matériel : combien de threads FFmpeg va réellement utiliser.
+  // Sur une station de travail (32 Go, plusieurs cœurs), un mauvais réglage
+  // AFROSPEAK_THREADS=1 hérité du .env.example (pensé pour un hébergeur
+  // gratuit à 512 Mo) divise la vitesse d'encodage par le nombre de cœurs
+  // disponibles — la cause n°1 des exports qui expirent sur du bon matériel.
+  const os = require('os');
+  const ffThreads = require('./lib/util').FF_THREADS;
+  const nCores = os.cpus().length;
+  const memGo = (os.totalmem() / 1e9).toFixed(1);
+  const threadsWarn = (ffThreads <= 2 && nCores > 4)
+    ? '  ║   ⚠ AFROSPEAK_THREADS bride FFmpeg à ' + ffThreads + '/' + nCores + ' cœurs — retire cette variable du .env'
+    : null;
+
   app.listen(PORT, '0.0.0.0', () => {
     const l = [
       `  ║   AfroSpeak Studio  ▸  http://localhost:${PORT}`,
@@ -586,6 +599,8 @@ async function bootstrap() {
       `  ║   Stockage: ${stState.mode === 's3' ? 'objet S3/R2' : 'disque local (éphémère)'}`,
       ligneLLM,
       `  ║   Rendu   : ${queue.CONCURRENCY} tâche(s) en parallèle`,
+      `  ║   Matériel: ${nCores} cœurs · ${memGo} Go RAM · FFmpeg threads=${ffThreads}`,
+      ...(threadsWarn ? [threadsWarn] : []),
     ];
     console.log('\n  ╔' + '═'.repeat(52) + '╗');
     l.forEach(x => console.log(x));

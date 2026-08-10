@@ -1,6 +1,7 @@
 # Dépendances
 node_modules/
 npm-debug.log*
+package-lock.json   # varie selon l'environnement (Ubuntu vs sandbox) — cause des conflits git pull récurrents
 
 # Données locales & sorties (jamais versionnées)
 data/
