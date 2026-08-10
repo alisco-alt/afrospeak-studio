@@ -29,6 +29,19 @@
 // dès son chargement).
 require('./lib/env').chargerEnv();
 
+/* ── DURCISSEMENT ANTI-CRASH SERVEUR (Phase 5) ──
+ * Le queue.js capture les erreurs par tâche, mais si une erreur
+ * s'échappe d'un try/catch (callback FFmpeg, timer, etc.), elle
+ * pourrait tuer le process Node ENTIER et arrêter le studio.
+ * On logge et on continue — le studio ne doit JAMAIS crasher. */
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] uncaughtException:', err.message);
+  if (err.stack) console.error(err.stack);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] unhandledRejection:', reason);
+});
+
 const fs = require('fs');
 const path = require('path');
 
