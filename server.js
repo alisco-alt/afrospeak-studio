@@ -565,8 +565,18 @@ async function bootstrap() {
   let ligneLLM = '  ║   Moteur  : AfroWriter (repli local, aucun LLM)';
   try {
     const st = await llm.status();
-    if (st.ollama && st.ollama.available) {
-      ligneLLM = `  ║   Moteur  : Ollama ${st.ollama.best || ''} (local)`;
+    /* Ollama n'est « le moteur » que s'il a RÉELLEMENT un modèle chargé.
+     * Un serveur Ollama démarré mais vide (aucun `ollama pull`) donnait
+     * `available: true` avec zéro modèle : la bannière annonçait
+     * « Moteur : Ollama (local) » alors que chaque rédaction basculait en
+     * silence sur le cloud, après avoir perdu le temps de la tentative.
+     * Le message affiché doit correspondre à ce qui se passe vraiment. */
+    if (st.ollama && st.ollama.available && st.ollama.best) {
+      ligneLLM = `  ║   Moteur  : Ollama ${st.ollama.best} (local)`;
+    } else if (st.ollama && st.ollama.available && !st.ollama.best) {
+      const actif = st.cloud.find(c => c.id === (st.cloudReady || [])[0]);
+      ligneLLM = `  ║   Moteur  : ${actif ? actif.label : 'AfroWriter'} `
+        + `(Ollama actif mais VIDE — faites : ollama pull deepseek-r1:7b)`;
     } else if (st.cloudReady && st.cloudReady.length) {
       const actif = st.cloud.find(c => c.id === st.cloudReady[0]);
       const modele = actif && actif.models ? actif.models[0] : '';
