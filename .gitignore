@@ -20,3 +20,6 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+
+# Cookies de session (jamais commit)
+cookies/*.txt
