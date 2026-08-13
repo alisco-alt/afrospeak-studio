@@ -165,11 +165,17 @@ function analyser(fichier) {
        * `function(s)`, `.map((s, i) =>`… La variable y est REDÉFINIE
        * localement, l'ancienne portée n'a aucune incidence. */
       const suite = apres.slice(u.index + nom.length, u.index + nom.length + 24);
-      const avantU = apres.slice(Math.max(0, u.index - 3), u.index);
+      /* Fenêtre large en amont : une clé d'objet peut être indentée de
+       * plusieurs espaces après le retour à la ligne. Une fenêtre de
+       * 3 caractères ne voyait que l'indentation et manquait le `\n`. */
+      const avantU = apres.slice(Math.max(0, u.index - 40), u.index);
       if (/^\s*(,\s*[\w$]+\s*)*\)\s*=>/.test(suite) && /[(,]\s*$/.test(avantU)) break;
 
-      // Ni une clé d'objet (`{ nom: … }` ou raccourci `{ nom }`)
-      if (/^\s*:/.test(suite) && /[{,]\s*$/.test(avantU)) break;
+      /* Ni une clé d'objet (`{ nom: … }` ou raccourci `{ nom }`).
+       * On accepte aussi le cas d'une clé en DÉBUT DE LIGNE, où le
+       * caractère précédent est un retour chariot et non `{` ou `,` —
+       * fréquent dans les objets d'options multilignes. */
+      if (/^\s*:/.test(suite) && /(^|[{,\n]\s*)$/.test(avantU)) break;
 
       /* Ni un ACCÈS DE PROPRIÉTÉ : dans `sections[0].shots[0]`, le mot
        * « shots » est une propriété de `sections`, pas notre variable.
