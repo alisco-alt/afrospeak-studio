@@ -928,12 +928,30 @@ window.expandShot = function(idx) {
 window.replaceShotPrompt = function(id, shotIdx) {
   const s = (S._reviewShots || [])[shotIdx];
   const label = s ? 'Plan ' + (shotIdx + 1) : 'Plan';
+  /* Requête pré-remplie : celle que le studio a réellement utilisée pour
+   * ce plan. L'utilisateur part donc du contexte du plan au lieu d'une
+   * page vide — il ajuste au lieu de tout retaper. */
+  const q = (s && (s.query || s.visual)) || '';
   openModal('Remplacer — ' + label, `
     <div class="rev-replace">
-      <p style="color:var(--txt-2);margin-bottom:16px">
-        Collez l'URL d'une image ou vidéo de remplacement.
-        Le fichier sera téléchargé et remplacera le visuel actuel.
-      </p>
+      ${s && s.narration ? `<p style="color:var(--txt-2);font-size:13px;margin-bottom:12px;
+        border-left:3px solid var(--acc);padding-left:10px">🎙️ ${esc(s.narration.slice(0, 160))}</p>` : ''}
+
+      <div style="margin-bottom:8px;font-weight:600">🔎 Chercher un autre visuel</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="text" id="searchQ" value="${esc(q)}" placeholder="mots-clés (anglais de préférence)"
+          onkeydown="if(event.key==='Enter')doSearchShot('${id}',${shotIdx})"
+          style="flex:1;padding:12px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-size:15px">
+        <button class="btn" onclick="doSearchShot('${id}', ${shotIdx})">Chercher</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--txt-2);margin-bottom:12px">
+        <input type="checkbox" id="searchVideo"> vidéos uniquement (B-roll)
+      </label>
+
+      <div id="searchResults" style="min-height:40px"></div>
+
+      <div class="hr"></div>
+      <div style="margin-bottom:8px;font-weight:600">🔗 Ou coller une URL précise</div>
       <input type="url" id="replaceUrl" placeholder="https://exemple.com/image.jpg"
         style="width:100%;padding:12px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-size:15px;margin-bottom:12px">
       <div class="btns">
@@ -942,6 +960,61 @@ window.replaceShotPrompt = function(id, shotIdx) {
       </div>
     </div>
   `);
+  // Recherche lancée d'emblée : l'utilisateur voit des propositions tout de suite.
+  if (q) doSearchShot(id, shotIdx);
+};
+
+/* Recherche de visuels de remplacement, affichés en galerie cliquable.
+ * Utilise /api/media/search, qui interroge toute la cascade de banques. */
+window.doSearchShot = async function(id, shotIdx) {
+  const qEl = $('#searchQ'); const box = $('#searchResults');
+  if (!qEl || !box) return;
+  const q = qEl.value.trim();
+  if (!q) { box.innerHTML = '<p style="color:var(--txt-2)">Saisissez des mots-clés.</p>'; return; }
+  const video = $('#searchVideo') && $('#searchVideo').checked ? '1' : '0';
+  box.innerHTML = '<p style="color:var(--txt-2)">Recherche en cours…</p>';
+  try {
+    const { results } = await api('/api/media/search?q=' + encodeURIComponent(q)
+      + '&video=' + video + '&limit=18');
+    if (!results || !results.length) {
+      box.innerHTML = '<p style="color:var(--txt-2)">Aucun résultat — essayez d\'autres mots-clés, en anglais.</p>';
+      return;
+    }
+    S._searchResults = results;
+    box.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">'
+      + results.map((r, i) => {
+        const t = r.thumb || r.url;
+        return `<div onclick="pickSearchResult('${id}',${shotIdx},${i})"
+          title="${esc(r.title || '')} — ${esc(r.provider || '')}"
+          style="cursor:pointer;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;background:var(--bg2)">
+          <img src="${esc(t)}" loading="lazy" style="width:100%;height:80px;object-fit:cover;display:block"
+            onerror="this.style.display='none'">
+          <div style="font-size:10px;padding:4px;color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+            ${esc(r.provider || '')}${r.kind === 'video' ? ' 🎬' : ''}
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+  } catch (e) {
+    box.innerHTML = '<p style="color:var(--dan)">Erreur : ' + esc(e.message) + '</p>';
+  }
+};
+
+/* Applique un résultat choisi dans la galerie. On passe l'asset complet :
+ * le serveur le télécharge et conserve licence, auteur et page source,
+ * donc le crédit reste correct à l'écran. */
+window.pickSearchResult = async function(id, shotIdx, i) {
+  const asset = (S._searchResults || [])[i];
+  if (!asset) return;
+  try {
+    toast('Téléchargement…');
+    await api('/api/projects/' + id + '/storyboard/' + shotIdx + '/replace', {
+      body: JSON.stringify({ asset })
+    });
+    toast('✅ Visuel remplacé', 'ok');
+    await reviewStoryboard(id);
+  } catch (e) {
+    toast('Erreur: ' + e.message, 'err');
+  }
 };
 
 window.doReplaceShot = async function(id, shotIdx) {
