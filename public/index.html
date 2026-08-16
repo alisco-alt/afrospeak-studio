@@ -1392,6 +1392,18 @@ function pollVideo(id){
       var local = S.videos.filter(function(x){ return x.id === id; })[0];
       if(local){ local.progress = v.progress; local.step = v.step; local.status = v.status; }
       updateProgress(v);
+      /* ── LA PAUSE DE VALIDATION DOIT REDESSINER LA CARTE ──────────
+       * `awaiting_review` n'était pas un état terminal ici : le polling
+       * continuait sans jamais appeler renderDash(). Les boutons
+       * « Valider les médias » / « Approuver » n'apparaissaient donc
+       * qu'après un rafraîchissement manuel de la page (F5), alors que
+       * le pipeline attendait déjà depuis plusieurs minutes. */
+      if(v.status === 'awaiting_review'){
+        clearInterval(iv); delete S.polls[id];
+        toast('🖼️ Médias prêts — validation requise.', 'ok');
+        loadVideos().then(renderDash);
+        return;
+      }
       if(['done','error','cancelled'].indexOf(v.status) >= 0){
         clearInterval(iv); delete S.polls[id];
         toast(v.status === 'done' ? '✅ Vidéo terminée !' : '❌ ' + (v.error||'échec'),
@@ -1764,15 +1776,41 @@ window.applyUrlShot = function(id, idx){
 };
 
 /* Approbation : relance le montage là où il s'était arrêté. */
+/* Approbation : relance le montage là où il s'était arrêté.
+ *
+ * Trois défauts corrigés ici, tous constatés en production :
+ *  1. aucune protection contre le double-clic. Le premier appel réussit,
+ *     les suivants tombent sur « projet pas en attente de validation »
+ *     (le statut a déjà changé) et affichaient « Échec du lancement »
+ *     alors que le montage tournait. Observé cinq fois d'affilée.
+ *  2. la carte n'était pas repassée en suivi : elle restait figée sur
+ *     « Validation requise » pendant tout le montage.
+ *  3. aucun retour visuel immédiat : rien ne montrait que le clic avait
+ *     été pris en compte. */
+var _approbationsEnCours = {};
 window.approveProject = function(id){
+  if(_approbationsEnCours[id]) return;      // déjà cliqué
+  _approbationsEnCours[id] = true;
+
   closeModal();
   toast('Lancement du montage…');
+
+  // Retour visuel immédiat, sans attendre la réponse du serveur.
+  var local = S.videos.filter(function(x){ return x.id === id; })[0];
+  if(local){ local.status = 'running'; local.step = 'Montage des plans'; renderDash(); }
+
   apiTry('/api/projects/'+id+'/approve', {
     method:'POST', headers:{'content-type':'application/json'}, body:'{}'
   }).then(function(j){
-    if(!j){ toast('Échec du lancement.', 'err'); return; }
+    if(!j){
+      delete _approbationsEnCours[id];
+      toast('Échec du lancement — rechargez la page.', 'err');
+      loadVideos().then(renderDash);
+      return;
+    }
     toast('Montage lancé.', 'ok');
-    loadVideos().then(function(){ renderDash(); });
+    // On reprend le suivi : la carte affichera la progression réelle.
+    loadVideos().then(function(){ renderDash(); pollVideo(id); });
   });
 };
 
@@ -1900,6 +1938,28 @@ function searchMedia(){
 renderStyles();
 loadTrends(false);
 loadVideos().then(function(){ renderDash(); loadLibrary(); });
+
+/* ── RAFRAÎCHISSEMENT PÉRIODIQUE DU TABLEAU DE BORD ────────────────────
+ * Il n'en existait AUCUN : seul `pollVideo` suivait une production, et
+ * uniquement après un lancement fait dans l'onglet courant. Conséquences
+ * observées : une production démarrée ailleurs n'apparaissait jamais, et
+ * le passage en « Validation requise » exigeait un F5 manuel.
+ *
+ * On resynchronise donc toutes les 8 s, mais UNIQUEMENT si le tableau de
+ * bord est visible et l'onglet actif — inutile de solliciter le serveur
+ * quand personne ne regarde. On relance aussi le suivi des productions
+ * actives que ce navigateur ne suivait pas encore. */
+setInterval(function(){
+  var dash = document.getElementById('p-dash');
+  if(!dash || !dash.classList.contains('on')) return;
+  if(document.hidden) return;
+  loadVideos().then(function(){
+    renderDash();
+    S.videos.forEach(function(v){
+      if(['queued','running'].indexOf(v.status) >= 0 && !S.polls[v.id]) pollVideo(v.id);
+    });
+  });
+}, 8000);
 </script>
 </body>
 </html>
