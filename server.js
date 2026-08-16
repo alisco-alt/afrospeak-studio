@@ -25,8 +25,14 @@ config.appliquerProduction();
  * un résolveur qui ne répond pas : chaque nom coûte alors 5 s de timeout,
  * soit ~17 min sur une vidéo de 25 plans. Si c'est le cas, on bascule sur
  * des résolveurs publics. Sur une machine saine, rien ne change. */
-require('./lib/reseau').verifierResolveur(m => console.log('[reseau] ' + m))
-  .catch(() => {});
+(async () => {
+  const reseau = require('./lib/reseau');
+  const dire = m => console.log('[reseau] ' + m);
+  await reseau.verifierResolveur(dire).catch(() => {});
+  /* Puis on préchauffe le cache DNS : sur un résolveur lent, cela
+   * transforme N attentes de 5 s en une seule. */
+  await reseau.prechauffer(dire).catch(() => {});
+})();
 const presets = require('./lib/presets');
 const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');
