@@ -50,6 +50,9 @@ const { DIRS, ensureDirs } = util;
 ensureDirs();
 
 const config = require('./lib/config');
+// Réglages de production (interface) → variables d'environnement.
+// Le .env reste prioritaire : appliquerProduction ne comble que le non-défini.
+config.appliquerProduction();
 const llm = require('./lib/llm');
 const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');

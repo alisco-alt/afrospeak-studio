@@ -746,6 +746,21 @@ function fillSettings(cfg) {
   ph('#kUnsplash', 'unsplash', 'Access key Unsplash');
   if (k.openaiModel) $('#kOpenaiModel').value = k.openaiModel;
   if (k.elevenVoice) $('#kElevenVoice').value = k.elevenVoice;
+
+  /* Réglages de production. Absents des anciennes configurations
+   * enregistrées : on retombe sur les valeurs par défaut plutôt que de
+   * laisser les cases dans un état indéterminé. */
+  const p = cfg.production || {};
+  const coche = (id, val, defaut) => {
+    const e = $(id); if (!e) return;
+    e.checked = (val === undefined ? defaut : !!val);
+  };
+  coche('#oMediaReview', p.mediaReview, true);
+  coche('#oFiltreEdito', p.filtreEdito, true);
+  const qs = $('#oQualite');
+  if (qs) qs.value = (p.modeQualite === false) ? 'rapide' : 'qualite';
+  const tm = $('#oTimeoutMult');
+  if (tm) tm.value = String(p.timeoutMult || 3);
 }
 $('#btnSaveKeys').addEventListener('click', async () => {
   const keys = {};
@@ -753,8 +768,15 @@ $('#btnSaveKeys').addEventListener('click', async () => {
   g('#kGroq', 'groq'); g('#kOpenrouter', 'openrouter'); g('#kOpenai', 'openai');
   g('#kOpenaiModel', 'openaiModel'); g('#kEleven', 'elevenlabs'); g('#kElevenVoice', 'elevenVoice');
   g('#kPexels', 'pexels'); g('#kPixabay', 'pixabay'); g('#kUnsplash', 'unsplash');
+  // Réglages de production, enregistrés avec les clés.
+  const production = {
+    mediaReview: $('#oMediaReview') ? $('#oMediaReview').checked : true,
+    filtreEdito: $('#oFiltreEdito') ? $('#oFiltreEdito').checked : true,
+    modeQualite: $('#oQualite') ? $('#oQualite').value !== 'rapide' : true,
+    timeoutMult: $('#oTimeoutMult') ? Number($('#oTimeoutMult').value) || 3 : 3,
+  };
   try {
-    const j = await api('/api/config', { body: JSON.stringify({ keys }) });
+    const j = await api('/api/config', { body: JSON.stringify({ keys, production }) });
     fillSettings(j.config);
     toast('Configuration enregistrée.', 'ok');
     loadHealth(); loadLLM(); loadPlatform();

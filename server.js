@@ -17,6 +17,9 @@ const { DIRS, ensureDirs, logger } = util;
 ensureDirs();
 
 const config = require('./lib/config');
+// Réglages de production (interface) → variables d'environnement, dès le
+// démarrage. Le .env reste prioritaire : on ne comble que le non-défini.
+config.appliquerProduction();
 const presets = require('./lib/presets');
 const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');
@@ -197,6 +200,8 @@ app.post('/api/config', wrap(async (req, res) => {
     }
   }
   config.save(patch);
+  // Les réglages de production prennent effet sans redémarrage.
+  if (patch.production) config.appliquerProduction();
   ok(res, { config: config.publicConfig() });
 }));
 

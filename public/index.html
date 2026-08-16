@@ -842,6 +842,52 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
             <input type="text" id="kPexels" placeholder="Clé API Pexels"></div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Production <span class="tag g">nouveau</span></h3>
+
+        <div class="field" style="margin-bottom:14px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="oMediaReview" checked>
+            <span>Valider les médias avant le montage
+              <span class="hint">— le studio s'arrête et attend votre feu vert</span></span>
+          </label>
+        </div>
+
+        <div class="field" style="margin-bottom:14px">
+          <label>Recherche des visuels</label>
+          <select id="oQualite">
+            <option value="qualite" selected>Qualité — cherche longtemps (12 à 35 min)</option>
+            <option value="rapide">Rapide — budgets réduits (5 à 12 min)</option>
+          </select>
+          <span class="hint">En mode Qualité, le studio insiste sur les sources réelles
+            plutôt que de basculer vite sur une illustration IA.</span>
+        </div>
+
+        <div class="field" style="margin-bottom:14px">
+          <label>Patience réseau <span class="hint">— multiplicateur des délais</span></label>
+          <select id="oTimeoutMult">
+            <option value="2">×2 — connexion rapide</option>
+            <option value="3" selected>×3 — recommandé</option>
+            <option value="5">×5 — connexion lente</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="oFiltreEdito" checked>
+            <span>Filtre éditorial panafricain
+              <span class="hint">— écarte l'iconographie coloniale et misérabiliste</span></span>
+          </label>
+        </div>
+
+        <div class="note" style="margin-top:12px">
+          Ces réglages sont enregistrés avec les clés. Ils correspondent aux
+          variables <code>MEDIA_REVIEW</code>, <code>AFROSPEAK_RAPIDE</code>,
+          <code>MEDIA_TIMEOUT_MULT</code> et <code>FILTRE_EDITO</code> du fichier
+          <code>.env</code>, qui reste prioritaire s'il les définit.
+        </div>
+      </div>
     </section>
 
     <!-- ═══ IDENTITÉ ═══ -->
