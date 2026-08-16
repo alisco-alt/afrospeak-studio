@@ -20,6 +20,13 @@ const config = require('./lib/config');
 // Réglages de production (interface) → variables d'environnement, dès le
 // démarrage. Le .env reste prioritaire : on ne comble que le non-défini.
 config.appliquerProduction();
+
+/* Sonde DNS au démarrage. Sous WSL2, /etc/resolv.conf pointe souvent vers
+ * un résolveur qui ne répond pas : chaque nom coûte alors 5 s de timeout,
+ * soit ~17 min sur une vidéo de 25 plans. Si c'est le cas, on bascule sur
+ * des résolveurs publics. Sur une machine saine, rien ne change. */
+require('./lib/reseau').verifierResolveur(m => console.log('[reseau] ' + m))
+  .catch(() => {});
 const presets = require('./lib/presets');
 const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');

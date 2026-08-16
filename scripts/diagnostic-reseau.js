@@ -49,11 +49,28 @@ async function testDNS(hote) {
   const t = chrono();
   try {
     const r = await dns.lookup(hote, { all: true });
-    return { ok: true, ms: t(), info: r.map(x => `${x.address}/v${x.family}`).join(' ') };
+    const ms = t();
+    /* Un DNS « réussi » mais lent est un DIAGNOSTIC EN SOI : les valeurs
+     * 5006 / 5014 / 15026 ms observées en production sont des timeouts
+     * de 5 000 ms au millième près, pas de la lenteur. Le résolveur ne
+     * répond pas et le système attend son délai avant d'en essayer un
+     * autre. On le signale explicitement. */
+    const lent = ms > 1500;
+    return {
+      ok: true, ms, lent,
+      info: (lent ? '⚠ TIMEOUT RÉSOLVEUR — ' : '') + r.map(x => `${x.address}/v${x.family}`).join(' '),
+    };
   } catch (e) { return { ok: false, ms: t(), info: e.code || e.message }; }
 }
 
-function testTCP(hote, port = 443, timeout = 10000) {
+/* Le test TCP reçoit une ADRESSE IP déjà résolue, pas un nom.
+ * Erreur de conception de la première version : `net.connect({host: nom})`
+ * refait une résolution DNS. Quand celle-ci coûte 15 s et que le plafond
+ * du test est à 10 s, le test expire AVANT d'avoir tenté la moindre
+ * connexion — et le verdict accusait à tort un pare-feu, alors que le
+ * même hôte fonctionnait en production. On résout d'abord, on connecte
+ * ensuite : chaque couche est ainsi mesurée pour elle-même. */
+function testTCP(hote, port = 443, timeout = 15000) {
   return new Promise(resolve => {
     const t = chrono();
     const s = net.connect({ host: hote, port });
@@ -65,10 +82,10 @@ function testTCP(hote, port = 443, timeout = 10000) {
   });
 }
 
-function testTLS(hote, timeout = 12000) {
+function testTLS(ip, sni, timeout = 15000) {
   return new Promise(resolve => {
     const t = chrono();
-    const s = tls.connect({ host: hote, port: 443, servername: hote });
+    const s = tls.connect({ host: ip, port: 443, servername: sni });
     const fin = (ok, info) => { try { s.destroy(); } catch (e) {} resolve({ ok, ms: t(), info }); };
     s.setTimeout(timeout);
     s.on('secureConnect', () => fin(true, s.getProtocol() || 'ok'));
@@ -116,15 +133,21 @@ const p = (r) => (r.ok ? '✓' : '✗') + ' ' + String(r.ms).padStart(5) + 'ms '
   console.log('');
 
   const echecs = [];
+  const lents = [];
   for (const c of CIBLES) {
     console.log('── ' + c.hote + (c.temoin ? '   [TÉMOIN — fonctionne en production]' : ''));
     const d = await testDNS(c.hote);
     console.log('   DNS      ' + p(d));
     if (!d.ok) { echecs.push([c.hote, 'DNS']); console.log(''); continue; }
-    const tcp = await testTCP(c.hote);
+    if (d.lent) lents.push([c.hote, d.ms]);
+    /* On connecte sur l'IP déjà résolue : la mesure TCP ne doit pas
+     * repayer le coût du DNS. */
+    const ip = (d.info.match(/(\d+\.\d+\.\d+\.\d+)/) || [])[1] || c.hote;
+    const tcp = await testTCP(ip);
     console.log('   TCP:443  ' + p(tcp));
     if (!tcp.ok) { echecs.push([c.hote, 'TCP']); console.log(''); continue; }
-    const t = await testTLS(c.hote);
+    // TLS sur l'IP, avec SNI sur le nom : le certificat reste vérifié.
+    const t = await testTLS(ip, c.hote);
     console.log('   TLS      ' + p(t));
     if (!t.ok) { echecs.push([c.hote, 'TLS']); console.log(''); continue; }
     const f = await testFetch(c.url);
@@ -137,6 +160,39 @@ const p = (r) => (r.ok ? '✓' : '✗') + ' ' + String(r.ms).padStart(5) + 'ms '
   }
 
   console.log('═══ VERDICT ═══');
+
+  /* Le DNS lent passe AVANT les échecs : c'est la cause la plus probable
+   * et la plus coûteuse, et elle se manifeste par des « succès » qui
+   * masquent le problème. */
+  if (lents.length) {
+    console.log('⚠ RÉSOLVEUR DNS DÉFAILLANT — cause principale');
+    for (const [h, ms] of lents) console.log(`    ${h} : ${ms} ms`);
+    console.log('');
+    console.log('  Des valeurs proches de 5000 / 10000 / 15000 ms sont des');
+    console.log('  TIMEOUTS, pas de la lenteur : le serveur DNS de');
+    console.log('  /etc/resolv.conf ne répond pas et le système attend son');
+    console.log('  délai avant d\'en essayer un autre.');
+    console.log('');
+    console.log('  Impact : ~200 résolutions par vidéo de 25 plans,');
+    console.log('  soit ~17 min passées uniquement à résoudre des noms.');
+    console.log('  C\'est ce qui vide le budget média avant tout téléchargement.');
+    console.log('');
+    console.log('  CORRECTIF AUTOMATIQUE : déjà en place. Au démarrage, le');
+    console.log('  studio sonde le résolveur et bascule sur 1.1.1.1 / 8.8.8.8');
+    console.log('  s\'il est trop lent. Vous verrez au lancement :');
+    console.log('    [reseau] DNS système lent (…) — bascule sur 1.1.1.1…');
+    console.log('');
+    console.log('  CORRECTIF DURABLE (recommandé), côté WSL2 :');
+    console.log('    sudo tee /etc/wsl.conf >/dev/null <<\'EOF\'');
+    console.log('    [network]');
+    console.log('    generateResolvConf = false');
+    console.log('    EOF');
+    console.log('    sudo rm -f /etc/resolv.conf');
+    console.log('    echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf');
+    console.log('  puis, depuis PowerShell : wsl --shutdown');
+    console.log('');
+  }
+
   if (!echecs.length) {
     console.log('Toutes les cibles répondent. Le problème n\'est pas le réseau :');
     console.log('relancez une production et notez à quel moment les échecs commencent.');
