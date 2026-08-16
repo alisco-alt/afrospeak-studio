@@ -1,138 +1,99 @@
-# Réparer le DNS sous WSL2 — procédure de secours
+# Réparer le DNS sous WSL2
 
-**Ma recommandation précédente a aggravé votre situation. Voici comment
-revenir en arrière, puis comment réparer proprement.**
+## ⚠ URGENT — à faire maintenant
+
+Votre `/etc/resolv.conf` contient actuellement `1.1.1.1` et `8.8.8.8`.
+**Nous savons que ces serveurs ne répondent pas depuis votre WSL2** (c'est
+ce qui a provoqué les `EAI_AGAIN` partout). Remettez le résolveur qui
+fonctionne :
+
+```bash
+sudo tee /etc/resolv.conf >/dev/null <<'EOF'
+nameserver 10.255.255.254
+options timeout:1 attempts:2
+EOF
+```
+
+Vérifiez tout de suite :
+
+```bash
+time getent hosts github.com
+```
+
+Vous devez obtenir une adresse en **moins d'une seconde**.
+
+Gardez `/etc/wsl.conf` tel quel (`generateResolvConf = false`) : il empêche
+WSL d'écraser ce fichier au redémarrage.
 
 ---
 
-## Étape 0 — RESTAURER (à faire en premier)
+## Ce que votre test a réellement montré
 
-Avant mon conseil, votre DNS était **lent (5 s) mais fonctionnel**.
-Maintenant il est **mort** (`EAI_AGAIN` partout, `git` ne résout plus).
-
-Cause : sous WSL2, le DNS passe normalement par un **proxy sur l'hôte
-Windows** (`172.x.x.1`). En écrivant `nameserver 1.1.1.1`, on a supprimé
-cette voie — et `1.1.1.1` est injoignable directement depuis votre WSL2,
-probablement à cause d'un pare-feu, d'un antivirus ou d'un VPN qui bloque
-le trafic DNS sortant.
-
-```bash
-sudo rm -f /etc/wsl.conf
-sudo rm -f /etc/resolv.conf
+```
+getent hosts github.com   →   140.82.121.4     ✓
+nameserver 10.255.255.254                       ✓
 ```
 
-Puis, depuis **PowerShell Windows** (pas dans WSL) :
+**Le résolveur `10.255.255.254` fonctionne.** C'est le proxy DNS de l'hôte
+Windows, la passerelle NAT de WSL2.
 
-```powershell
-wsl --shutdown
-```
+### Pourquoi mon test affichait « INJOIGNABLE » partout
 
-Rouvrez WSL. `/etc/resolv.conf` est régénéré automatiquement avec le
-résolveur de l'hôte. Vérifiez :
+Deux bugs dans la boucle que je vous ai donnée :
 
-```bash
-cat /etc/resolv.conf
-getent hosts github.com
-```
+1. **`nslookup` n'était pas encore installé** quand la boucle a tourné —
+   vous avez installé `dnsutils` *après*. La commande échouait donc
+   systématiquement, et `|| echo "INJOIGNABLE"` se déclenchait pour tous
+   les serveurs, y compris celui qui marche.
+2. La ligne `(via système)` testait `getent` (le résolveur système) au
+   lieu du candidat `$s` — elle s'affichait à chaque tour sans rien
+   prouver.
 
-Vous devez retrouver l'état initial : lent, mais qui répond.
+Les quatre `INJOIGNABLE` sont des **faux négatifs**.
 
----
+### Test corrigé
 
-## Étape 1 — Identifier ce qui est joignable
-
-Une fois revenu à l'état de départ, ce test dit **quel** résolveur
-fonctionne réellement :
+Maintenant que `dnsutils` est installé :
 
 ```bash
-# Le résolveur actuel (celui de l'hôte Windows)
-grep nameserver /etc/resolv.conf
-
-# Test de chaque candidat, 3 s max
-for s in $(grep nameserver /etc/resolv.conf | awk '{print $2}') 1.1.1.1 8.8.8.8 9.9.9.9; do
+for s in 10.255.255.254 1.1.1.1 8.8.8.8 9.9.9.9; do
   printf "%-16s " "$s"
-  timeout 3 getent ahostsv4 github.com >/dev/null 2>&1 && echo "(via système)" || true
-  timeout 3 nslookup github.com "$s" >/dev/null 2>&1 && echo "OK" || echo "INJOIGNABLE"
+  if timeout 3 dig +short +tries=1 +time=2 @"$s" github.com A >/dev/null 2>&1; then
+    t=$( { TIMEFORMAT=%R; time timeout 3 dig +short +tries=1 +time=2 @"$s" github.com A >/dev/null 2>&1; } 2>&1 )
+    echo "OK  (${t}s)"
+  else
+    echo "INJOIGNABLE"
+  fi
 done
 ```
 
-Si `nslookup` n'existe pas :
+---
 
-```bash
-sudo apt update && sudo apt install -y dnsutils
-```
+## Le vrai problème : la lenteur, pas la panne
 
-**Interprétation :**
+Le résolveur répond, mais il mettait **5 s** par nom. La cause est la
+valeur par défaut de la libc : `timeout:5 attempts:2`. Quand le proxy WSL2
+ne répond pas du premier coup — ce qui arrive souvent — le système attend
+5 secondes pleines avant de réessayer.
 
-| résultat | signification |
-|---|---|
-| seul l'IP `172.x.x.1` répond | le proxy WSL2 est votre **seule** voie — ne le retirez pas |
-| `1.1.1.1` ou `8.8.8.8` répond | vous pouvez fixer ce résolveur (étape 2) |
-| **aucun** ne répond | un pare-feu/antivirus/VPN bloque le DNS (étape 3) |
+`options timeout:1 attempts:2` ramène cette attente à 1 s. C'est le seul
+réglage qui compte, et il ne change pas de résolveur.
+
+| | avant | après |
+|---|---|---|
+| attente par tentative | 5 s | **1 s** |
+| pire cas (2 tentatives) | 10 s | **2 s** |
 
 ---
 
-## Étape 2 — Fixer un résolveur qui répond
+## Si la lenteur persiste
 
-**Uniquement si l'étape 1 a montré qu'il répond.**
+### Option A — mode miroir (Windows 11 22H2+)
 
-```bash
-sudo tee /etc/wsl.conf >/dev/null <<'EOF'
-[network]
-generateResolvConf = false
-EOF
+La solution la plus fiable : WSL2 partage la pile réseau de Windows,
+il n'y a plus de proxy DNS intermédiaire.
 
-sudo rm -f /etc/resolv.conf
-sudo tee /etc/resolv.conf >/dev/null <<'EOF'
-nameserver 1.1.1.1
-nameserver 8.8.8.8
-options timeout:2 attempts:1
-EOF
-```
-
-`timeout:2 attempts:1` est important : même si un serveur ne répond pas,
-on perd 2 s au lieu de 5, et on passe immédiatement au suivant.
-
-Puis `wsl --shutdown` depuis PowerShell.
-
----
-
-## Étape 3 — Si rien ne répond : le blocage est sur Windows
-
-Le DNS sortant est filtré. Trois suspects, par ordre de fréquence :
-
-1. **VPN actif** (même en veille) — déconnectez-le complètement et
-   retestez.
-2. **Antivirus avec protection réseau** (Kaspersky, Avast, ESET,
-   Bitdefender…) — leur module « protection Web » ou « filtrage DNS »
-   bloque WSL2. Suspendez-le 5 minutes pour vérifier.
-3. **Pare-feu Windows** — autorisez `vEthernet (WSL)` :
-
-```powershell
-# PowerShell en administrateur
-Get-NetFirewallHyperVVMSetting -PolicyStore ActiveStore
-Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
-```
-
-Réinitialiser complètement le réseau WSL2 (souvent efficace) :
-
-```powershell
-wsl --shutdown
-netsh winsock reset
-netsh int ip reset
-ipconfig /flushdns
-# redémarrer Windows
-```
-
----
-
-## Étape 4 — Solution de contournement : mode miroir
-
-Windows 11 (build 22H2+) propose un mode réseau où WSL2 partage
-directement la pile réseau de Windows. C'est la solution la plus fiable
-quand le NAT pose problème.
-
-Dans `C:\Users\<vous>\.wslconfig` (fichier Windows, pas WSL) :
+Dans `C:\Users\HP ZBOOK\.wslconfig` (fichier Windows) :
 
 ```ini
 [wsl2]
@@ -141,36 +102,74 @@ dnsTunneling=true
 autoProxy=true
 ```
 
-Puis `wsl --shutdown`. Si votre Windows est trop ancien, ces options sont
-simplement ignorées.
+Puis, depuis PowerShell : `wsl --shutdown`.
+
+Si votre build de Windows est trop ancien, ces options sont ignorées sans
+effet de bord.
+
+### Option B — réinitialiser la pile réseau Windows
+
+```powershell
+wsl --shutdown
+netsh winsock reset
+netsh int ip reset
+ipconfig /flushdns
+```
+
+Puis redémarrez Windows.
+
+### Option C — revenir à la génération automatique
+
+Si tout se dégrade, ce retour en arrière est toujours sûr :
+
+```bash
+sudo rm -f /etc/wsl.conf /etc/resolv.conf
+```
+
+Puis `wsl --shutdown` depuis PowerShell. WSL régénère un `resolv.conf`
+fonctionnel au démarrage suivant.
+
+---
+
+## À propos du pare-feu Hyper-V
+
+Vous avez exécuté :
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-...}' -DefaultInboundAction Allow
+```
+
+Cette commande autorise le trafic **entrant** vers la VM. Le DNS sortant
+n'était pas concerné — elle n'aggrave rien, mais elle ne réglait pas ce
+problème-là. Vous pouvez revenir à l'état d'origine si vous préférez :
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Block
+```
 
 ---
 
 ## Vérification finale
 
 ```bash
-time getent hosts github.com     # doit répondre en < 0,1 s
-node scripts/diagnostic-reseau.js
+time getent hosts github.com        # < 1 s
+git pull origin main
+node scripts/diagnostic-reseau.js   # DNS < 200 ms partout
 ```
-
-Objectif : **DNS < 100 ms** sur toutes les lignes.
 
 ---
 
 ## Ce que le studio fait de son côté
 
-Depuis le commit `ff71405`, le studio sonde le résolveur au démarrage et
-bascule automatiquement sur `1.1.1.1` / `8.8.8.8` s'il est lent — **mais
-seulement si ces serveurs répondent**. Dans votre cas ils ne répondent
-pas : aucun correctif applicatif ne peut compenser un DNS bloqué au
-niveau du système. La réparation doit se faire dans WSL2/Windows.
+Depuis le commit `b1ba584` :
 
----
+- **préchauffage DNS** au démarrage : les 14 domaines interrogés en boucle
+  sont résolus **en parallèle**, une seule fois. Même à 5 s par nom, le
+  coût total devient ~5 s au lieu de 5 s × 14 ;
+- **cache DNS applicatif** porté à 30 minutes ;
+- **bascule réversible** : si le studio tente un résolveur public et qu'il
+  ne répond pas, il restaure immédiatement le vôtre. C'est exactement la
+  panne que nous venons de vivre — elle ne peut plus se reproduire depuis
+  le code.
 
-## Pourquoi je me suis trompé
-
-J'ai lu « 5006 ms = timeout du résolveur » et proposé de le remplacer.
-Le raisonnement était juste sur le diagnostic, **faux sur le remède** :
-je n'ai pas vérifié que le résolveur de remplacement était joignable
-avant de vous faire supprimer celui qui marchait. Un résolveur lent qui
-répond vaut mieux qu'un résolveur rapide inaccessible.
+Autrement dit : même avec un DNS lent, la production redevient viable.

@@ -205,12 +205,25 @@ const p = (r) => (r.ok ? '✓' : '✗') + ' ' + String(r.ms).padStart(5) + 'ms '
   }
   console.log('');
   if (par.DNS) {
-    console.log('→ DNS défaillant. Sous WSL2, /etc/resolv.conf est régénéré au');
-    console.log('  démarrage. Correctif durable : créer /etc/wsl.conf avec');
-    console.log('    [network]');
-    console.log('    generateResolvConf = false');
-    console.log('  puis, depuis PowerShell : wsl --shutdown, et écrire');
-    console.log('  nameserver 1.1.1.1 dans /etc/resolv.conf.');
+    console.log('→ DNS défaillant (EAI_AGAIN = aucune réponse du résolveur).');
+    console.log('');
+    console.log('  ⚠ NE REMPLACEZ PAS le résolveur avant de l\'avoir testé.');
+    console.log('  Sous WSL2, le DNS passe par la passerelle de l\'hôte Windows');
+    console.log('  (10.255.255.254). Les résolveurs publics (1.1.1.1, 8.8.8.8)');
+    console.log('  sont souvent BLOQUÉS par un pare-feu, un antivirus ou un VPN :');
+    console.log('  les substituer transforme un DNS lent en DNS mort.');
+    console.log('');
+    console.log('  1) Vérifiez d\'abord ce qui répond :');
+    console.log('       cat /etc/resolv.conf');
+    console.log('       getent hosts github.com');
+    console.log('     Si une adresse s\'affiche, le résolveur FONCTIONNE.');
+    console.log('');
+    console.log('  2) S\'il est seulement lent, le remède est le délai, pas le');
+    console.log('     serveur — ajoutez à /etc/resolv.conf :');
+    console.log('       options timeout:1 attempts:2');
+    console.log('     (défaut libc : timeout:5 → 5 s perdues par tentative)');
+    console.log('');
+    console.log('  3) Procédure complète et retour arrière : REPARER-DNS.md');
   }
   if (par.TCP || par.TLS) {
     console.log('→ Connexion bloquée avant HTTP : pare-feu, antivirus avec');
