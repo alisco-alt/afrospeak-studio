@@ -165,31 +165,52 @@ const p = (r) => (r.ok ? '✓' : '✗') + ' ' + String(r.ms).padStart(5) + 'ms '
    * et la plus coûteuse, et elle se manifeste par des « succès » qui
    * masquent le problème. */
   if (lents.length) {
-    console.log('⚠ RÉSOLVEUR DNS DÉFAILLANT — cause principale');
+    /* Un temps CONSTANT et égal au timeout configuré + quelques ms est la
+     * signature d'une tentative perdue, pas d'une latence réseau. */
+    const tim = lents.map(x => x[1]);
+    const constant = tim.length > 2
+      && (Math.max(...tim) - Math.min(...tim)) < 60
+      && Math.abs(Math.min(...tim) % 1000) < 60;
+
+    console.log('⚠ RÉSOLUTION DNS LENTE — cause principale');
     for (const [h, ms] of lents) console.log(`    ${h} : ${ms} ms`);
     console.log('');
-    console.log('  Des valeurs proches de 5000 / 10000 / 15000 ms sont des');
-    console.log('  TIMEOUTS, pas de la lenteur : le serveur DNS de');
-    console.log('  /etc/resolv.conf ne répond pas et le système attend son');
-    console.log('  délai avant d\'en essayer un autre.');
+
+    if (constant) {
+      const sec = Math.round(Math.min(...tim) / 1000);
+      console.log(`  Ces durées sont CONSTANTES et valent ${sec} s + quelques ms,`);
+      console.log('  soit exactement le `timeout` de /etc/resolv.conf. Ce n\'est');
+      console.log('  pas de la latence : la PREMIÈRE requête est perdue, le');
+      console.log('  résolveur attend son délai, puis la seconde aboutit.');
+      console.log('');
+      console.log('  Cause connue sous WSL2 : la libc envoie les requêtes A');
+      console.log('  (IPv4) et AAAA (IPv6) SIMULTANÉMENT sur le même socket UDP,');
+      console.log('  et le proxy DNS de l\'hôte n\'en traite qu\'une.');
+      console.log('');
+      console.log('  ✅ CORRECTIF — sérialiser les deux requêtes :');
+      console.log('     sudo tee /etc/resolv.conf >/dev/null <<\'EOF\'');
+      console.log('     nameserver 10.255.255.254');
+      console.log('     options single-request-reopen timeout:1 attempts:2');
+      console.log('     EOF');
+      console.log('');
+      console.log('  Puis vérifier :  time getent hosts github.com');
+      console.log('  Attendu : moins de 100 ms au lieu de ' + Math.min(...tim) + ' ms.');
+    } else {
+      console.log('  Des valeurs proches de 5000 / 10000 / 15000 ms sont des');
+      console.log('  TIMEOUTS : le serveur DNS ne répond pas et le système');
+      console.log('  attend son délai avant d\'en essayer un autre.');
+      console.log('');
+      console.log('  Ajoutez à /etc/resolv.conf, SANS changer de nameserver :');
+      console.log('     options single-request-reopen timeout:1 attempts:2');
+    }
     console.log('');
-    console.log('  Impact : ~200 résolutions par vidéo de 25 plans,');
-    console.log('  soit ~17 min passées uniquement à résoudre des noms.');
-    console.log('  C\'est ce qui vide le budget média avant tout téléchargement.');
+    console.log('  ⚠ NE REMPLACEZ PAS le nameserver par 1.1.1.1 ou 8.8.8.8 sans');
+    console.log('  avoir vérifié qu\'ils répondent : sous WSL2 ils sont souvent');
+    console.log('  filtrés, et les substituer transforme un DNS lent en DNS mort.');
     console.log('');
-    console.log('  CORRECTIF AUTOMATIQUE : déjà en place. Au démarrage, le');
-    console.log('  studio sonde le résolveur et bascule sur 1.1.1.1 / 8.8.8.8');
-    console.log('  s\'il est trop lent. Vous verrez au lancement :');
-    console.log('    [reseau] DNS système lent (…) — bascule sur 1.1.1.1…');
-    console.log('');
-    console.log('  CORRECTIF DURABLE (recommandé), côté WSL2 :');
-    console.log('    sudo tee /etc/wsl.conf >/dev/null <<\'EOF\'');
-    console.log('    [network]');
-    console.log('    generateResolvConf = false');
-    console.log('    EOF');
-    console.log('    sudo rm -f /etc/resolv.conf');
-    console.log('    echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf');
-    console.log('  puis, depuis PowerShell : wsl --shutdown');
+    console.log('  Le studio amortit déjà ce coût : les 14 domaines utilisés en');
+    console.log('  boucle sont préchauffés EN PARALLÈLE au démarrage, puis mis');
+    console.log('  en cache 30 min. Détails et retour arrière : REPARER-DNS.md');
     console.log('');
   }
 

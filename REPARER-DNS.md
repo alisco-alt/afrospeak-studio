@@ -1,29 +1,59 @@
 # Réparer le DNS sous WSL2
 
-## ⚠ URGENT — à faire maintenant
+## ✅ Correctif final — une seule ligne à changer
 
-Votre `/etc/resolv.conf` contient actuellement `1.1.1.1` et `8.8.8.8`.
-**Nous savons que ces serveurs ne répondent pas depuis votre WSL2** (c'est
-ce qui a provoqué les `EAI_AGAIN` partout). Remettez le résolveur qui
-fonctionne :
+Le résolveur fonctionne, il perd simplement sa première requête à chaque
+fois. Ajoutez `single-request-reopen` :
 
 ```bash
 sudo tee /etc/resolv.conf >/dev/null <<'EOF'
 nameserver 10.255.255.254
-options timeout:1 attempts:2
+options single-request-reopen timeout:1 attempts:2
 EOF
-```
 
-Vérifiez tout de suite :
-
-```bash
 time getent hosts github.com
 ```
 
-Vous devez obtenir une adresse en **moins d'une seconde**.
+**Attendu : moins de 100 ms** (contre 1001 ms actuellement, 5006 ms au
+départ).
 
 Gardez `/etc/wsl.conf` tel quel (`generateResolvConf = false`) : il empêche
 WSL d'écraser ce fichier au redémarrage.
+
+### Pourquoi cette option
+
+Vos mesures après le premier correctif :
+
+| domaine | temps |
+|---|---|
+| api.groq.com | **1001** ms |
+| commons.wikimedia.org | **1001** ms |
+| archive.org | **1001** ms |
+| duckduckgo.com | **1001** ms |
+| api.pexels.com | **1003** ms |
+
+Ces valeurs sont **constantes** et valent exactement le `timeout:1`
+configuré, plus quelques millisecondes. Ce n'est pas de la latence réseau
+— une vraie latence varie d'un domaine à l'autre. C'est **une tentative
+perdue** : le résolveur attend son délai, abandonne, réessaie, et réussit.
+
+La cause est connue sous WSL2 : la libc envoie les requêtes **A** (IPv4) et
+**AAAA** (IPv6) *simultanément sur le même socket UDP*. Le proxy DNS de
+l'hôte Windows n'en traite qu'une et laisse tomber l'autre.
+
+`single-request-reopen` force l'envoi **séquentiel** des deux requêtes,
+avec un nouveau socket pour la seconde. Le problème disparaît.
+
+C'est aussi ce qui explique les 5006 ms du début : même bug, avec le
+`timeout:5` par défaut de la libc.
+
+### Progression
+
+| étape | temps par résolution |
+|---|---|
+| au départ (`timeout:5`) | 5006 – 15026 ms |
+| après `timeout:1` | 1001 – 3012 ms |
+| après `single-request-reopen` | **< 100 ms attendu** |
 
 ---
 
