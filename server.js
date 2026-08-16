@@ -464,8 +464,29 @@ app.post('/api/projects/:id/storyboard/:shotIdx/replace', wrap(async (req, res) 
 
 /** Approuve le storyboard et relance le rendu. */
 app.post('/api/projects/:id/approve', wrap(async (req, res) => {
-  const p = await pipeline.resumeFromReview(req.params.id);
-  ok(res, { project: p, resumed: true });
+  const id = req.params.id;
+  const p0 = pipeline.loadProject(id);
+  if (!p0) return fail(res, new Error('projet introuvable'), 404);
+  if (p0.status !== 'awaiting_review') {
+    /* Double-clic ou page rechargée : le montage est déjà lancé. Ce n'est
+     * pas une erreur, on le dit calmement plutôt que d'afficher un échec
+     * alors que tout va bien. */
+    return ok(res, { project: p0, resumed: false, deja: true });
+  }
+
+  /* ── PASSER PAR LA FILE, COMME LA PRODUCTION INITIALE ────────────────
+   * Appeler `pipeline.resumeFromReview()` directement contournait
+   * `runJob`, donc le miroir « projet → base ». Le montage tournait
+   * réellement mais la base restait bloquée sur `awaiting_review` :
+   * carte figée, et vidéo terminée jamais affichée bien que présente sur
+   * le disque. On réutilise le même circuit que le premier lancement. */
+  const q = queue.enqueue({
+    id,
+    userId: (req.user && req.user.id) || 'local',
+    run: async ({ onCancelable }) =>
+      webapp.reprendreApresRevue(id, (req.user && req.user.id) || 'local', onCancelable),
+  });
+  ok(res, { project: p0, resumed: true, queue: q });
 }));
 
 /* ------------------------------ SSE ------------------------------ */
