@@ -21,16 +21,23 @@ const config = require('./lib/config');
 // démarrage. Le .env reste prioritaire : on ne comble que le non-défini.
 config.appliquerProduction();
 
-/* Sonde DNS au démarrage. Sous WSL2, /etc/resolv.conf pointe souvent vers
- * un résolveur qui ne répond pas : chaque nom coûte alors 5 s de timeout,
- * soit ~17 min sur une vidéo de 25 plans. Si c'est le cas, on bascule sur
- * des résolveurs publics. Sur une machine saine, rien ne change. */
+/* ── DNS : cache global puis préchauffage ────────────────────────────
+ * Sous WSL2, le proxy DNS de l'hôte perd sa première requête : mesuré,
+ * chaque résolution coûte ~1 s même après réglage de /etc/resolv.conf.
+ *
+ * `installerCacheGlobal()` est posé EN PREMIER et de façon SYNCHRONE :
+ * il intercepte `dns.lookup`, donc toute résolution du process — y
+ * compris celles de `fetch()`, qui ignorait complètement notre cache.
+ * Il doit être en place avant la moindre requête réseau, sinon les
+ * premières la repaient.
+ *
+ * Mesuré avec un résolveur simulé à 1 s : 3 requêtes coûtaient 2289 ms,
+ * elles coûtent 49 ms une fois le cache installé et préchauffé. */
+require('./lib/reseau').installerCacheGlobal();
 (async () => {
   const reseau = require('./lib/reseau');
   const dire = m => console.log('[reseau] ' + m);
   await reseau.verifierResolveur(dire).catch(() => {});
-  /* Puis on préchauffe le cache DNS : sur un résolveur lent, cela
-   * transforme N attentes de 5 s en une seule. */
   await reseau.prechauffer(dire).catch(() => {});
 })();
 const presets = require('./lib/presets');
