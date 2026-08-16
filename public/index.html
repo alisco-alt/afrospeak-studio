@@ -1464,7 +1464,12 @@ function renderDash(){
 function videoRow(v){
   var map = {
     done:['g','Terminée'], running:['o','En cours'], queued:['n','En file'],
-    error:['r','Erreur'], cancelled:['n','Annulée']
+    error:['r','Erreur'], cancelled:['n','Annulée'],
+    /* Statut introduit avec la validation humaine des médias. Sans cette
+     * entrée, le tableau de bord affichait le code brut « AWAITING_REVIEW »
+     * et n'offrait AUCUN bouton : la production restait en attente sans
+     * qu'on puisse l'approuver. */
+    awaiting_review:['o','Validation requise']
   };
   var st = map[v.status] || ['n', v.status];
   var pct = Math.round((v.progress||0)*100);
@@ -1500,6 +1505,11 @@ function videoRow(v){
             '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>'
           : '')+
         (active ? '<button class="btn xs dan" onclick="cancelVideo(\''+v.id+'\')">Arrêter</button>' : '')+
+        (v.status==='awaiting_review'
+          ? '<button class="btn xs ok" onclick="reviewStoryboard(\''+v.id+'\')">🖼️ Valider les médias</button>'+
+            '<button class="btn xs" onclick="approveProject(\''+v.id+'\')">✅ Approuver et monter</button>'+
+            '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>'
+          : '')+
         (v.status==='error' ? '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>' : '')+
       '</div>'+
     '</div></div>';
@@ -1630,6 +1640,140 @@ window.deleteVideo = function(id){
     toast('Vidéo supprimée.', 'ok');
     loadVideos().then(function(){ renderDash(); loadLibrary(); });
   }).catch(function(){ toast('Erreur lors de la suppression.', 'err'); });
+};
+
+/* ══════════ VALIDATION HUMAINE DES MÉDIAS ══════════
+ * Le pipeline s'arrête après la recherche des visuels et attend une
+ * approbation. Ces fonctions vivaient dans public/app.js — un fichier
+ * que index.html ne charge JAMAIS. Résultat : le tableau de bord
+ * affichait le statut brut « AWAITING_REVIEW » sans aucun bouton, et la
+ * production restait indéfiniment en attente. */
+
+/* Galerie de relecture : une vignette par plan, remplaçable d'un clic. */
+window.reviewStoryboard = function(id){
+  openModal('Validation des médias',
+    '<div style="text-align:center;padding:24px"><span class="spin"></span>'+
+    '<p style="margin-top:12px;color:var(--txt-2)">Chargement du storyboard…</p></div>');
+  apiTry('/api/projects/'+id+'/storyboard').then(function(j){
+    if(!j){ toast('Storyboard indisponible.', 'err'); return; }
+    var sb = j.storyboard || {};
+    var shots = sb.shots || [];
+    var avecVisuel = shots.filter(function(s){ return s.asset && s.asset.file; }).length;
+
+    var cases = shots.map(function(s){
+      var a = s.asset || {};
+      var url = a.file ? '/api/media/file?p='+encodeURIComponent(a.file) : null;
+      var src = a.genereParIA ? '<span class="tag o">IA</span>'
+              : a.provider ? '<span class="tag n">'+esc(String(a.provider).slice(0,18))+'</span>'
+              : '<span class="tag r">manquant</span>';
+      return '<div style="border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;background:var(--bg2)">'+
+        (url
+          ? '<img src="'+esc(apiUrl(url))+'" loading="lazy" style="width:100%;height:110px;object-fit:cover;display:block">'
+          : '<div style="height:110px;display:grid;place-items:center;color:var(--txt-2)">📷</div>')+
+        '<div style="padding:8px">'+
+          '<div style="font-size:11px;color:var(--txt-2);margin-bottom:4px">Plan '+(s.index+1)+' '+src+'</div>'+
+          '<div style="font-size:11.5px;line-height:1.4;max-height:48px;overflow:hidden">'+
+            esc(String(s.narration||'').slice(0,90))+'</div>'+
+          '<button class="btn xs" style="margin-top:8px;width:100%" '+
+            'onclick="replaceShot(\''+id+'\','+s.index+')">🔁 Remplacer</button>'+
+        '</div></div>';
+    }).join('');
+
+    openModal('Validation des médias — '+esc(sb.title||''),
+      '<div style="display:flex;gap:18px;margin-bottom:14px;font-size:13px;color:var(--txt-2)">'+
+        '<span><b style="color:var(--txt)">'+shots.length+'</b> plans</span>'+
+        '<span><b style="color:var(--txt)">'+avecVisuel+'/'+shots.length+'</b> visuels</span>'+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;'+
+        'max-height:52vh;overflow:auto;padding-right:4px">'+cases+'</div>'+
+      '<div class="btns" style="margin-top:16px">'+
+        '<button class="btn pri" onclick="approveProject(\''+id+'\')">✅ Approuver et lancer le montage</button>'+
+        '<button class="btn ghost" onclick="closeModal()">Fermer</button>'+
+      '</div>');
+  });
+};
+
+/* Remplacement d'un visuel : recherche intégrée + collage d'URL. */
+window.replaceShot = function(id, idx){
+  openModal('Remplacer le plan '+(idx+1),
+    '<div class="field" style="margin-bottom:10px">'+
+      '<label>Rechercher un autre visuel</label>'+
+      '<div style="display:flex;gap:8px">'+
+        '<input type="text" id="rsQ" placeholder="mots-clés (anglais de préférence)" '+
+          'style="flex:1;padding:11px;background:var(--bg2);border:1px solid var(--bd);'+
+          'border-radius:var(--r);color:var(--txt)">'+
+        '<button class="btn" onclick="searchShot(\''+id+'\','+idx+')">Chercher</button>'+
+      '</div></div>'+
+    '<div id="rsRes" style="min-height:30px"></div>'+
+    '<div class="hr"></div>'+
+    '<div class="field"><label>Ou coller une URL directe</label>'+
+      '<input type="url" id="rsUrl" placeholder="https://…/image.jpg" '+
+        'style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--bd);'+
+        'border-radius:var(--r);color:var(--txt)"></div>'+
+    '<div class="btns" style="margin-top:12px">'+
+      '<button class="btn pri" onclick="applyUrlShot(\''+id+'\','+idx+')">Télécharger & remplacer</button>'+
+      '<button class="btn ghost" onclick="reviewStoryboard(\''+id+'\')">← Retour</button>'+
+    '</div>');
+};
+
+window.searchShot = function(id, idx){
+  var q = (document.getElementById('rsQ')||{}).value || '';
+  var box = document.getElementById('rsRes');
+  if(!q.trim()){ box.innerHTML = '<p style="color:var(--txt-2)">Saisissez des mots-clés.</p>'; return; }
+  box.innerHTML = '<p style="color:var(--txt-2)">Recherche…</p>';
+  apiTry('/api/media/search?q='+encodeURIComponent(q)+'&limit=12').then(function(j){
+    var r = (j && j.results) || [];
+    if(!r.length){ box.innerHTML = '<p style="color:var(--txt-2)">Aucun résultat.</p>'; return; }
+    S._rs = r;
+    box.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">'+
+      r.map(function(x,i){
+        return '<div onclick="pickShot(\''+id+'\','+idx+','+i+')" title="'+esc(x.provider||'')+'" '+
+          'style="cursor:pointer;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden">'+
+          '<img src="'+esc(x.thumb||x.url)+'" loading="lazy" '+
+            'style="width:100%;height:72px;object-fit:cover;display:block"></div>';
+      }).join('')+'</div>';
+  });
+};
+
+window.pickShot = function(id, idx, i){
+  var asset = (S._rs||[])[i];
+  if(!asset) return;
+  toast('Téléchargement…');
+  apiTry('/api/projects/'+id+'/storyboard/'+idx+'/replace', {
+    method:'POST', headers:{'content-type':'application/json'},
+    body: JSON.stringify({ asset: asset })
+  }).then(function(j){
+    if(!j){ toast('Échec du remplacement.', 'err'); return; }
+    toast('Visuel remplacé.', 'ok');
+    reviewStoryboard(id);
+  });
+};
+
+window.applyUrlShot = function(id, idx){
+  var u = (document.getElementById('rsUrl')||{}).value || '';
+  if(!u.trim()){ toast('URL requise.', 'err'); return; }
+  toast('Téléchargement…');
+  apiTry('/api/projects/'+id+'/storyboard/'+idx+'/replace', {
+    method:'POST', headers:{'content-type':'application/json'},
+    body: JSON.stringify({ url: u.trim() })
+  }).then(function(j){
+    if(!j){ toast('Échec du remplacement.', 'err'); return; }
+    toast('Visuel remplacé.', 'ok');
+    reviewStoryboard(id);
+  });
+};
+
+/* Approbation : relance le montage là où il s'était arrêté. */
+window.approveProject = function(id){
+  closeModal();
+  toast('Lancement du montage…');
+  apiTry('/api/projects/'+id+'/approve', {
+    method:'POST', headers:{'content-type':'application/json'}, body:'{}'
+  }).then(function(j){
+    if(!j){ toast('Échec du lancement.', 'err'); return; }
+    toast('Montage lancé.', 'ok');
+    loadVideos().then(function(){ renderDash(); });
+  });
 };
 
 window.editVideo = function(id){
