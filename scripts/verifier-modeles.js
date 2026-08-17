@@ -25,7 +25,12 @@
  */
 
 const path = require('path');
-try { require('dotenv').config({ path: path.join(__dirname, '..', '.env') }); } catch (e) {}
+/* Le projet n'utilise PAS dotenv (absent des dépendances) mais son propre
+ * chargeur lib/env.js. Le `try { require('dotenv') } catch {}` d'origine
+ * échouait donc silencieusement : le script annonçait « GROQ_API_KEY
+ * absente » alors que la clé était bien dans .env, et se rabattait sur la
+ * seule table des arrêts annoncés au lieu d'interroger le vrai catalogue. */
+require('../lib/env').chargerEnv();
 
 const { CLOUD_PROVIDERS } = require('../lib/llm');
 
