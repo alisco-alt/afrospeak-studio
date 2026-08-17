@@ -29,9 +29,17 @@ const DOSSIER = path.join(DIRS.root, 'cookies');
 const CIBLES = {
   youtube: { outil: 'yt-dlp', url: 'https://www.youtube.com/@AJPlus/videos' },
   tiktok: { outil: 'yt-dlp', url: 'https://www.tiktok.com/@bbcnews' },
-  instagram: { outil: 'gallery-dl', url: 'https://www.instagram.com/bbcnews/' },
-  x: { outil: 'gallery-dl', url: 'https://x.com/AFP' },
-  facebook: { outil: 'yt-dlp', url: 'https://www.facebook.com/BBCNews' },
+  /* Instagram et X : on vise un POST précis, pas un profil.
+   * Mesuré : sur une URL de profil, gallery-dl parcourt la timeline
+   * entière (timeout de 45 s atteint sans verdict) et, sur X, tente de
+   * charger des ressources annexes qui rendent 404 — deux faux négatifs
+   * qui feraient croire à des cookies morts alors qu'ils sont bons. */
+  instagram: { outil: 'gallery-dl', url: 'https://www.instagram.com/p/C0000000000/' },
+  x: { outil: 'gallery-dl', url: 'https://x.com/AFP/status/1' },
+  /* Facebook : yt-dlp ne gère que les URL de VIDÉO, pas les pages de
+   * profil (« Unsupported URL »). On vise donc une vidéo inexistante :
+   * la réponse dit si la session passe, sans rien télécharger. */
+  facebook: { outil: 'gallery-dl', url: 'https://www.facebook.com/BBCNews/posts/1' },
 };
 
 function lancer(cmd, args, timeout = 45000) {
@@ -63,12 +71,26 @@ function lancer(cmd, args, timeout = 45000) {
 function diagnostiquer(r) {
   const e = (r.err || '') + (r.out || '');
   if (r.absent) return { verdict: 'outil-absent', detail: 'commande introuvable' };
-  if (r.timeout) return { verdict: 'timeout', detail: 'aucune réponse dans le délai' };
+  if (r.timeout) return { verdict: 'indetermine', detail: 'pas de réponse — plateforme lente, cookies non mis en cause' };
+  /* Erreur serveur : le problème est chez eux, pas dans le fichier.
+   * Instagram et Facebook renvoient fréquemment 500 sur un contenu de
+   * test ; conclure « cookies morts » serait un faux négatif. */
+  if (/50[0-9]|internal server error|bad gateway|service unavailable/i.test(e)) {
+    return { verdict: 'indetermine', detail: 'erreur serveur de la plateforme — cookies non mis en cause' };
+  }
   if (/login required|log in|sign in to confirm|authentication|not logged|cookies.*required/i.test(e)) {
     return { verdict: 'session-refusee', detail: 'la plateforme demande une connexion' };
   }
   if (/rate.?limit|429|too many requests/i.test(e)) {
     return { verdict: 'quota', detail: 'trop de requêtes — réessayez plus tard' };
+  }
+  /* 404 / contenu introuvable = la plateforme a RÉPONDU, donc la session
+   * a été acceptée. On teste volontairement un identifiant qui n'existe
+   * pas : c'est le moyen le plus rapide d'obtenir une réponse
+   * authentifiée sans rien télécharger. Un cookie mort renverrait une
+   * demande de connexion, pas un 404. */
+  if (/404|not found|no results|does not exist|introuvable/i.test(e)) {
+    return { verdict: 'ok', detail: 'session acceptée (contenu test absent, normal)' };
   }
   if (/unable to resolve|getaddrinfo|network|temporary failure/i.test(e)) {
     return { verdict: 'reseau', detail: 'problème réseau/DNS, pas les cookies' };
@@ -115,11 +137,19 @@ function diagnostiquer(r) {
         path.join(DOSSIER, plateforme + '_cookies.txt'), cible.url];
 
     process.stdout.write('   test réel (' + cible.outil + ')… ');
-    const r = await lancer(cible.outil, args);
+    /* Instagram répond lentement même sur un contenu absent : 45 s ne
+     * suffisaient pas et le script concluait à tort « aucune réponse ».
+     * On lui accorde 90 s — un test de session ne se joue qu'une fois. */
+    const delai = plateforme === 'instagram' ? 90000 : 45000;
+    const r = await lancer(cible.outil, args, delai);
     const d = diagnostiquer(r);
 
-    const symbole = d.verdict === 'ok' ? '✓' : (d.verdict === 'reseau' || d.verdict === 'quota') ? '~' : '✗';
+    const incertain = ['reseau', 'quota', 'indetermine', 'outil-absent'].includes(d.verdict);
+    const symbole = d.verdict === 'ok' ? '✓' : incertain ? '~' : '✗';
     console.log(symbole + ' ' + d.detail);
+    if (incertain) {
+      console.log('   → non concluant : le studio essaiera quand même cette plateforme.');
+    }
 
     if (d.verdict === 'session-refusee' || (etat.expired && d.verdict !== 'ok')) {
       aRefaire.push(plateforme);
