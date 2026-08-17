@@ -34,7 +34,12 @@ const CIBLES = {
    * entière (timeout de 45 s atteint sans verdict) et, sur X, tente de
    * charger des ressources annexes qui rendent 404 — deux faux négatifs
    * qui feraient croire à des cookies morts alors qu'ils sont bons. */
-  instagram: { outil: 'gallery-dl', url: 'https://www.instagram.com/p/C0000000000/' },
+  /* Instagram : un shortcode inventé fait répondre l'API en 400 Bad
+   * Request (identifiant malformé), ce qui était compté comme un échec
+   * alors que la session était acceptée — faux négatif constaté sur des
+   * cookies valides 84 jours. On interroge donc un compte public réel :
+   * la réponse distingue alors vraiment session acceptée / refusée. */
+  instagram: { outil: 'gallery-dl', url: 'https://www.instagram.com/instagram/' },
   x: { outil: 'gallery-dl', url: 'https://x.com/AFP/status/1' },
   /* Facebook : yt-dlp ne gère que les URL de VIDÉO, pas les pages de
    * profil (« Unsupported URL »). On vise donc une vidéo inexistante :
@@ -77,6 +82,12 @@ function diagnostiquer(r) {
    * test ; conclure « cookies morts » serait un faux négatif. */
   if (/50[0-9]|internal server error|bad gateway|service unavailable/i.test(e)) {
     return { verdict: 'indetermine', detail: 'erreur serveur de la plateforme — cookies non mis en cause' };
+  }
+  /* 400 Bad Request : la requête est malformée (identifiant de test
+   * inexistant), pas la session. Une session morte renverrait une
+   * demande de connexion ou un 401/403, jamais un 400. */
+  if (/400|bad request/i.test(e)) {
+    return { verdict: 'indetermine', detail: 'requête de test refusée — cookies non mis en cause' };
   }
   if (/login required|log in|sign in to confirm|authentication|not logged|cookies.*required/i.test(e)) {
     return { verdict: 'session-refusee', detail: 'la plateforme demande une connexion' };
