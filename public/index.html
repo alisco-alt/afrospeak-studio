@@ -627,12 +627,29 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
         <!-- Options avancées -->
         <div class="acc" id="advAcc" style="margin-top:20px">
           <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
-            <span>⚙️ Options avancées — angle, habillage, sous-titres</span><span class="arw">▼</span>
+            <span>⚙️ Options avancées — consignes, script fourni, habillage</span><span class="arw">▼</span>
           </div>
           <div class="acc-b"><div class="inner">
+
+            <!-- Consignes libres : la FAÇON de s'adresser au spectateur -->
+            <div class="field" style="margin-top:14px">
+              <label>Consignes à l'orateur
+                <span class="hint">— comment parler au spectateur (pas le sujet)</span></label>
+              <textarea id="fConsignes" rows="3"
+                placeholder="Ex : nous revenons après plusieurs mois d'absence pour raisons techniques, dis-le simplement. Termine en demandant l'avis en commentaire et l'abonnement."></textarea>
+            </div>
+
+            <!-- Script déjà écrit : le studio ne rédige pas, il met en vidéo -->
+            <div class="field" style="margin-top:14px">
+              <label>Votre propre script
+                <span class="hint">— si rempli, le studio NE RÉDIGE PAS : il met ce texte en vidéo, mot pour mot</span></label>
+              <textarea id="fScript" rows="6"
+                placeholder="Collez ici un script déjà écrit. Laissez vide pour que le studio l'écrive lui-même (mode par défaut)."></textarea>
+            </div>
+
             <div class="row" style="margin-top:14px">
               <div class="field">
-                <label>Angle narratif <span class="hint">— oriente le script</span></label>
+                <label>Angle narratif <span class="hint">— oriente le CONTENU du script</span></label>
                 <input type="text" id="fAngle" placeholder="Ex : qui capte réellement la hausse des prix">
               </div>
               <div class="field">
@@ -1303,6 +1320,8 @@ function submitVideo(){
   var body = {
     topic: topic,
     angle: $('#fAngle').value.trim(),
+    consignes: ($('#fConsignes') ? $('#fConsignes').value.trim() : ''),
+    scriptFourni: ($('#fScript') ? $('#fScript').value.trim() : ''),
     format: S.format,
     style: S.style,
     minutes: +$('#fMin').value,
