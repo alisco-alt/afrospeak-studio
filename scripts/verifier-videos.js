@@ -95,8 +95,20 @@ async function testerYouTube() {
 
   let ff = null;
   try { ff = require('ffmpeg-static'); } catch (e) {}
+  /* Le test DOIT reproduire les conditions du pipeline : celui-ci passe
+   * les cookies YouTube s'ils existent. Sans eux, le diagnostic
+   * annoncerait un 403 alors que la production, elle, passerait. */
+  let ckArgs = [];
+  let ckNom = '';
+  try {
+    const social = require('../lib/social');
+    if (social.hasCookies && social.hasCookies('youtube')) {
+      ckArgs = ['--cookies', social.cookiePath('youtube')];
+      ckNom = require('path').basename(social.cookiePath('youtube'));
+    }
+  } catch (e) {}
   const dl = await lance([
-    '--no-warnings', ...(ff ? ['--ffmpeg-location', ff] : []),
+    '--no-warnings', ...(ff ? ['--ffmpeg-location', ff] : []), ...ckArgs,
     '-f', 'best[height<=480][ext=mp4]/best',
     '--max-filesize', '8M', '-o', '/tmp/_yt_diag.mp4',
     'https://www.youtube.com/watch?v=' + id,
@@ -106,7 +118,13 @@ async function testerYouTube() {
   const obtenu = fs.existsSync('/tmp/_yt_diag.mp4') && fs.statSync('/tmp/_yt_diag.mp4').size > 10000;
   try { fs.unlinkSync('/tmp/_yt_diag.mp4'); } catch (e) {}
 
-  if (obtenu) return { etat: 'ok', detail: `recherche + téléchargement fonctionnels (${trouve} résultats)` };
+  if (obtenu) {
+    return {
+      etat: 'ok',
+      detail: `recherche + téléchargement fonctionnels (${trouve} résultats)`
+        + (ckNom ? ` — cookies utilisés : ${ckNom}` : ' — sans cookies'),
+    };
+  }
 
   const brut = (dl.err || '') + (dl.out || '');
   let cause = 'cause inconnue';
@@ -116,7 +134,11 @@ async function testerYouTube() {
   return {
     etat: 'partiel',
     detail: `recherche OK (${trouve} résultats) mais téléchargement KO — ${cause}`,
-    conseil: 'Exporter les cookies YouTube dans cookies/youtube_cookies.txt peut débloquer',
+    conseil: ckNom
+      ? `cookies pourtant présents (${ckNom}) : la session est peut-être expirée, `
+        + 'ou l\'IP est bloquée quelle que soit la session'
+      : 'Exporter les cookies YouTube dans cookies/ (le nom produit par '
+        + 'Cookie-Editor, ex. www.youtube.com_cookies.txt, est accepté tel quel)',
   };
 }
 

@@ -76,10 +76,27 @@ ls -la /mnt/c/Users/*/Downloads/*cookies*.txt
 | `x_cookies.txt` | X (Twitter) |
 | `instagram_cookies.txt` | Instagram |
 | `facebook_cookies.txt` | Facebook |
-| `youtube_cookies.txt` | YouTube *(facultatif)* |
+| `youtube_cookies.txt` | YouTube — **débloque le téléchargement des clips** |
 
-Le studio cherche `{plateforme}_cookies.txt`. Un nom différent = fichier
-ignoré, sans message d'erreur.
+Le studio cherche `{plateforme}_cookies.txt`, **mais accepte aussi le nom
+produit automatiquement par Cookie-Editor**, qui reprend le domaine :
+
+| ce que l'extension enregistre | reconnu comme |
+|---|---|
+| `www.youtube.com_cookies.txt` | youtube |
+| `www.tiktok.com_cookies.txt` | tiktok |
+| `www.instagram.com_cookies.txt` | instagram |
+| `www.facebook.com_cookies.txt` | facebook |
+| `x.com_cookies.txt`, `twitter.com_cookies.txt` | x |
+
+Vous n'avez donc **rien à renommer** : déposez le fichier tel qu'il sort de
+l'extension. Un nom hors de cette liste reste ignoré, sans message.
+
+> **Pourquoi YouTube compte.** La *recherche* fonctionne toujours (17 vidéos
+> pertinentes trouvées lors des tests), mais le *téléchargement* renvoie
+> souvent `HTTP 403 Forbidden` : YouTube traite les deux différemment. Une
+> session valide est la seule parade connue. Sans elle, le studio se rabat
+> sur les vignettes — d'où les vidéos composées d'images fixes.
 
 ### 5. Vérifier
 
