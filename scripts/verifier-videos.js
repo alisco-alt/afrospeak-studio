@@ -107,12 +107,16 @@ async function testerYouTube() {
       ckNom = require('path').basename(social.cookiePath('youtube'));
     }
   } catch (e) {}
+  /* Le test doit refléter le pipeline : celui-ci essaie le client android
+   * en premier — mesuré comme le seul qui passe là où les autres
+   * renvoient 403 ou « format not available ». */
   const dl = await lance([
     '--no-warnings', ...(ff ? ['--ffmpeg-location', ff] : []), ...ckArgs,
-    '-f', 'best[height<=480][ext=mp4]/best',
-    '--max-filesize', '8M', '-o', '/tmp/_yt_diag.mp4',
+    '--extractor-args', 'youtube:player_client=android',
+    '-f', 'best[height<=480][ext=mp4]/best[ext=mp4]/best',
+    '--max-filesize', '90M', '-o', '/tmp/_yt_diag.mp4',
     'https://www.youtube.com/watch?v=' + id,
-  ], 90000);
+  ], 120000);
 
   const fs = require('fs');
   const obtenu = fs.existsSync('/tmp/_yt_diag.mp4') && fs.statSync('/tmp/_yt_diag.mp4').size > 10000;
