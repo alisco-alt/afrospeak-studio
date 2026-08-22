@@ -86,7 +86,11 @@ def main():
         words, sentences = asyncio.run(synth(
             text,
             payload["out"],
-            payload.get("voice", "fr-FR-HenriNeural"),
+            # Defaut aligne sur VOIX_GRAVE (lib/edgetts.js). Remy module
+            # ~40 % plus que Henri (CV de F0 : 27,4 % contre 19,4 %),
+            # ce qui corrige le rendu « robotique » signale a l'ecoute.
+            # En pratique `voice` est toujours transmis : ce n'est qu'un filet.
+            payload.get("voice", "fr-FR-RemyMultilingualNeural"),
             payload.get("rate", "+0%"),
             payload.get("volume", "+0%"),
             payload.get("pitch", "+0Hz"),
