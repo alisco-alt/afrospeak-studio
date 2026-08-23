@@ -582,14 +582,71 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
       </div>
 
       <div class="card glow" style="margin-bottom:22px;padding:24px">
+
+        <!-- ══ DEUX MODES DE PRODUCTION ══
+             Le champ « votre propre script » existait, mais il était enfermé
+             dans l'accordéon « Options avancées », replié par défaut : en
+             pratique il restait invisible, et un script collé dans le champ
+             SUJET était traité comme un titre — d'où « Titre Choc : 🚨 28
+             FÉVRIER » comme sujet de recherche, et un script entièrement
+             réécrit par le studio. On rend donc le choix explicite. -->
+        <div class="mode-toggle" id="modeToggle"
+             style="display:flex;gap:10px;margin-bottom:18px">
+          <div class="mode-opt on" data-m="sujet"
+               style="flex:1;padding:12px 14px;border-radius:10px;cursor:pointer;
+                      border:1.5px solid var(--acc);background:rgba(255,138,0,.08);
+                      transition:all .2s">
+            <div style="font-weight:600;font-size:13px">✦ Donner un sujet</div>
+            <div style="font-size:11px;color:var(--txt-3);margin-top:3px">
+              Le studio recherche, écrit et illustre</div>
+          </div>
+          <div class="mode-opt" data-m="script"
+               style="flex:1;padding:12px 14px;border-radius:10px;cursor:pointer;
+                      border:1.5px solid var(--line);transition:all .2s">
+            <div style="font-weight:600;font-size:13px">✎ J'ai déjà mon script</div>
+            <div style="font-size:11px;color:var(--txt-3);margin-top:3px">
+              Le studio met VOTRE texte en vidéo, mot pour mot</div>
+          </div>
+        </div>
+
         <!-- Grand champ de saisie -->
-        <div class="hero-input">
+        <div class="hero-input" id="zoneSujet">
           <div class="fieldwrap">
             <span class="ic">✦</span>
             <textarea id="fTopic" rows="1"
               placeholder="Ex : Pourquoi le cacao ivoirien vaut soudain trois fois plus cher"></textarea>
           </div>
           <button class="btn pri go" id="btnGo">▶ Produire</button>
+        </div>
+
+        <!-- Mode script : le texte est reproduit tel quel -->
+        <div id="zoneScript" style="display:none">
+          <div class="field">
+            <label>Votre script complet
+              <span class="hint">— reproduit mot pour mot : le studio ne réécrit rien</span></label>
+            <textarea id="fScriptMain" rows="10"
+              placeholder="Collez ici votre script entier.&#10;&#10;Le studio le découpe en plans, le fait lire par la voix choisie, cherche les visuels correspondants et monte la vidéo — sans modifier une seule phrase."
+              style="width:100%;font-family:inherit;line-height:1.6"></textarea>
+          </div>
+          <div class="field" style="margin-top:12px">
+            <label>Titre de la vidéo
+              <span class="hint">— sert au nom du fichier et à la recherche de visuels</span></label>
+            <input type="text" id="fTitreScript"
+              placeholder="Ex : Iran : l'humiliation des experts en 72 h">
+          </div>
+          <button class="btn pri go" id="btnGoScript" style="margin-top:14px;width:100%">
+            ▶ Produire à partir de mon script</button>
+        </div>
+
+        <!-- Voix : remontée ici, c'est un choix courant et non « avancé » -->
+        <div class="field" style="margin-top:18px">
+          <label>Voix de la narration
+            <span class="hint">— un seul timbre pour toute la vidéo</span></label>
+          <select id="fVoixGenre">
+            <option value="">Automatique (selon le style de montage)</option>
+            <option value="M">Masculine — Rémy, grave et posée (registre Écofin)</option>
+            <option value="F">Féminine — Denise, claire et professionnelle</option>
+          </select>
         </div>
 
         <!-- Format + style -->
@@ -639,27 +696,11 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
                 placeholder="Ex : nous revenons après plusieurs mois d'absence pour raisons techniques, dis-le simplement. Termine en demandant l'avis en commentaire et l'abonnement."></textarea>
             </div>
 
-            <!-- Script déjà écrit : le studio ne rédige pas, il met en vidéo -->
-            <div class="field" style="margin-top:14px">
-              <label>Votre propre script
-                <span class="hint">— si rempli, le studio NE RÉDIGE PAS : il met ce texte en vidéo, mot pour mot</span></label>
-              <textarea id="fScript" rows="6"
-                placeholder="Collez ici un script déjà écrit. Laissez vide pour que le studio l'écrive lui-même (mode par défaut)."></textarea>
-            </div>
+            <!-- Le champ « votre propre script » et le choix de la voix ont
+                 été remontés en haut de page : enfermés ici, dans un
+                 accordéon replié par défaut, ils restaient invisibles. -->
 
-            <!-- Choix de la voix. Le moteur savait déjà gérer `voiceGender`
-                 (voir resolveVoiceLock dans pipeline.js) : seul le contrôle
-                 manquait dans l'interface. -->
             <div class="row" style="margin-top:14px">
-              <div class="field">
-                <label>Voix de la narration
-                  <span class="hint">— un seul timbre pour toute la vidéo</span></label>
-                <select id="fVoixGenre">
-                  <option value="">Automatique (selon le style de montage)</option>
-                  <option value="M">Masculine — Rémy, grave et posée (registre Écofin)</option>
-                  <option value="F">Féminine — Denise, claire et professionnelle</option>
-                </select>
-              </div>
               <div class="field">
                 <label>Angle narratif <span class="hint">— oriente le CONTENU du script</span></label>
                 <input type="text" id="fAngle" placeholder="Ex : qui capte réellement la hausse des prix">
@@ -1321,22 +1362,66 @@ window.useTrend = function(k){
 
 /* ─── Production ─── */
 $('#btnGo').addEventListener('click', submitVideo);
+if($('#btnGoScript')) $('#btnGoScript').addEventListener('click', submitVideo);
+
+/* Bascule entre « Donner un sujet » et « J'ai déjà mon script ». */
+if($('#modeToggle')){
+  $('#modeToggle').addEventListener('click', function(e){
+    var opt = e.target.closest('.mode-opt');
+    if(!opt) return;
+    MODE = opt.getAttribute('data-m');
+    var tous = $('#modeToggle').querySelectorAll('.mode-opt');
+    for(var i=0;i<tous.length;i++){
+      var actif = tous[i] === opt;
+      tous[i].classList.toggle('on', actif);
+      tous[i].style.borderColor = actif ? 'var(--acc)' : 'var(--line)';
+      tous[i].style.background  = actif ? 'rgba(255,138,0,.08)' : 'transparent';
+    }
+    if($('#zoneSujet'))  $('#zoneSujet').style.display  = (MODE==='script') ? 'none' : '';
+    if($('#zoneScript')) $('#zoneScript').style.display = (MODE==='script') ? '' : 'none';
+  });
+}
 $('#fTopic').addEventListener('keydown', function(e){
   if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submitVideo(); }
 });
 
+/* Mode courant : 'sujet' (le studio écrit) ou 'script' (texte fourni). */
+var MODE = 'sujet';
+
 function submitVideo(){
-  var topic = $('#fTopic').value.trim();
-  if(!topic){
-    toast('Indiquez un sujet ou choisissez une tendance.', 'err');
-    $('#fTopic').focus();
-    return;
+  var script = '';
+  var topic  = '';
+
+  if (MODE === 'script') {
+    script = ($('#fScriptMain') ? $('#fScriptMain').value.trim() : '');
+    if(!script){
+      toast('Collez votre script, ou revenez au mode « Donner un sujet ».', 'err');
+      if($('#fScriptMain')) $('#fScriptMain').focus();
+      return;
+    }
+    topic = ($('#fTitreScript') ? $('#fTitreScript').value.trim() : '');
+    /* Sans titre explicite, on prend la PREMIÈRE PHRASE du script, jamais
+     * son premier bloc brut : un titre du type « Titre Choc : 🚨 28 FÉVRIER »
+     * partait en recherche d'actualité et ramenait n'importe quoi. */
+    if(!topic){
+      topic = script.split(/[.!?\n]/)[0].replace(/[«»""'']/g,' ')
+                    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'')
+                    .replace(/\s+/g,' ').trim().slice(0,90);
+    }
+  } else {
+    topic = $('#fTopic').value.trim();
+    if(!topic){
+      toast('Indiquez un sujet ou choisissez une tendance.', 'err');
+      $('#fTopic').focus();
+      return;
+    }
   }
+
   var body = {
     topic: topic,
     angle: $('#fAngle').value.trim(),
     consignes: ($('#fConsignes') ? $('#fConsignes').value.trim() : ''),
-    scriptFourni: ($('#fScript') ? $('#fScript').value.trim() : ''),
+    scriptFourni: script,
     // '' = automatique, 'M' = Rémy, 'F' = Denise. Lu par resolveVoiceLock().
     voiceGender: ($('#fVoixGenre') ? $('#fVoixGenre').value : ''),
     format: S.format,
@@ -1351,7 +1436,8 @@ function submitVideo(){
     watermark: $('#oMark').checked,
     progressBar: $('#oProg').checked
   };
-  var btn = $('#btnGo');
+  var btn = (MODE === 'script' && $('#btnGoScript')) ? $('#btnGoScript') : $('#btnGo');
+  var libelle = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<span class="spin"></span> Lancement…';
 
@@ -1359,9 +1445,11 @@ function submitVideo(){
     method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body)
   }).then(function(j){
     btn.disabled = false;
-    btn.innerHTML = '▶ Produire';
+    btn.innerHTML = libelle;
     if(j && j.video){
-      toast('Production lancée — position ' + j.queue.position + ' dans la file.', 'ok');
+      toast(MODE === 'script'
+        ? 'Production lancée — votre script sera reproduit mot pour mot.'
+        : 'Production lancée — position ' + j.queue.position + ' dans la file.', 'ok');
       $('#fTopic').value = '';
       go('dash');
       loadVideos().then(function(){ pollVideo(j.video.id); });
