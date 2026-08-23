@@ -647,11 +647,26 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
                 placeholder="Collez ici un script déjà écrit. Laissez vide pour que le studio l'écrive lui-même (mode par défaut)."></textarea>
             </div>
 
+            <!-- Choix de la voix. Le moteur savait déjà gérer `voiceGender`
+                 (voir resolveVoiceLock dans pipeline.js) : seul le contrôle
+                 manquait dans l'interface. -->
             <div class="row" style="margin-top:14px">
+              <div class="field">
+                <label>Voix de la narration
+                  <span class="hint">— un seul timbre pour toute la vidéo</span></label>
+                <select id="fVoixGenre">
+                  <option value="">Automatique (selon le style de montage)</option>
+                  <option value="M">Masculine — Rémy, grave et posée (registre Écofin)</option>
+                  <option value="F">Féminine — Denise, claire et professionnelle</option>
+                </select>
+              </div>
               <div class="field">
                 <label>Angle narratif <span class="hint">— oriente le CONTENU du script</span></label>
                 <input type="text" id="fAngle" placeholder="Ex : qui capte réellement la hausse des prix">
               </div>
+            </div>
+
+            <div class="row" style="margin-top:14px">
               <div class="field">
                 <label>Sous-titres</label>
                 <select id="fCapMode">
@@ -1322,6 +1337,8 @@ function submitVideo(){
     angle: $('#fAngle').value.trim(),
     consignes: ($('#fConsignes') ? $('#fConsignes').value.trim() : ''),
     scriptFourni: ($('#fScript') ? $('#fScript').value.trim() : ''),
+    // '' = automatique, 'M' = Rémy, 'F' = Denise. Lu par resolveVoiceLock().
+    voiceGender: ($('#fVoixGenre') ? $('#fVoixGenre').value : ''),
     format: S.format,
     style: S.style,
     minutes: +$('#fMin').value,
