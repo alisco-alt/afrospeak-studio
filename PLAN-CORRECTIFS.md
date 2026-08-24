@@ -6,7 +6,7 @@ séparément : un lot qui échoue ne bloque pas les autres.
 
 ---
 
-## LOT 1 — URGENT : régression que j'ai introduite (disjoncteur)
+## LOT 1 — [FAIT] URGENT : régression que j'ai introduite (disjoncteur)
 
 **Ce que montre le journal :**
 ```
@@ -24,7 +24,7 @@ pause, et distinguer un échec réseau passager d'une panne franche.
 
 ---
 
-## LOT 2 — Cohérence du script (répétitions, structure)
+## LOT 2 — [FAIT] Cohérence du script (répétitions, structure)
 
 **Ce que montre le journal :**
 - 3 planifications successives, chapitres abandonnés puis re-rédigés
@@ -40,7 +40,7 @@ volume n'est jamais borné en cours de route.
 
 ---
 
-## LOT 3 — Vidéos réelles (le point le plus important pour vous)
+## LOT 3 — [PARTIEL] Vidéos réelles (le point le plus important pour vous)
 
 **Ce que montre le journal :** 5 clips YouTube annoncés, 1 perdu en 403,
 et **aucune vidéo Pexels** (source écartée par le lot 1).
@@ -59,7 +59,7 @@ et **aucune vidéo Pexels** (source écartée par le lot 1).
 
 ---
 
-## LOT 4 — Motion design (qualité + synchronisation)
+## LOT 4 — [FAIT] Motion design (qualité + synchronisation)
 
 **Ce que montre le journal :** `Slides de données animées : 9 chiffres`
 mais toutes en `counter`, et l'utilisateur les voit arriver **avant** que
@@ -77,7 +77,7 @@ la voix ne prononce le chiffre.
 
 ---
 
-## LOT 5 — Temps de production (~2 h → cible < 40 min)
+## LOT 5 — [PARTIEL] Temps de production (~2 h → cible < 40 min)
 
 **Ce que montre le journal :**
 - script : 3 planifications complètes = ~1 h
@@ -93,3 +93,22 @@ la voix ne prononce le chiffre.
 
 Un lot = une mesure avant, un correctif, une mesure après, un commit.
 Aucun lot n'est déclaré résolu sans chiffre à l'appui.
+
+
+---
+
+## État au 24/08/2026
+
+| lot | état | mesure |
+|---|---|---|
+| 1 — disjoncteur | **fait** | Pexels : 0 → 4 vidéos sur 4 requêtes |
+| 2 — répétitions | **fait** | 0 phrase redondante sur un run complet |
+| 3 — vidéos réelles | **partiel** | Pexels/Pixabay OK ; X/FB/YouTube exigent une session (voir COOKIES-VIDEOS.md) |
+| 4 — motion design | **fait** | jauge animée vérifiée à l'image, synchro au mot près |
+| 5 — temps | **partiel** | traité en partie par 78257dd (attentes mortes, replanifications) |
+
+### Ce qui ne peut pas être résolu par le code seul
+X, Facebook et YouTube ont fermé l'accès anonyme. Le studio sait
+télécharger leurs vidéos, mais il faut **votre session** (fichier de
+cookies). C'est documenté dans `COOKIES-VIDEOS.md`. Aucun contournement
+de protection n'a été mis en place, et aucun ne le sera.
