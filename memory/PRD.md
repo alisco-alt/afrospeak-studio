@@ -15,6 +15,14 @@ gratuites sans clé ; (2) slides/motions data-viz professionnels pour chiffres/%
 en horizontal ET vertical. Tout gratuit, sans clé.
 
 ### Livré & validé
+- **Requêtes enrichies par phrase (étape 2)** — `lib/mediaFetcher.js` + `lib/entites.js` :
+  chaque plan est désormais ancré sur le **lieu nommé dans SA phrase** (San Pedro,
+  Conakry…) et non plus seulement sur le lieu du sujet global ; requête concrète
+  `"<lieu> city street"` placée en tête. Nouvelle heuristique : un nom capitalisé
+  introduit par « à/au/vers/depuis » est traité comme lieu (« à Kolwezi », « vers
+  Tarkwa ») même hors liste, avec exclusion des villes hors-Afrique (Paris rejeté).
+  `requetesPersonne` ne colle plus « portrait » à une institution (Banque Mondiale →
+  « building »). Testé (extraction + build de requêtes non-LLM + boot).
 - **Pertinence visuelle par plan (étape 1)** — La distribution du batch pool
   (`pipeline.js`) collait des clips « du sujet global » au hasard sur les plans.
   Désormais **relevance-gated** : un clip du batch n'est assigné à un plan que s'il
