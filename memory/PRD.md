@@ -15,6 +15,13 @@ gratuites sans clé ; (2) slides/motions data-viz professionnels pour chiffres/%
 en horizontal ET vertical. Tout gratuit, sans clé.
 
 ### Livré & validé
+- **Pertinence visuelle par plan (étape 1)** — La distribution du batch pool
+  (`pipeline.js`) collait des clips « du sujet global » au hasard sur les plans.
+  Désormais **relevance-gated** : un clip du batch n'est assigné à un plan que s'il
+  partage ≥1 mot-clé avec la requête de CE plan (`query`+`queryAlt`+`queries[]`) ;
+  sinon le plan part à la cascade par-plan (recherche spécifique = meilleure
+  pertinence). Corrige aussi un bug d'index partagé clips/imgs. Testé (unitaire +
+  boot). Réglage : `BATCH_MATCH_MIN` (défaut 1).
 - **Refonte complète de `lib/motionGraphics.js` en libass (ASS)** : l'ancien module
   reposait sur `drawtext` (ABSENT du binaire ffmpeg-static) → tout était du code mort
   sauf `dataSlide`. Réécrit : `dataSlide` (chiffre + fantôme + jauge animée),
