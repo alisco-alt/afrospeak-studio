@@ -9,6 +9,28 @@ Stack : Node 20 + Express (mono-processus), FFmpeg (ffmpeg-static, **sans drawte
 libass présent. Frontend HTML/CSS/JS statique. Lancement : `node index.js --serve`.
 ~28 000 lignes, 40 modules dans `lib/`.
 
+## Itération — Juin 2026 (analyse du log de production Ubuntu)
+Analyse du run réel « Ghana 2,6 Mds $ » : plan 19 perdu, 6×403 YouTube,
+blocage standardisation 180 s, appels LLM séquentiels. Correctifs livrés :
+- **Plan perdu = 3 causes corrigées** : (1) `motionGraphics._renderAssClip`
+  réutilisait un mp4 PARTIEL en cache (process tué) → cache désormais validé
+  par `mediaInfo` (durée) + écriture atomique via .tmp + rename ; (2)
+  `renderer.renderShot` ne MUTE plus `shot.asset` quand un motion réussit
+  (variable locale `assetMotion`, gardes `extraitCite`/`estGenere`) ; (3) la
+  reprise « secours » (`pipeline.js`) retire `shot.motion` → retour au visuel
+  réel, et la reprise solo reçoit `_planMaxMs: 240000`. Testé (cache corrompu
+  régénéré, tmp propres, boot OK).
+- **YouTube fail-fast** (`batchSource.js`) : sans cookies, dès le 1er 403
+  « PO Token », drapeau partagé `_ytVerrouille` → les autres clips/clients
+  n'insistent plus (économie de plusieurs minutes/run). Message conseille le
+  plugin `bgutil-ytdlp-pot-provider`.
+- **Watchdog standardisation** 180 s → 60 s (`mediaTransform.js`,
+  réglable `STD_WATCHDOG_MS`).
+- **Requêtes visuelles LLM en parallèle** (`mediaFetcher.buildQueries`) :
+  lots joués 2 de front (`REQUETES_PARALLELES`, défaut 2).
+- **Montage 4 plans × 2 threads** sur machines ≥ 8 cœurs (plafond 3 → 4,
+  toujours borné par le budget mémoire 1,5 Go/plan).
+
 ## Itération — Juin 2026 (data-viz + b-roll gratuit)
 Demande utilisateur : (1) b-roll réel abondant qui reflète le script, sources vidéo
 gratuites sans clé ; (2) slides/motions data-viz professionnels pour chiffres/%,
