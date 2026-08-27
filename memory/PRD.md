@@ -9,6 +9,36 @@ Stack : Node 20 + Express (mono-processus), FFmpeg (ffmpeg-static, **sans drawte
 libass présent. Frontend HTML/CSS/JS statique. Lancement : `node index.js --serve`.
 ~28 000 lignes, 40 modules dans `lib/`.
 
+## Itération — Juin 2026 (audit qualité + miniature accrocheuse)
+Audit des 5 domaines demandé par l'utilisateur (voix, sous-titres,
+slides/motion, montage, édition post-génération) — verdicts dans le résumé.
+Implémenté :
+- **Miniature accrocheuse** (`renderer.thumbnail` + `chiffreAccrocheur`) :
+  extraction du chiffre le plus vendeur (milliards/millions+devise > % >
+  grands nombres, années exclues) affiché GÉANT en Anton couleur accent,
+  rotation -2°, contour massif ; titre descend en bas (2 lignes max) ;
+  kicker seulement sans chiffre. Testé 16:9 + 9:16 + cas sans chiffre.
+- **BUG PRÉEXISTANT CORRIGÉ** : le titre des miniatures était INVISIBLE
+  depuis toujours — `addHeadline` applique un `\fad(220ms)` et la miniature
+  capture la frame t=0 (alpha 0). Nouveau paramètre `still: true` qui
+  supprime les animations pour les rendus mono-frame.
+- **Voile dégradé** : bande unique alpha D0 (ligne dure visible) → 6 bandes
+  d'alpha croissant (F2→92).
+- Chaîne complète vérifiée : p.result.thumbnail → db thumb_url → UI thumbUrl.
+
+### Audit (état vérifié dans le code)
+- Voix 8/10 : edge-tts Rémy (F0 mesurée), pauses par re-ponctuation (SSML
+  impossible), prononciation, cascade ElevenLabs/OpenAI si clés. Plafond du
+  gratuit atteint ; marge = micro-débit sur les chiffres, ou clé ElevenLabs.
+- Sous-titres 9/10 : mot-à-mot karaoke ASS, métriques réelles des polices,
+  entités colorées, SRT/VTT. Marge : défaut 'phrase' → karaoke en 9:16.
+- Slides/motion 8/10 : 8 types libass biformat. Backlog : multi-barres, habillage.
+- Montage 9/10 : Ken Burns varié, xfade, SFX, ducking, étalonnage, split-screen.
+- Édition post-génération 6/10 : checkpoint AVANT montage complet (remplacer
+  par URL/recherche/fichier + approve). MANQUE : rééditer une vidéo TERMINÉE
+  (status done) sans relancer tout le projet — c'est le vrai chantier.
+
+
 ## Itération — Juin 2026 (YouTube CC + bgutil + citation sociale)
 Choix utilisateur : mode hybride (B) + détection bgutil (C), puis règle de
 citation pour X/Instagram/TikTok (A). Livré :
