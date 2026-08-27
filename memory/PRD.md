@@ -1,5 +1,29 @@
 # AfroSpeak Studio — PRD & Journal
 
+## Itération — Juin 2026 (réédition post-rendu + karaoke pastille)
+Trois demandes utilisateur :
+- **Réédition Après Rendu (LIVRÉ)** : `pipeline.reopenForReedit(id)` rouvre
+  un projet done/error/cancelled au checkpoint awaiting_review (script, voix,
+  timeline conservés). Garde-fous : refus si en cours, si voix purgées du
+  cache (erreur explicite), compte les assets manquants (`missing`).
+  Endpoint `POST /api/projects/:id/reopen` (miroir db). UI : bouton
+  « 🖼️ Rééditer » sur cartes done (dashboard + bibliothèque) →
+  `window.reeditVideo` → écran de revue existant → approve → remontage via
+  le circuit habituel (`resumeFromReview` pose reviewedAt qui court-circuite
+  la pause de validation). Testé : reopen OK/refus double/refus voix
+  purgée/endpoint HTTP/storyboard lisible.
+- **Débit Chiffres (DÉJÀ EXISTANT — rien changé)** : pipeline lignes
+  ~587-620 (rate -6 % plans à chiffres, -4 accroche, -5 chute,
+  VOIX_PROSODIE=0 pour désactiver) + edgetts virgule-respiration après
+  montants. Communiqué à l'utilisateur.
+- **Karaoke Shorts (LIVRÉ)** : preset `bankable` (défaut vertical) passe de
+  'word' à 'karaoke' + `captionActiveBox: true`. Nouveau rendu « pastille » :
+  style ASS `Bulle` (clone Main, BorderStyle 3) en couche 1 — 2e copie de la
+  ligne où seul le mot actif est visible → rectangle doré PILE sous le mot
+  (aucun calcul de position) ; mot actif en encre sombre sans contour
+  (couche 2). Événements avec layer/style/noPlaque. Testé frame par frame
+  1080×1920 : alignement parfait, mots-clés ambre + entités cyan préservés.
+
 ## Problème / Intention
 Studio autonome de vidéos « faceless » d'actualité panafricaine (façon Money Radar,
 Agence Ecofin). Un sujet → un master MP4 prêt à publier (script IA, voix off

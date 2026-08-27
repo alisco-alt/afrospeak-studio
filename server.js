@@ -462,6 +462,18 @@ app.post('/api/projects/:id/storyboard/:shotIdx/replace', wrap(async (req, res) 
   }
 }));
 
+/** Rouvre une vidéo terminée pour rééditer ses visuels (script + voix conservés). */
+app.post('/api/projects/:id/reopen', wrap(async (req, res) => {
+  const r = pipeline.reopenForReedit(req.params.id);
+  try {
+    await db.updateVideo(req.params.id, {
+      status: 'awaiting_review', progress: 0.62,
+      step: 'Réédition des visuels — remplacez puis approuvez',
+    });
+  } catch (e) { /* le miroir base ne bloque jamais la réédition */ }
+  ok(res, { project: r.project, missing: r.missing });
+}));
+
 /** Approuve le storyboard et relance le rendu. */
 app.post('/api/projects/:id/approve', wrap(async (req, res) => {
   const id = req.params.id;

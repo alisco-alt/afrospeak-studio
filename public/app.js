@@ -332,6 +332,7 @@ function videoRow(v) {
         ${v.status === 'done' && v.videoUrl ? `
           <button class="btn xs ok" onclick="watchVideo('${v.id}')">▶ Voir</button>
           <a class="btn xs" href="${esc(v.videoUrl)}" download>⬇ MP4</a>
+          <button class="btn xs ghost" onclick="reeditVideo('${v.id}')" title="Remplacer des visuels et remonter, sans régénérer le script ni la voix">🖼️ Rééditer</button>
           ${v.srtUrl ? `<a class="btn xs ghost" href="${esc(v.srtUrl)}" download>SRT</a>` : ''}
           ${v.metaUrl ? `<a class="btn xs ghost" href="${esc(v.metaUrl)}" target="_blank">Description</a>` : ''}` : ''}
         ${active ? `<button class="btn xs dan" onclick="cancelVideo('${v.id}')">Arrêter</button>` : ''}
@@ -420,6 +421,19 @@ window.deleteVideo = async id => {
   loadDash();
 };
 
+/* Rouvre une vidéo terminée : remplacement des visuels puis re-montage,
+ * en conservant le script et la voix. */
+window.reeditVideo = async id => {
+  if (!confirm('Rouvrir cette vidéo pour remplacer des visuels ?\n'
+    + 'Le script et la voix sont conservés — seule la vidéo sera remontée après validation.')) return;
+  try {
+    const r = await api('/api/projects/' + id + '/reopen', { body: {} });
+    if (r.missing) toast(`${r.missing} visuel(s) d'origine introuvable(s) — remplacez-les dans la revue.`);
+    await reviewStoryboard(id);
+    loadDash();
+  } catch (e) { toast('Réédition impossible : ' + e.message); }
+};
+
 /* ─────────────── Plateforme ─────────────── */
 async function loadPlatform() {
   try {
@@ -491,6 +505,7 @@ async function loadLibrary() {
             ${fmtDur(v.duration)} · ${fmtSize(v.size)} · ${fmtAgo(v.createdAt)}</div>
           <div class="btns">
             <a class="btn xs pri" href="${esc(v.videoUrl)}" download>⬇ MP4</a>
+            <button class="btn xs ghost" onclick="reeditVideo('${v.id}')" title="Remplacer des visuels et remonter">🖼️</button>
             ${v.srtUrl ? `<a class="btn xs ghost" href="${esc(v.srtUrl)}" download>SRT</a>` : ''}
             <button class="btn xs dan" onclick="deleteVideo('${v.id}')">✕</button>
           </div>
