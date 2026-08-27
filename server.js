@@ -260,11 +260,49 @@ app.get('/api/media/search', wrap(async (req, res) => {
   ok(res, { results: results.map(r => ({ ...r, credit: mediaLib.creditLine(r) })) });
 }));
 
+/* ── SERVEUR DE MÉDIAS : LA PORTE NE DONNE PAS LES CLEFS ──────────────
+ * L'ancienne garde vérifiait seulement `f.startsWith(DIRS.root)` — soit TOUT
+ * le dépôt. Constaté par requête réelle sur le serveur lancé :
+ *   GET /api/media/file?p=<racine>/data/config.json   → 200, clés API en clair
+ *   GET /api/media/file?p=<racine>/data/auth-secret.json → 200, secret de
+ *   signature des JWT (de quoi forger un jeton d'administrateur).
+ * Le dépôt est PUBLIC sur GitHub ; ces deux fichiers ne le sont pas, mais
+ * n'importe qui disposant de l'URL du studio pouvait les lire.
+ *
+ * Le projet écrit tout son média dans data/cache (médias recherchés, TTS),
+ * data/work (dossiers de rendu) et output (exports) : ce sont les trois
+ * seules racines autorisées. Trois durcissements allant avec :
+ *   1. `path.resolve` AVANT la comparaison — sinon `data/cache/../../config.json`
+ *      commence bien par la racine autorisée et en sort ;
+ *   2. extensions limitées aux médias (une requête ne peut plus lire un .json
+ *      ni un .env, même bien nommé) ;
+ *   3. callback sur `sendFile` — sans lui, un envoi interrompu remonte en
+ *      exception et la réponse contient la pile d'appels.
+ * Échappatoire assumée pour ne jamais bloquer un usage légitime :
+ * `MEDIA_OPEN_ROOT=1` rétablit la lecture sous la racine du dépôt (déconseillé,
+ * journalisé à chaque requête). */
+const MEDIA_RACINES = [DIRS.cache, DIRS.work, DIRS.output]
+  .map(d => path.resolve(d));
+const MEDIA_EXT = new Set([
+  '.mp4', '.mov', '.m4v', '.webm', '.mkv', '.avi',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.avif',
+  '.mp3', '.m4a', '.aac', '.wav', '.ogg', '.opus', '.flac',
+  '.ass', '.srt', '.vtt',
+]);
 app.get('/api/media/file', (req, res) => {
-  const f = String(req.query.p || '');
-  if (!f.startsWith(DIRS.root)) return res.status(403).end();
-  if (!fs.existsSync(f)) return res.status(404).end();
-  res.sendFile(f);
+  const brut = String(req.query.p || '');
+  if (!brut) return res.status(400).end();
+  const f = path.resolve(brut);
+  const autorise = MEDIA_RACINES.some(d => f === d || f.startsWith(d + path.sep));
+  if (!autorise && process.env.MEDIA_OPEN_ROOT === '1') {
+    log.warn('MEDIA_OPEN_ROOT=1 : lecture hors dossiers de médias — ' + f);
+    if (f.startsWith(path.resolve(DIRS.root)) && fs.existsSync(f)) return res.sendFile(f, () => {});
+  }
+  if (!autorise) return res.status(403).end();
+  if (!MEDIA_EXT.has(path.extname(f).toLowerCase())) return res.status(415).end();
+  if (!fs.existsSync(f) || !fs.statSync(f).isFile()) return res.status(404).end();
+  // Erreur d'envoi avalée : express enverrait un 500 avec la pile.
+  res.sendFile(f, (e) => { if (e && !res.headersSent) res.status(404).end(); });
 });
 
 /* ────────────────── LLM local (Ollama / DeepSeek) ────────────────── */
