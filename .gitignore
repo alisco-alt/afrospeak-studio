@@ -23,3 +23,6 @@ dist/
 
 # Cookies de session (jamais commit)
 cookies/*.txt
+*.env
+credentials.json
+.credentials
