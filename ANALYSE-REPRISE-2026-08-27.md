@@ -417,3 +417,50 @@ produit par le vrai `lib/motionGraphics.js`.
   **A8** (`public/app.js`, 1087 lignes mortes).
 - Les quatre souhaits reportés 5 fois : habillage signature, banque de b-roll locale, graphique de
   barres agrégé par section, aperçu avant remontage.
+
+---
+
+## 10. Règle de travail : l'audit avant le correctif
+
+Formulée par le commanditaire le 27/08/2026 : *« avant d'ajouter une corrective ou
+une amélioration, il faut vérifier le code existant pour ne pas casser ni répéter
+ce qui existe déjà ; et ne pas enfermer le studio. »* Elle vaut pour tous les lots,
+présents et futurs. Le protocole appliqué ici, en cinq temps :
+
+1. **lire le chemin concerné en entier**, pas seulement l'endroit où l'on veut
+   intervenir — pas `writeMeta` seul, mais ses quatre fournisseurs de données.
+2. **chercher la capacité sous d'autres noms** avant d'écrire quoi que ce soit :
+   grep des synonymes (`hashtags|entités|chapters|chapitres|roots|upload`), pas du
+   mot que j'avais choisi. Une recherche par nom de variable rate une fonction
+   qui existe sous un autre nom — c'est exactement comme ça qu'on duplique.
+3. **mesurer l'écart réel** sur des données réelles (les 11 titres du catalogue,
+   les 3 chemins de rendu), jamais l'écart supposé.
+4. **si la capacité existe : l'exposer et la réutiliser.** Une fonction inlinée
+   dans un batch n'est pas une absence : c'est un `module.exports` à ajouter.
+5. **poser le garde-fou de non-régression avant de toucher**, avec les bugs
+   historiques du module en cas de test, et une porte de sortie nommée
+   (variable d'environnement, ou revert d'un commit unique).
+
+### 10.1 Ce que l'audit a tué, et pourquoi
+
+| proposition initiale | verdict de l'audit | devenir |
+|---|---|---|
+| réécrire la description en 8-9 blocs + 12-16 hashtags | `writeMeta` écrit **déjà** deux blocs (CRÉDITS MÉDIAS, SOURCES ÉDITORIALES) ; un constructeur de hashtags correct (accents ôtés, entités en tête) **existe** mais est inliné dans `galleryDlBatch` (`lib/batchSource.js:1069`) | ne pas réécrire : exposer le constructeur, n'ajouter que les blocs absents |
+| ajouter les entités AES au sourcing | `lib/entites.js` **existe** (NER + garde-fou géographique), déjà branché sur `media.js:1417`, `contexte.js`, `batchSource.js` en 3 points | **zéro module** : du dictionnaire et un mécanisme d'adjectifs — exécuté en `28ea1f1` |
+| injecter les chapitres dans la description | les chapitres sont **déjà générés** (`scriptwriter.js:366` dans la spec, `:1128` en repli local, `:1653` en sortie LLM) mais `lib/pipeline.js` ne les lit **jamais** ; de plus leur `t` est faux en repli local (`${i}:00`) | les recalculer depuis les durées de plans réels, ne pas faire confiance au `t` du modèle |
+| câbler `logoSize` / `logoOpacity` / `logoFade` | clés mortes confirmées ; le câbler **changerait la taille du bug** au rendu suivant, alors que le test en cours doit rester sur les réglages mesurés | en attente exprès, après le test |
+| durcissement de `/api/media/file` = « enfermer le studio » | **vérifié, non supposé** : `express.static` sert `public/`, `/output`, `/cache` hors de cette route ; **aucun** endpoint d'upload dans le serveur ; tout média produit par l'app tombe sous `data/cache`, `data/work`, `output` | le verrou ne ferme aucune porte de travail ; ressort `MEDIA_OPEN_ROOT=1` documenté. Si un jour des rushes vivent ailleurs : ajouter `MEDIA_ROOTS=<liste>` (4 lignes, élargissement seulement) |
+
+### 10.2 Le lot entités, consigné
+
+Mesure avant : **2/11** titres du catalogue produisaient un pays. Après : **7/11**.
+Non-régression : `node scripts/verifier-entites.js` → **12/12** ; avec le module
+d'avant (`ENTITES=/tmp/entites-avant.js`) la même batterie fait tomber **5 cas**,
+dont les deux runs historiques documentés dans l'en-tête de `lib/entites.js`
+(« Guinée illustrée par Johannesburg et l'Ontario »). Les 4 titres sans pays après
+retouche ne nomment aucune géographie : les forcer eût été inventer un lieu.
+
+Ce que le changement **ne fait pas** : il ne touche ni au montage, ni aux
+sous-titres, ni au rendu ; il n'ajoute aucune restriction (une région n'ajoute que
+des pays admis) ; il ne modifie aucune API publique du module (les trois
+consommateurs se chargent à l'identique).
