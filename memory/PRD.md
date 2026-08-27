@@ -9,6 +9,30 @@ Stack : Node 20 + Express (mono-processus), FFmpeg (ffmpeg-static, **sans drawte
 libass présent. Frontend HTML/CSS/JS statique. Lancement : `node index.js --serve`.
 ~28 000 lignes, 40 modules dans `lib/`.
 
+## Itération — Juin 2026 (YouTube CC + bgutil + citation sociale)
+Choix utilisateur : mode hybride (B) + détection bgutil (C), puis règle de
+citation pour X/Instagram/TikTok (A). Livré :
+- **Recherche YouTube en 2 phases** (`batchSource.youtubeBatch`) : d'abord
+  filtre licence Creative Commons (URL résultats + sp=EgIwAQ==), puis
+  recherche standard seulement si moisson CC < maxClips. `YT_MODE` =
+  cc | hybride (défaut) | libre. Testé e2e : 12 vidéos CC réelles trouvées,
+  phase standard évitée, licence vérifiée (« CC Attribution license »).
+- **Clips CC** : durée demandée conservée, provider « YouTube CC · chaîne »
+  (attribution CC-BY), pas de marqueur citation. **Clips non-CC** : coupés à
+  4 s (`YT_NONCC_MAX_S`), marqueur `citation` (crédit écran obligatoire +
+  verifierMontage borne le plan).
+- **Détection bgutil** (`bgutilPoTokenInfo`, exportée) : ping serveur
+  (BGUTIL_BASE_URL, défaut 127.0.0.1:4416) + pip show du plugin. 3 états
+  testés : inactif silencieux, plugin-sans-serveur (conseil docker run),
+  actif (fail-fast désactivé, args base_url passés à yt-dlp). Mémoïsé.
+- **Citation sociale** (`galleryDlBatch`) : clips X/IG/TikTok passent par
+  `citation.extraitCitable` (divertissement écarté) + `preparerExtrait`
+  (≤4 s, -an, marqueur citation) ; crédit « Plateforme · @compte » extrait
+  des métadonnées gallery-dl. Testé : coupe 12 s→4 s, audio retiré, marqueur
+  correct, refus divertissement.
+- **reglagesPour** (mediaTransform) : règle youtube — CC traité comme banque
+  pro, non-CC léger resserrage éditorial (PAS un contournement Content ID).
+
 ## Itération — Juin 2026 (analyse du log de production Ubuntu)
 Analyse du run réel « Ghana 2,6 Mds $ » : plan 19 perdu, 6×403 YouTube,
 blocage standardisation 180 s, appels LLM séquentiels. Correctifs livrés :
