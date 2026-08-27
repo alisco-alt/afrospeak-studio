@@ -183,8 +183,20 @@ async function doctor() {
     }
   } else {
     say.warn('Aucun LLM — le moteur local AfroWriter prendra le relais');
-    console.log(`    ${c.grey}Pour des scripts nettement meilleurs, gratuitement :${c.r}`);
-    for (const s of L.install.steps) console.log(`      ${c.blue}${s}${c.r}`);
+    /* `install` vaut `{ hint, cloud[], local[] }` (lib/llm.js:1071) et PAS
+     * `{ steps }` : le diagnostic plantait en `TypeError: L.install.steps is
+     * not iterable` — et il plantait précisément sur les machines où il sert,
+     * celles où aucun moteur n'est encore installé (reproduit ici). Un `--doctor`
+     * qui meurt emporte avec lui la seule explication que le nouveau venu
+     * allait lire. On affiche le conseil puis les deux voies, et on tolère
+     * qu'il n'y ait rien à conseiller (Ollama local détecté, cloud absent). */
+    const I = L.install || {};
+    if (I.hint) console.log(`    ${c.grey}${I.hint}${c.r}`);
+    for (const s of (I.cloud || [])) console.log(`      ${c.blue}cloud · ${s}${c.r}`);
+    for (const s of (I.local || [])) console.log(`      ${c.blue}local · ${s}${c.r}`);
+    if (!I.hint && !(I.cloud || []).length && !(I.local || []).length) {
+      say.info('OpenRouter ou Groq : une clé API et les scripts s\'améliorent tout seuls');
+    }
   }
 
   // Voix
