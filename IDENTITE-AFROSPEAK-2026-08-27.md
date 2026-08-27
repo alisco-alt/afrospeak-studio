@@ -180,3 +180,104 @@ réellement publiés).
   (monnaie SAHEL, CFA, or, dette, Bamako, Traoré, BCID).
 
 Chacun est additif et réversible ; aucun ne touche au montage ni aux sous-titres.
+
+---
+
+## 8. Marque : quel logo incruster, format par format
+
+Les trois candidats reçus (les PNG ont été effacés par le reset du sandbox — à
+redéposer dans `assets/marque-2026-08/sources/`) :
+
+| | ce que c'est | emploi retenu |
+|---|---|---|
+| **①** | médaillon seul, fond quasi-noir : disque à queue de bulle en bas‑gauche, fin liseré or, Afrique en or brossé, croissant vert foncé à motif géométrique or à droite | **LE filigrane d'angle**, sur tous les formats vidéo |
+| **②** | bloc horizontal : « AFRO » cuivre / « SPEAK » vert foncé + tagline « PARLONS VRAI · PENSONS AFRICAIN », emblème à droite | cartes d'intro/outro, bannière, miniature, interface — **jamais en bug** |
+| **③** | même bloc sur papier crème, embossage et ombres portées cuits dans l'image | hors vidéo uniquement (page, print, réseaux) : c'est une maquette, pas un décalque |
+
+À noter : **① est déjà le fichier en place** dans le studio — `assets/logo-mark.png`
+(1024 × 1190) est le même médaillon, avec une ombre portée incluse dans le PNG.
+Le choix de ① ne demande donc pas de câblage, seulement un nettoyage (ci‑dessous).
+
+### 8.1 Ce que le moteur impose (lib/renderer.js)
+
+```
+logoW = LOGO_WIDTH || round(W * 0,11)      // ≈118 px en 1080 vertical, ≈211 px en 1920 paysage
+marge = H * 0,028 · opacité fixe 0,85 · positions : top-center ou top-right
+greffe: scale=w:-1:flags=lanczos, format=rgba, colorchannelmixer=aa=0,85, overlay:format=auto
+```
+
+Trois conséquences, dans l'ordre où elles pourrissent un rendu :
+
+1. **aucun color‑key** : `colorchannelmixer=aa=` *multiplie* l'alpha, il ne détourne
+   pas. Un logo posé sur fond noir peint un **rectangle noir** sur les rushs
+   (invisible sur le `#0B0F14` des slides, très visible en plan de jour).
+   → **exigence n°1 : un PNG à alpha réel.**
+2. **`scale=w:-1` ne garde que la largeur** : toute marge morte dans le PNG est
+   retirée de la marque visible. Un emblème recadré au contour rend ~30 % plus
+   grand que le même fichier paddingué.
+3. **deux étages de texte = illisible à 118 px** : `findLogo()` (l.144‑156) le dit
+   déjà — c'est pour ça que la pastille, et non le bloc, sert de filigrane.
+
+Et un point de palette : or/vert/noir convergent avec les couleurs du studio
+(`#F5A623` / `#00A651` / `#0B0F14`), mais le **vert foncé de « SPEAK » s'éteint**
+sur les images étalonnées sombres (`lut.js` écrase les ombres) → prévoir une
+déclinaison **1 couleur** pour l'incrustation.
+
+### 8.2 Mesure, et non opinion
+
+`scripts/preparer-marque.js` compose le bug à sa taille réelle sur trois fonds
+plats (nuit 0x14181C, demi 0x6E7783, jour 0xE8E4DA), puis **soustrait le même
+fond sans le logo** : ce qui reste est exactement ce que l'œil voit.
+`saillie` = 95ᵉ percentile de l'écart de luminance · `emprise` = % de la boîte où
+l'écart dépasse 12 pts · `marge morte` = % sous 3 pts.
+
+| fichier testé | fond | saillie | emprise visible | marge morte |
+|---|---|---|---|---|
+| `assets/logo-mark.png` (médaillon, **①**) | sombre | 160 | **41 %** | 47 % |
+| | demi | 86 | **53 %** | 42 % |
+| | clair | 171 | **54 %** | 41 % |
+| `assets/logo.png` (bloc horizontal, **②**) | sombre | 112 | 24 % | **70 %** |
+| | demi | 75 | 28 % | 66 % |
+| | clair | 161 | 33 % | 61 % |
+
+Lecture : à taille de bug identique, le médaillon garde **le double d'emprise
+visible** et +11 pts de saillie sur fond demi ; le bloc horizontal perd les
+deux tiers de sa boîte (marge morte 61‑70 %) et sa tagline ne passe plus.
+Dans les deux cas, la marge morte élevée dit la même chose : **recadrer au
+contour, marge fixe de 4 %** — le médaillon actuel pourrait rendre ~30 % plus
+grand sans toucher au code.
+
+Planches témoins : `assets/marque-2026-08/comparaison-fond-{moyen,sombre}.png`
+(1:1, les deux candidats côte à côte à 118 px et 211 px).
+
+### 8.3 Réglages par format
+
+| format | quoi | réglage |
+|---|---|---|
+| **9:16 court** | ① | `logoPos: 'top-center'` (déjà le défaut du style Impact). Le rail d'actions de YouTube occupe le bord droit, le titre/n@ le bas : le haut centré est la seule bande libre. 118 px de large, y = 3,5 % H. |
+| **16:9 long** | ① | `top-right` avec `LOGO_WIDTH=150`‑ish, ou `top-left` si les cartes de fin « s'assoient » dessus — position non prévue par le code à ce jour. |
+| **1:1** | ① | `top-center`, 118 px. |
+| **miniature** | ② | via `LOGO_COMPLET` (`public/logo.png` / `assets/logo.png`), coin, ~14 % de la largeur — jamais le filigrane. |
+| **carte d'intro/outro, habillage** | ② | pleine largeur, tagline lisible. |
+| **avatar chaîne** | ① | centré dans un **cercle de 66 %** de 800 × 800 : YouTube recadre en rond, la queue de bulle est coupée sinon. |
+| **bannière** | ② | dans la zone sûre 1235 × 335 centrée (2048 × 1152) : le bloc horizontal, pas le médaillon. |
+| **dernier plan d'un 16:9** | rien | la carte de fin porte déjà le nom et le @ → `logoOverlay: false` sur ce plan. |
+
+⚠ **`logoSize`, `logoOpacity`, `logoFade` des presets sont déclarés mais jamais
+lus** (aucune occurrence hors `lib/presets.js:185`, qui ne lit que `logoPos`) :
+promettre un réglage par format exige de les câbler dans le renderer. Non fait —
+ça changerait la taille du bug dès le prochain rendu, et le test en cours doit
+rester sur les réglages mesurés.
+
+### 8.4 Procédure quand les PNG sont redéposés
+
+```bash
+node scripts/preparer-marque.js assets/marque-2026-08/sources/Embleme.png \
+    --fond noir --out assets/marque-2026-08          # détourage + recadrage + planches
+# puis, et seulement après avoir regardé les planches :
+cp assets/marque-2026-08/logo-mark.png assets/logo-mark.png      # → `assets/ancien-logo/` d'abord
+```
+
+Le script n'écrase **aucun** fichier du studio : il écrit dans `--out`, avertit
+si le fond n'est pas transparent (« le bug PEINDRA UN RECTANGLE »), et ne touche
+pas au moteur.
