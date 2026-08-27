@@ -1,0 +1,7 @@
+Déposer ici les PNG fournis par le graphiste (emblème, bloc horizontal, version papier).
+Le script ne les écrase pas : il écrit ses déclinaisons dans le dossier parent.
+
+  node scripts/preparer-marque.js assets/marque-2026-08/sources/<fichier>.png --out assets/marque-2026-08
+
+Sans .png à alpha, le filigrane peindra un rectangle sur les rushs — voir le §8 de
+IDENTITE-AFROSPEAK-2026-08-27.md.
