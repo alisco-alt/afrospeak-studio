@@ -307,6 +307,68 @@ poste dérape — plus de reconstruction à la main.
 - gdelt saturé 20 min : source écartée proprement ;
 - esap.online / duckduckgo : échecs réseau bornés, gérés.
 
+## 5 ter. Avant fusion : ligne éditoriale + nouvelles sources ✅ FAIT
+
+Demande : *« avant de merger, y a-t-il encore des améliorations ? ajouter
+d'autres sources de sujets, et les sujets doivent parler d'émancipation
+africaine ou y être amenés »* — Afro Speak produit pour une chaîne dédiée à
+l'émancipation du continent, à l'éveil des consciences, à l'unité africaine
+et à la souveraineté.
+
+### La boussole : `lib/ligne.js` (NOUVEAU)
+
+Un module de ligne éditoriale, câblé aux quatre points où le studio choisit
+ses sujets :
+
+| Point de branchement | Effet |
+|---|---|
+| `editor.scanForTopics` | La mission + les 5 thèmes sont **dans le prompt** du rédacteur en chef ; les propositions ressortent **bonusées et re-triées**. |
+| `scriptwriter.ideas` | Idem pour la veille simple (`--ideas`, autopilote). |
+| `autopilot.cycle` | Tri final avec bonus + **angle d'amorce émancipation** injecté sur tout sujet neutre retenu. |
+| `intelligence.trendingNews` | La liste affichée dans l'UI remonte les sujets alignés. |
+
+- **5 thèmes** : Souveraineté (Franc CFA, BCEAO, monnaie, mines, terres,
+  dette, données), Unité (ZLECAf, Union africaine, CEDEAO/Sahel,
+  panafricanisme), Éveil (histoire, restitutions, éducation, désinformation,
+  diaspora), Transformation (industrie, transformation locale, énergie,
+  infrastructures, innovation), Dépendance (aides conditionnées, exposition
+  extractive, fuite des capitaux, importations alimentaires).
+- **Scoring** : +7 par mot-clé repéré (phrase complète ×2), plafonné à +30 —
+  le bonus **re-classe** sans écraser le potentiel viral déjà calculé.
+- **Jamais de déformation** : le prompt l'interdit explicitement — un sujet
+  neutre est *relié* au continent par ses faits (l'angle est déduit), jamais
+  forcé en slogan.
+- **Audit** : chaque proposition porte `themeLigne`, `motsLigne` et
+  `angleEmancipation` (visibles dans l'API et les logs).
+- **Sortie de secours** : `LIGNE_EDITORIALE=0` désactive tout (comportement
+  d'avant) ; `node index.js --doctor` affiche l'état de la ligne.
+
+### Les sources : 7 nouveaux flux dans la veille
+
+| Flux | Quoi |
+|---|---|
+| `ligne_souverainete` | Google News · souveraineté, Franc CFA, banques centrales |
+| `ligne_zlecaf` | Google News · ZLECAf, Union africaine, CEDEAO, intégration |
+| `ligne_transformation` | Google News · industrialisation, transformation locale, lithium, cacao |
+| `ligne_ressources` | Google News · mines, cobalt, terres rares, fuite des capitaux |
+| `ligne_histoire` | Google News · restitutions, panafricanisme, décolonisation |
+| `africanarguments` | African Arguments (analyse panafricaine, EN) |
+| `allafrica` | AllAfrica (actu continentale, EN) |
+
+- Les 5 flux « ligne » utilisent le **même canal éprouvé** que le flux
+  « Google News Afrique » déjà en place (aucun nouveau domaine à débloquer).
+- Garantie structurelle : la veille **inclut toujours** ces flux — le
+  défaut `news()` les ajoute même sans sélection explicite, et l'autopilote
+  les ajoute à la config sauvegardée des anciennes installations.
+- Un flux mort est écarté proprement sans faire tomber les autres (déjà le
+  comportement de `news()`).
+
+### Comment ça se voit
+
+- `--doctor` : nouvelle section « Ligne éditoriale » (mission + flux dédiés).
+- Les logs du rédacteur en chef affichent l'alignement dominant, ex.
+  `12 sujets proposés — alignement dominant : Souveraineté`.
+
 ## 6. Fichiers touchés
 
 | Fichier | Changement |
@@ -321,3 +383,8 @@ poste dérape — plus de reconstruction à la main.
 | `lib/webapp.js`, `public/*` | Style Viral + option « Nuage mot à mot » dans l'UI, styles API élargis |
 | `scripts/verifier-sous-titres.js` | Mode `--pop`, wrapper async |
 | `README.md` | Section sous-titres nuage |
+| `lib/ligne.js` | **NOUVEAU** — ligne éditoriale : thèmes, scoring, réorientation, bloc prompt |
+| `lib/sources.js` | +7 flux (5 Google News « ligne », African Arguments, AllAfrica), inclusion garantie |
+| `lib/editor.js` / `lib/scriptwriter.js` / `lib/autopilot.js` / `lib/intelligence.js` | Câblage de la boussole aux 4 points de choix des sujets |
+| `lib/config.js` | Défauts autopilote : flux de ligne inclus |
+| `index.js` | `--doctor` : section ligne éditoriale |

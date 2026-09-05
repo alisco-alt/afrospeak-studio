@@ -98,7 +98,8 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 | `server.js` | **Serveur web** — API REST + interface + routes SaaS |
 | `lib/llm.js` | **LLM local** — Ollama / DeepSeek-R1, raisonnement, hors ligne |
 | `lib/scriptwriter.js` | Écriture du script : hook, développement, CTA |
-| `lib/sources.js` | Veille : 16 flux RSS africains + extraction d'articles |
+| `lib/sources.js` | Veille : 23 flux RSS (actu + **ligne éditoriale**) + extraction d'articles |
+| `lib/ligne.js` | **Ligne éditoriale** — émancipation, unité, souveraineté : boussole des sujets |
 | `lib/tts.js` | Voix off + **timings mot à mot** |
 | `lib/media.js` | Banques libres : Pexels, Pixabay, Unsplash, Openverse, Wikimedia, NASA |
 | `lib/social.js` | **Scraping réseaux sociaux & archives** avec cookies de session |
