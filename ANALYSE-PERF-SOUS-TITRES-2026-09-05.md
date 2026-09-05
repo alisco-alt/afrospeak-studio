@@ -257,7 +257,43 @@ la largeur cible (25 % pour une vidéo). Les vignettes vraiment pixélisées
 sont rejetées → la cascade cherche une vraie photo. `BATCH_QUALITE_MIN`
 ajuste le seuil.
 
-### Troisième point : les logs sont maintenant horodatés
+### Troisième amélioration : les illustrations IA représentent le SUJET (demande explicite)
+
+Retour sur la démo : « j'ai très bien aimé l'illustration du port — si les
+illustrations IA représentaient les sujets comme ça, ça serait top ». C'est
+exactement le changement apporté.
+
+**Pourquoi l'image du port était réussie** : sa consigne était écrite comme
+un PHOTOJOURNALISTE — sujet + action + lieu + heure + composition +
+registre éditorial. Or le studio nourrissait le générateur avec des
+**requêtes de moteur de recherche** (« Zamboï village minier défie… ») :
+un modèle de diffusion n'a pas une scène à peindre, il a un amas de
+mots-clés.
+
+**Correctif — la « direction photo »** (`lib/aiassets.js`) :
+1. quand un plan tombe en illustration IA, UN appel LLM (la cascade
+   gratuite existante, 30 s max, UNE tentative, course contre le budget
+   média) transforme la requête en **une description de scène
+   photographiable** : « Gold panners sifting river sediment at a
+   small-scale mining site in the Central African Republic, mid-morning
+   light » — et non plus « gold mining CAR » ;
+2. règles imposées au LLM : scène concrète (pas de métaphore), cadre
+   large, gens de loin/de dos, lumière naturelle abondante, dignité,
+   AUCUNE personnalité réelle identifiable ;
+3. **garde-fous** : la scène est re-pASSÉE dans les mêmes filtres
+   déontologiques que l'image (sujets sensibles refusés → repli sur la
+   consigne heuristique d'origine) ; jamais de blocage : LLM absent ou
+   lent → ancien comportement ;
+4. **cache disque** (`data/cache/ia-prompts.json`) : la scène d'une
+   requête n'est écrite qu'une fois — les re-runs ne paient plus l'appel ;
+5. `IA_SCENE_LLM=0` désactive. La mention « ILLUSTRATION IA » à l'écran
+   est inchangée (transparence éditoriale).
+
+La qualité Monte d'un cran par ailleurs : le modèle `flux` est déjà
+demandé explicitement (commit précédent). Combinés, ces deux changements
+visent exactement le rendu de l'image du port.
+
+### Quatrième point : les logs sont maintenant horodatés
 
 Chaque ligne du pipeline est préfixée `[+mm:ss]` depuis le début du run.
 Le prochain log collé dans un ticket permettra de dire immédiatement quel
