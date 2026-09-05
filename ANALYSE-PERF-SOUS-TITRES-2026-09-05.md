@@ -198,6 +198,79 @@ node index.js --doctor
 # ⏱ Temps de production — script 1:12 · medias 3:40 · voix 0:58 · montage 2:51 — total 8:41
 ```
 
+---
+
+## 5 bis. Analyse du RUN RÉEL du 5 septembre (log fourni, PC local 8 cœurs / 16 Go, WSL2)
+
+Reconstitution chronologique de la génération « Zamboï » (25 plans, 1:35) :
+
+| Étape | Temps constaté | Verdict |
+|---|---|---|
+| Script (OpenRouter→Groq, quotas, relecture) | plusieurs allers-retours LLM | correct, les cascades de repli ont fonctionné |
+| Requêtes visuelles LLM (5 appels de 10 segments) | ~1-2 min | normal (lots de 10, 2 de front) |
+| **Phase visuelle** | **1151 s (19 min)** | **LE poste dominant — voir ci-dessous** |
+| Validation médias (pause interface) | temps humain | normal |
+| Montage 4 plans × 2 threads + mixage + export | rapide, aucun échec | sain (11,3 Mo pour 1:35 ≈ 7,6 Mb/s : bon débit) |
+
+### Le bug trouvé dans ce log : le batch était jeté puis refait
+
+Le log montre la séquence :
+
+```
+Batch pool distribué : 24/25 plans couverts par du contenu réel   ← 24 plans ONT leur visuel
+Budget média : 210s déjà consommés (105s imputés)
+Pre-pass Bing : 1 plans non couverts
+Plan 17 : photo réelle Bing
+Plan 2 : aucune archive → illustration générée                    ← pourtant « couvert » !
+[media] normalisé 2560×1707 → 2400×1600                           ← retéléchargements massifs
+[media] normalisé 5152×6864 → 1802×2400                           (14 images géantes)
+Plan 10 / 13 : aucune archive → illustration générée
+⚠ Phase visuelle court-circuitée (budget 1058s) pour les 3 plans restants
+```
+
+**Cause exacte (trouvée dans le code)** : la distribution batch pose
+`s.asset` sur 24 plans, mais la boucle de recherche par plan ne sautait que
+les plans `assetLocked`. Les 24 plans « couverts » repartaient donc dans la
+cascade COMPLÈTE : retéléchargements (photos de presse à 30 Mpx),
+normalisations, secours… ~900 s à refaire ce qui était déjà fait, et trois
+plans couverts sont même tombés en illustration IA faute de nouveau
+résultat. **C'est LA cause principale de vos 19 minutes de phase visuelle.**
+
+**Correctif appliqué** : un plan couvert par le batch (ou le pre-pass Bing)
+dont le fichier est valide est maintenant CONSERVÉ tel quel — validation
+légère (existence + probe, qui passe par le cache). Les médias imposés par
+l'utilisateur restent prioritaires. Fichier invalide → cascade normale.
+Compteur affiché en fin de phase : « Batch réutilisé sans recherche : N
+plan(s) conservé(s) ».
+
+**Effet attendu sur CE run** : phase visuelle ≈ 210 s (batch) + 30 s
+(pre-pass) + validation < 15 s ≈ **4-5 min au lieu de 19** — le run complet
+passe sous ~12 min revue comprise.
+
+### Deuxième problème du log : les vignettes molles
+
+Les « images pas à la qualité voulue » s'expliquent en partie ici : une
+vignette YouTube 480×360 recadrée en 9:16 donne ~200 px de large étirés en
+1080 — du flou garanti. Un filtre qualité est ajouté à la validation :
+la largeur UTILE après recadrage au format de sortie doit dépasser 35 % de
+la largeur cible (25 % pour une vidéo). Les vignettes vraiment pixélisées
+sont rejetées → la cascade cherche une vraie photo. `BATCH_QUALITE_MIN`
+ajuste le seuil.
+
+### Troisième point : les logs sont maintenant horodatés
+
+Chaque ligne du pipeline est préfixée `[+mm:ss]` depuis le début du run.
+Le prochain log collé dans un ticket permettra de dire immédiatement quel
+poste dérape — plus de reconstruction à la main.
+
+### Restes connus, non bloquants
+
+- gallery-dl : cookie TikTok expiré (plateforme ignorée proprement) et
+  YouTube clip 403 (limitation yt-dlp sans cookies — renouveler
+  `cookies/youtube.txt` améliore la part de clips vidéo) ;
+- gdelt saturé 20 min : source écartée proprement ;
+- esap.online / duckduckgo : échecs réseau bornés, gérés.
+
 ## 6. Fichiers touchés
 
 | Fichier | Changement |
