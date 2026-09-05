@@ -223,6 +223,20 @@ async function doctor() {
     say.ok(`Veille   ${c.grey}${items.length} articles récupérés${c.r}`);
   } catch (e) { say.warn('Veille indisponible : ' + e.message); }
 
+  // Ligne éditoriale (émancipation / unité / souveraineté)
+  const ligne = require('./lib/ligne');
+  const stLigne = ligne.statut();
+  if (stLigne.active) {
+    const fluxLigne = sources.FEEDS_LIGNE
+      .map(id => (sources.FEEDS.find(f => f.id === id) || {}).name)
+      .filter(Boolean);
+    console.log(`\n  ${c.b}Ligne éditoriale${c.r}  ${c.grey}Afro Speak — émancipation, éveil, unité, souveraineté${c.r}`);
+    say.kv('Mission', stLigne.mission);
+    say.kv('Veille dédiée', `${fluxLigne.length} flux : ${fluxLigne.join(' · ')}`);
+  } else {
+    say.warn('Ligne éditoriale désactivée (LIGNE_EDITORIALE=0)');
+  }
+
   console.log(`\n  ${c.b}Sorties${c.r}`);
   say.kv('Vidéos', DIRS.output);
   say.kv('Cookies', path.join(DIRS.data, 'cookies'));

@@ -712,6 +712,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
                 <label>Sous-titres</label>
                 <select id="fCapMode">
                   <option value="">Automatique (selon le style)</option>
+                  <option value="pop">Nuage mot à mot — style shorts (recommandé)</option>
                   <option value="karaoke">Karaoké — mot surligné</option>
                   <option value="word">Un mot à la fois</option>
                   <option value="phrase">Par phrase</option>
@@ -1055,8 +1056,10 @@ var S = {
 
 /* ─── Styles de montage ─── */
 var STYLES = [
+  { id:'viral',      label:'Viral 2026 ★', desc:'Nuage jaune mot à mot + plein cadre + slides de chiffres. Le look des grandes chaînes faceless — recommandé Shorts/Reels/TikTok.' },
+  { id:'bankable',   label:'Bankable',     desc:'Actualité économique premium, nuage doré sur le mot prononcé, tiers-bas fixe.' },
   { id:'ecofin',     label:'Écofin',       desc:'Rythme posé, cartes de données, chiffres animés, bandeaux sobres. Idéal 5-12 min.' },
-  { id:'brut',       label:'Brut',         desc:'Coupes rapides, sous-titres mot-à-mot énormes, bandeaux colorés. Idéal Shorts.' },
+  { id:'brut',       label:'Brut',         desc:'Coupes rapides, nuage jaune géant, bandeaux colorés. Idéal Shorts.' },
   { id:'moneyradar', label:'Money Radar',  desc:'Grade sombre, chiffres qui claquent, zooms serrés, ambiance thriller éco.' },
   { id:'doc',        label:'Documentaire', desc:'Plans longs, Ken Burns lent, sous-titres discrets, grade cinéma chaud.' }
 ];
@@ -1231,7 +1234,7 @@ $$('#fmtToggle .fmt-opt').forEach(function(el){
       x.classList.toggle('on', x.dataset.f === S.format);
     });
     // Le style suit naturellement le format
-    var suggested = S.format === 'vertical' ? 'brut' : 'ecofin';
+    var suggested = S.format === 'vertical' ? 'viral' : 'ecofin';
     if(S.style !== suggested){ S.style = suggested; renderStyles(); }
   });
 });
