@@ -122,7 +122,7 @@ $$('#fmtToggle .fmt-opt').forEach(el => el.addEventListener('click', () => {
   S.format = el.dataset.f;
   $$('#fmtToggle .fmt-opt').forEach(x => x.classList.toggle('on', x.dataset.f === S.format));
   // Le style « Brut » colle au vertical, « Écofin » au horizontal.
-  const suggested = S.format === 'vertical' ? 'brut' : 'ecofin';
+  const suggested = S.format === 'vertical' ? 'viral' : 'ecofin';
   if (S.style !== suggested) { S.style = suggested; renderStyles(); }
 }));
 

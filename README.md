@@ -201,10 +201,21 @@ Les timings alimentent à la fois les sous-titres incrustés et le fichier `.srt
 
 ## 4️⃣ Incrustations et gestion des droits
 
-### Sous-titres dynamiques
-Karaoké mot surligné, un mot à la fois, ou par phrase. Police grasse,
-contour noir, voile sombre pour la lisibilité. La largeur des lignes est
-calculée sur les **métriques réelles des polices** : jamais de débordement.
+### Sous-titres dynamiques — mode « nuage » (pop)
+**Le style des grands shorts verticaux** : un nuage arrondi (jaune par
+défaut) suit le mot PRONONCÉ à l'instant, posé au **pixel près** — chaque
+mot est mesuré avec le vrai TTF (aller-retour FFmpeg, ~30 ms pour toute
+la vidéo), plus aucune estimation. Chiffres et montants en or, noms
+propres et sigles en cyan, mots forts (« record », « flambée »…)
+surlignés, micro pop d'échelle à l'ouverture de chaque groupe.
+Disponible dans tous les styles verticaux (`viral`, `bankable`, `brut`,
+`impact`) ; `karaoke`, « un mot à la fois » et « par phrase » restent
+disponibles. Réglages : `CAPTION_PILL_TAIL` (tenue du nuage après le
+mot), `CAPTION_PILL=0` (désactiver), `captionPill: 'brand'` (couleur de
+marque). Karaoké mot surligné, un mot à la fois, ou par phrase. Police
+grasse, contour noir, voile sombre pour la lisibilité. La largeur des
+lignes est calculée sur les **métriques réelles des polices** : jamais de
+débordement.
 
 ### ⚖️ Crédit source obligatoire
 

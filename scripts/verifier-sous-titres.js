@@ -40,7 +40,7 @@ const FFMPEG = (() => {
 const argv = process.argv.slice(2);
 const TAG = (argv.find(a => !a.startsWith('--'))) || 'run';
 const FORMAT = argv.includes('--horizontal') ? 'landscape' : 'vertical';
-const MODE = argv.includes('--word') ? 'word' : argv.includes('--phrase') ? 'phrase' : 'karaoke';
+const MODE = argv.includes('--pop') ? 'pop' : argv.includes('--word') ? 'word' : argv.includes('--phrase') ? 'phrase' : 'karaoke';
 const OUT = '/tmp/cap-' + TAG;
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT + '/frames', { recursive: true });
@@ -88,7 +88,8 @@ const OPTS = {
   boxColor: '#1A1A2E', boxOpacity: 0.95, marginRatio: 0.08, bold: true,
 };
 
-const ass = captions.buildASS(words, OPTS);
+(async () => {
+const ass = await captions.buildASS(words, OPTS);
 fs.writeFileSync(OUT + '/captions.ass', ass);
 const F = FORMAT === 'vertical' ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 };
 console.log(`[${TAG}] ${FORMAT}/${MODE} — ASS : ${ass.match(/^Dialogue:/gm).length} événements, `
@@ -191,3 +192,5 @@ fs.writeFileSync(OUT + '/mesures.json', JSON.stringify({
 }, null, 2));
 console.log(`→ ${OUT}/mesures.json`);
 process.exit(score === 0 ? 0 : 2);
+
+})().catch(e => { console.error(e); process.exit(1); });
