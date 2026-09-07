@@ -15,7 +15,10 @@
   complète des articles dans pipeline.js (≤12, lots de 3, repli RSS), boussole
   lib/ligne.blocPrompt() dans SYSTEM / SYSTEM_COURT / CONSIGNE (redacteurChef),
   timeout edge-tts 75 s (EDGE_TTS_TIMEOUT_MS).
-- PR #3 vers main (fusion par l'utilisateur).
+- PR #3 **FUSIONNÉE le 2026-09-07** (merge commit `62a5443`) — main = 62a5443,
+  branche de session resynchronisée dessus, prête pour les correctifs suivants.
+  Prochaine étape convenue : run de test réel par l'utilisateur sur sa machine
+  (`git checkout main && git pull`), puis retour des logs/observations ici.
 
 ## Tests
 - `tests/test-c1-sous-titres.js` — moteur pop réel (buildASS) : 11 vérifications.
