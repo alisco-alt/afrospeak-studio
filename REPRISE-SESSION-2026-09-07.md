@@ -17,6 +17,44 @@
   timeout edge-tts 75 s (EDGE_TTS_TIMEOUT_MS).
 - PR #3 vers main (fusion par l'utilisateur).
 
+## ROUND 2 — correctifs des retours du run (2026-09-07, branche `arena/01a07a02-afrospeak-studio`)
+
+> Les 6 correctifs ont été développés et validés par tests dans une session dont le
+> push était impossible ; ils ont été RÉ-APPLIQUÉS fidèlement (code exact compris) ici.
+
+- `516542c` — **R1** sous-titres trop espacés (moteur pop, bloc « Layout manuel »,
+  `lib/captions.js`) : bug géométrique — quand la ligne est réduite (fsGroupe < fs),
+  l'espace entre mots gardait sa taille pleine. L'avance du curseur utilise désormais
+  `espReel = espace × (fsGroupe / fs)`.
+- `f20a5a0` — **R2** slides de données sans sous-titres : `captions.motsHorsPlans()`
+  (nouvelle, exportée) retire les mots des plans `motion.type === 'dataSlide'` du flux
+  du `buildASS` uniquement (le SRT reste complet) ; log « le chiffre respire seul ».
+- `578e993` — **R3** logo trop bas (8,5 %) : hiérarchie `LOGO_TOP_RATIO` env >
+  `style.logoTopRatio` > défauts (0,06 vertical / 0,05 paysage) ; le style viral pose
+  `logoTopRatio: 0.06` — juste sous la barre recherche Shorts.
+- `7d1c055` — **R4** compression du quota par ARTICLES ENTIERS (cause racine du
+  « script pas journalistique » : l'ancienne troncature coupait les articles en deux,
+  « prompt ramené de 6823 à 3943 jetons »). `llm.compresserParBlocs()` retire des blocs
+  `[N]` entiers depuis la fin, garde l'amorce + les 2 premiers articles + la fin du
+  prompt (QUEUE = 2600 car., schéma JSON), repli troncature de tête hors matière,
+  `null` si rien de compressable.
+- `dd33a2b` — **R5** fin des scripts « 0/228 mots » (deux re-prompts de ~90 s perdus
+  sur des JSON valides dans des formes non lues) : `normalize()` accepte
+  `chapitres/chapters/document.sections/script.sections/storyboard.sections`, les clés
+  `plans/segments/scenes`, les chaînes brutes et les clés `texte/text/voix/voiceover` ;
+  filet `ramasserPlans()` (profondeur 6, 60 plans max, clés narration|texte|voix,
+  ≥ 40 car.) si aucune section n'émerge.
+- `939ecfd` — **R6** prononciation : 6 entrées Sénégal/wolof après `'saied'` —
+  `diomaye→Djomaï, wade→Wad, khady→Kady, xibaaru→Sibaarou, seneweb→Sènewèb,
+  thiaroye→Tiaroyé`. (Extension sans code via `data/prononciation.json`, rechargé à chaud.)
+- `68bfe99` — **Tests** : `tests/test-v2-retour-run2.js` — 34 vérifications (motsHorsPlans,
+  compresserParBlocs, normalize formes alternatives + ramassage, prononciation,
+  buildASS positions croissantes/dans l'écran avec FIT déclenché). Toujours verts :
+  `test-c1-sous-titres.js` (11) et `test-c456-matiere-boussole.js` (17). Tout à 0 ko
+  (FFmpeg absent du sandbox = repli estimation normal).
+
+PR ROUND 2 ouverte vers `main` (fusion par l'utilisateur, puis run réel et boucle).
+
 ## Tests
 - `tests/test-c1-sous-titres.js` — moteur pop réel (buildASS) : 11 vérifications.
 - `tests/test-c456-matiere-boussole.js` — ré-étiquetage, matière, boussole, timeout : 17.
