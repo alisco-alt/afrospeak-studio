@@ -55,6 +55,35 @@
 
 PR ROUND 2 ouverte vers `main` (fusion par l'utilisateur, puis run réel et boucle).
 
+## ROUND 3 — « qualité des grands canaux » (2026-09-07, même branche / PR #4)
+
+> Inspiration : grammaire de rétention des chaînes faceless de référence
+> (MagnatesMedia, Money Radar, Brut…) — pattern interrupts, sound design collé
+> aux révélations, barre de progression « Stories », master aux normes
+> plateformes. Chaque ajout est désactivable par env (retour arrière instantané
+> au premier run réel).
+
+- `a32c581` — **Q1** barre de progression GLOBALE : elle remplit TOUTE la vidéo
+  (mode « Stories ») au lieu de repartir à zéro à chaque plan. `overlays
+  .addProgressBar(offset, total)` (segments à cheval continuité parfaite),
+  `pipeline` fige `shot.start`/`shot.total` (somme des durées = offset final
+  xfade grâce à la compensation), renderer pose la barre dès le plan 0.
+  `PROGRESS_STEPS` (90 par défaut).
+- `9c2ef64` — **Q2** SFX `riser` : tension montante (balayage 170→870 Hz +
+  souffle, coupe sèche 0,85 s) posée avant chaque carte `dataSlide` — l'`impact`
+  clôt la tension. Whoosh sauté sur ces plans (anti-boue) ; rien dans la
+  première seconde.
+- `d817492` — **Q3** MASTER audio normalisé à **-14 LUFS / TP -1,5 / LRA 11**
+  (cible YouTube/Shorts/TikTok — la voix seule était à -16, le mix final
+  n'était pas normalisé) ; `MIX_LOUDNORM=0` pour revenir en arrière.
+  **Q4** PUNCH d'accroche : zoom ×1,6 plafonné à 14 % sur le plan 0 (pattern
+  interrupt d'ouverture) ; `style.hookPunch` (viral : true), `HOOK_PUNCH=0`.
+- `be95f78` — **Tests** : `tests/test-round3-qualite.js` — 21 vérifications, 0 ko.
+  Suites existantes inchangées : c1 11, c456 17, v2 34.
+- Constaté déjà au niveau (rien à faire) : easing cosinus du Ken Burns
+  (fenêtre de lecture, sous-pixel), SFX calés sur le mot prononcé, ducking
+  sidechain, outro card, transitions xfade riches.
+
 ## Tests
 - `tests/test-c1-sous-titres.js` — moteur pop réel (buildASS) : 11 vérifications.
 - `tests/test-c456-matiere-boussole.js` — ré-étiquetage, matière, boussole, timeout : 17.
