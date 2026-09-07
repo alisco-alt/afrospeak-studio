@@ -84,6 +84,29 @@ PR ROUND 2 ouverte vers `main` (fusion par l'utilisateur, puis run réel et bouc
   (fenêtre de lecture, sous-pixel), SFX calés sur le mot prononcé, ducking
   sidechain, outro card, transitions xfade riches.
 
+## ROUND 4 — « éditorial » : fin des abandons silencieux (2026-09-07, même branche / PR #4)
+
+> Deux scènes du run réel traitées : « Script utilisé tel quel malgré 1 alerte(s):
+> Ton accroche est un constat neutre… » et « Relecture refusée (chiffre(s)
+> inventé(s) : 10, 000, 60) — brouillon conservé ». Dans les deux cas le studio
+> avait raison de signaler, mais tort de s'arrêter là.
+
+- `b3a1b9b` — **E1** rédacteur en chef : au premier refus, UNE reprise est
+  demandée avec le motif injecté dans la consigne (`messageReprise()`,
+  exportée). La matière de base reste le brouillon ORIGINAL ; second refus
+  (ou appel raté) → brouillon conservé, comme avant. `CHEF_REPRISE=0`
+  rétablit l'abandon immédiat.
+- `17f307c` — **E2** accroche faible : réécriture CIBLÉE de la seule phrase
+  (1 appel LLM, pas un re-prompt complet à ~90 s). `estAlerteAccroche()` +
+  `accrocheAcceptable()` (contrôle strict : tension obligatoire, aucun
+  chiffre hors matière, pas d'anglais, pas de formule creuse — détecteurs
+  existants réutilisés) + `reecritAccroche()` appliquée au plan 0 ET au
+  champ `hook`, stats recalculées. Le pipeline re-valide ; « utilisé tel
+  quel » ne s'affiche que s'il reste des alertes. `HOOK_REPRISE=0` désactive.
+- `4a88d8b` — **Tests** : `tests/test-round4-editorial.js` — 25 vérifications,
+  0 ko, avec LLM SIMULÉ (monkey-patching de lib/llm : déterministe, zéro
+  réseau). Suites existantes inchangées : c1 11, c456 17, v2 34, round3 21.
+
 ## Tests
 - `tests/test-c1-sous-titres.js` — moteur pop réel (buildASS) : 11 vérifications.
 - `tests/test-c456-matiere-boussole.js` — ré-étiquetage, matière, boussole, timeout : 17.
