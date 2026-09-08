@@ -17,5 +17,7 @@ check('signale une année absente', result.unverified.length === 1 && result.unv
 check('bloque le statut si une valeur est absente', result.status === 'blocked');
 const okResult = auditScript({ sections: [{ shots: [{ index: 0, narration: '60 CFA.' }] }] }, sources);
 check('passe quand toutes les valeurs sont traçables', okResult.status === 'passed' && okResult.unverified.length === 0);
+const noSource = auditScript({ sections: [{ shots: [{ index: 0, narration: '60 CFA.' }] }] }, []);
+check('sans matière, demande une revue au lieu de bloquer à tort', noSource.status === 'review_required' && noSource.sourceAvailable === false);
 console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
 process.exit(ko ? 1 : 0);
