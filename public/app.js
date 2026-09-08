@@ -916,6 +916,9 @@ window.reviewStoryboard = async function(id) {
         <div class="rev-stat"><b>${totalDur}</b><span>durée</span></div>
         <div class="rev-stat"><b>${shots.filter(s => s.asset && s.asset.file).length}/${shots.length}</b><span>visuels trouvés</span></div>
       </div>
+      ${sb.mediaAudit && sb.mediaAudit.status === 'review_required'
+        ? `<div class="note warn" style="margin:14px 0"><b>⚠ Provenance à vérifier</b><br>${sb.mediaAudit.unresolvedLicenses} source(s) n'ont pas de licence ou d'URL de licence vérifiable. Vérifiez-les avant publication.</div>`
+        : `<div class="note" style="margin:14px 0">✓ Provenance média documentée pour les sources retenues.</div>`}
       <div class="rev-grid">${shotHtml}</div>
       <div class="hr"></div>
       <div class="rev-actions">
@@ -951,6 +954,7 @@ window.expandShot = function(idx) {
       <div class="kv"><span>Visuel prévu</span><b>${esc(s.visual || '—')}</b></div>
       <div class="kv"><span>Recherche</span><b>${esc(s.query || '—')}</b></div>
       <div class="kv"><span>Source</span><b>${s.asset ? esc(s.asset.provider || '—') : 'manquant'}</b></div>
+      ${s.asset && s.asset.license ? `<div class="kv"><span>Licence</span><b>${esc(s.asset.license)}${s.asset.licenseUrl ? ` · <a href="${esc(s.asset.licenseUrl)}" target="_blank" rel="noopener">vérifier</a>` : ' · non vérifiée'}</b></div>` : ''}
       ${s.credit ? `<div class="kv"><span>Crédit</span><b>${esc(s.credit)}</b></div>` : ''}
       <div class="hr"></div>
       <p style="color:var(--txt-2);font-size:14px;line-height:1.6">${esc(s.narration || '')}</p>
