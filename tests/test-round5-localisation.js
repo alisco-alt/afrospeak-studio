@@ -1,0 +1,13 @@
+'use strict';
+const media = require('../lib/mediaFetcher');
+const captions = require('../lib/captions');
+let ok = 0, ko = 0;
+const check = (n, x) => { if (x) { ok++; console.log('  ✓ ' + n); } else { ko++; console.log('  ✗ ' + n); } };
+check('ancre un visage au Sénégal', /senegalese/i.test(media.ancrerRequeteHumaine('prime minister portrait people', 'Sénégal politique')));
+check('conserve une requête de bâtiment sans ajouter un démonyme', media.ancrerRequeteHumaine('Dakar government building', 'Sénégal politique') === 'Dakar government building');
+check('ancre une personne au pays même sans entité nommée', /senegalese/i.test(media.ancrerRequeteHumaine('president portrait people', 'Sénégal Diomaye Faye')));
+const spaced = captions.buildASS;
+check('les sous-titres exposent un réglage de variation désactivable', typeof spaced === 'function');
+check('les slides peuvent retirer les mots écran sans toucher au flux source', captions.motsHorsPlans([{ word: 'un', shotIndex: 0 }, { word: 'deux', shotIndex: 1 }], new Set([0])).length === 1);
+console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
+process.exit(ko ? 1 : 0);
