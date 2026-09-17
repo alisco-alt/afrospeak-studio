@@ -391,9 +391,13 @@ window.watchVideo = async id => {
   const { video: v } = await api('/api/videos/' + id);
   const vert = v.format === 'vertical';
   openModal(v.title || v.topic, `
-    <div style="display:grid;place-items:center;background:#000;border-radius:var(--r);overflow:hidden">
-      <video src="${esc(v.videoUrl)}" controls autoplay playsinline
-        style="max-height:60vh;${vert ? 'max-width:340px;' : 'width:100%;'}display:block"></video>
+    <div style="display:flex;justify-content:center;align-items:center;background:#000;border-radius:var(--r);overflow:hidden">
+      <div style="${vert
+        ? 'height:min(60vh,720px);aspect-ratio:9/16;max-width:340px;'
+        : 'width:100%;max-height:60vh;aspect-ratio:16/9;'}">
+        <video src="${esc(v.videoUrl)}" controls autoplay playsinline
+          style="width:100%;height:100%;object-fit:contain;display:block"></video>
+      </div>
     </div>
     <div class="btns" style="margin-top:16px">
       <a class="btn pri" href="${esc(v.videoUrl)}" download>⬇ Télécharger le MP4</a>

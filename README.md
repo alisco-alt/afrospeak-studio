@@ -23,6 +23,15 @@ node index.js --doctor     # diagnostic complet de l'environnement
 node index.js --serve      # interface web sur http://localhost:7860
 ```
 
+Pour tester l'interface avec le logo complet AfroSpeak, visible en haut à
+droite comme un logo de chaîne :
+
+```bash
+cd /home/user/afrospeak-studio
+LOGO_PATH="$PWD/assets/logo.png" LOGO_POS=top-right LOGO_OPACITY=0.86 \
+  node index.js --serve --port 7860
+```
+
 **Aucune clé API n'est requise** : le studio produit des vidéos dès
 l'installation (moteur de script local, voix Google TTS, images libres).
 
@@ -187,6 +196,8 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 - **Mixage** : voix compressée + normalisée (EBU R128, −16 LUFS), musique
   auto-duckée par *sidechain*.
 - Limitation automatique des threads FFmpeg pour ne pas saturer les petites machines.
+- **Transitions motivées par le contenu** : coupe dans une même idée, fondu à un changement de chapitre, ponctuation dédiée pour une carte chiffrée ou une citation — plutôt qu'un cycle décoratif fixe.
+- **Contrôle qualité traçable** (`p.quality`) : cadence, doublons de visuels, couverture, timing de voix, chiffres affichés et conformité du master sont résumés dans les logs et le projet.
 
 ### Synchronisation mot à mot
 
@@ -197,6 +208,14 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 | OpenAI | estimée pondérée |
 
 Les timings alimentent à la fois les sous-titres incrustés et le fichier `.srt`.
+
+### Contrôle qualité et références
+
+Le rapport `p.quality` est produit après la timeline, après les médias et après
+le master. Il signale les plans trop longs, les doublons, les visuels manquants,
+les chevauchements de mots et les chiffres affichés sans trace dans la narration.
+Voir [AUDIT-VIDEOS-REFERENCE.md](AUDIT-VIDEOS-REFERENCE.md) pour la méthode de
+comparaison avec des vidéos de référence et la limite d'accès aux liens Facebook.
 
 ---
 
@@ -211,10 +230,13 @@ propres et sigles en cyan, mots forts (« record », « flambée »…)
 surlignés, micro pop d'échelle à l'ouverture de chaque groupe.
 Disponible dans tous les styles verticaux (`viral`, `bankable`, `brut`,
 `impact`) ; `karaoke`, « un mot à la fois » et « par phrase » restent
-disponibles. Réglages : `CAPTION_PILL_TAIL` (tenue du nuage après le
-mot), `CAPTION_PILL=0` (désactiver), `captionPill: 'brand'` (couleur de
-marque). Karaoké mot surligné, un mot à la fois, ou par phrase. Police
-grasse, contour noir, voile sombre pour la lisibilité. La largeur des
+disponibles. En vertical, la ligne pop regroupe jusqu'à 4 mots lorsque le
+rythme le permet ; le nuage reste individuel sous le mot réellement prononcé.
+Réglages : `CAPTION_PILL_TAIL` (tenue du nuage après le mot),
+`CAPTION_WORD_GAP_EM` (écart typographique, 0,14 par défaut),
+`CAPTION_PILL=0` (désactiver), `captionPill: 'brand'` (couleur de marque).
+Karaoké mot surligné, un mot à la fois, ou par phrase. Police grasse, contour
+noir, voile sombre pour la lisibilité. La largeur des
 lignes est calculée sur les **métriques réelles des polices** : jamais de
 débordement.
 
@@ -302,8 +324,9 @@ output/
 
 | Style | Inspiration | Plans | Sous-titres |
 |---|---|---|---|
+| **viral** | shorts faceless premium | 1,4–2,6 s | nuage pop géant, cartes chiffres |
 | **ecofin** | Agence Écofin | 5–9 s | phrase, sobre |
-| **brut** | Brut | 1,8–3,4 s | karaoké géant |
+| **brut** | Brut | 1,8–3,4 s | nuage pop géant |
 | **moneyradar** | Money Radar | 2,6–5 s | karaoké, grade sombre |
 | **doc** | documentaire | 7–12 s | discret, Ken Burns lent |
 
