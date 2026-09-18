@@ -105,7 +105,7 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 |---|---|
 | `index.js` | **Orchestrateur CLI** — enchaîne les 6 étapes de bout en bout |
 | `server.js` | **Serveur web** — API REST + interface + routes SaaS |
-| `lib/llm.js` | **LLM local** — Ollama / DeepSeek-R1, raisonnement, hors ligne |
+| `lib/llm.js` | **LLM cloud** — OpenRouter prioritaire, Groq en secours ; Ollama optionnel |
 | `lib/scriptwriter.js` | Écriture du script : hook, développement, CTA |
 | `lib/sources.js` | Veille : 23 flux RSS (actu + **ligne éditoriale**) + extraction d'articles |
 | `lib/ligne.js` | **Ligne éditoriale** — émancipation, unité, souveraineté : boussole des sujets |
@@ -121,28 +121,35 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 
 ---
 
-## 1️⃣ Scripts par IA locale gratuite (Ollama / DeepSeek)
+## 1️⃣ Scripts IA — OpenRouter prioritaire
 
-Le studio privilégie un **modèle de raisonnement installé sur votre machine** :
-pas de clé, pas de quota, pas d'envoi de données.
+Le studio utilise en priorité les modèles configurés sur **OpenRouter**, puis
+les fournisseurs de secours disponibles (Groq, Gemini, Cerebras, etc.). Il n'a
+besoin d'aucune installation Ollama pour fonctionner. La cascade reste bornée,
+avec repli automatique vers AfroWriter si tous les fournisseurs échouent.
+
+Configurez les clés dans votre environnement, puis vérifiez l'ordre avec :
 
 ```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama pull deepseek-r1:7b       # ~4,7 Go — recommandé (raisonnement)
-ollama serve
+npm run doctor
 ```
 
-Détection et priorité automatiques :
-`deepseek-r1` › `qwq` › `qwen3` › `qwen2.5` › `llama3.x` › `mistral` › `gemma`
+**Chaîne de repli** (jamais de blocage) :
+1. OpenRouter et ses modèles `:free`
+2. autres fournisseurs cloud configurés
+3. serveur local compatible OpenAI explicitement disponible
+4. **Moteur AfroWriter** intégré — templates + matière RSS
+
+Ollama est conservé uniquement comme adaptateur facultatif pour les personnes
+qui le souhaitent. Il est désactivé par défaut et ne sera jamais sondé ni
+utilisé sans cette activation explicite :
+
+```bash
+export ENABLE_OLLAMA=1
+```
 
 Le bloc `<think>…</think>` des modèles de raisonnement est retiré
 automatiquement, et le JSON est extrait même si la réponse est bruitée.
-
-**Chaîne de repli** (jamais de blocage) :
-1. Ollama local
-2. Serveur local compatible OpenAI (llama.cpp, LM Studio, vLLM)
-3. Clé distante si vous en avez configuré une
-4. **Moteur AfroWriter** intégré — templates + matière RSS
 
 ---
 
