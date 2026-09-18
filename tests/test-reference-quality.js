@@ -97,6 +97,9 @@ assert(style.logoWidthRatio >= 0.12);
 assert(STYLES.brut.logoTopRatio >= 0.09);
 assert(renderer.findLogo().endsWith('logo.png'));
 assert(!renderer.findLogo().endsWith('logo-mark.png'));
+assert(renderer.findLogoVertical().endsWith('logo-mark.png'));
+assert(renderer.logoForFormat(1080, 1920).endsWith('logo-mark.png'));
+assert(renderer.logoForFormat(1920, 1080).endsWith('logo.png'));
 assert.strictEqual(renderer.pickFitMode('auto', 16 / 9, 9 / 16), 'crop');
 assert(quality.compact(quality.auditMaster({ hasVideo: true, width: 1080, height: 1920, duration: 4 }, { format: 'vertical' })).includes('master 1080×1920'));
 assert.strictEqual(renderer.transitionFor([
