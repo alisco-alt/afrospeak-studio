@@ -69,7 +69,9 @@ assert(repeat.issues.some(x => x.code === 'ASSET_REPEAT'));
 
 const style = STYLES.viral;
 assert.strictEqual(style.logoPos, 'top-right');
+assert(style.logoTopRatio >= 0.09);
 assert(style.logoWidthRatio >= 0.12);
+assert(STYLES.brut.logoTopRatio >= 0.09);
 assert(renderer.findLogo().endsWith('logo.png'));
 assert(!renderer.findLogo().endsWith('logo-mark.png'));
 assert.strictEqual(renderer.pickFitMode('auto', 16 / 9, 9 / 16), 'crop');
