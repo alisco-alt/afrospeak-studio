@@ -60,6 +60,8 @@ assert.strictEqual(report.stats.shots, 2);
 assert.strictEqual(report.stats.coverage, 1);
 assert.strictEqual(report.stats.errors, 0);
 assert.strictEqual(report.passed, true);
+assert(report.score > 0);
+assert(report.score >= 55);
 
 const repeat = quality.auditStoryboard([
   ...base,
