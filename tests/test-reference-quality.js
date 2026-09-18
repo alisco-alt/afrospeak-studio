@@ -7,6 +7,8 @@ const quality = require('../lib/qualityGate');
 const renderer = require('../lib/renderer');
 const pipeline = require('../lib/pipeline');
 const visualRelevance = require('../lib/visualRelevance');
+const scriptwriter = require('../lib/scriptwriter');
+const { nombresEnChiffres } = require('../lib/numberFormat');
 const fs = require('fs');
 
 /* Un asset du pool global ne doit pas devenir pertinent uniquement parce
@@ -37,6 +39,25 @@ const narrationMakesQueryStrict = visualRelevance.scoreAsset(
 );
 assert.strictEqual(narrationMakesQueryStrict.minimum, 2);
 assert.strictEqual(narrationMakesQueryStrict.passed, false);
+
+for (const [input, expected] of [
+  ['soixante-sept pour cent', '67 %'],
+  ['huit virgule cinq pour cent', '8,5 %'],
+  ['deux milliards de dollars', '2 Md$'],
+  ['trente-sept millions d’euros', '37 M€'],
+  ['2000000000 de dollars', '2 Md$'],
+  ['220000000 dollars', '220 M$'],
+  ['2000000000', '2 Md'],
+]) assert.strictEqual(nombresEnChiffres(input), expected, `format numérique: ${input}`);
+const figure = scriptwriter.figureFiable(
+  { value: 'soixante-sept pour cent', label: 'part du marché' },
+  'La part du marché atteint soixante-sept pour cent cette année.',
+);
+assert.deepStrictEqual(figure, { value: '67 %', label: 'part du marché' });
+assert.strictEqual(
+  scriptwriter.figureFiable({ value: '67 %', label: 'part du marché' }, 'La part atteint vingt pour cent.'),
+  null,
+);
 
 const voice = {
   words: [
