@@ -58,6 +58,13 @@ assert.strictEqual(
   scriptwriter.figureFiable({ value: '67 %', label: 'part du marché' }, 'La part atteint vingt pour cent.'),
   null,
 );
+const anglePrompt = scriptwriter.buildUserPrompt({
+  topic: 'Dangote en Bourse et accès des petits épargnants',
+  style: 'ecofin', format: 'vertical', minutes: 1,
+});
+assert(anglePrompt.includes('CADRE DE LECTURE AFROSPEAK'));
+assert(anglePrompt.includes('petits épargnants africains'));
+assert(/ne peut être affirmé\s+que si une source le rapporte/.test(anglePrompt));
 
 const voice = {
   words: [
