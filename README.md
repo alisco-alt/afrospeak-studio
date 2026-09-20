@@ -28,7 +28,7 @@ droite comme un logo de chaîne :
 
 ```bash
 cd /home/user/afrospeak-studio
-LOGO_PATH="$PWD/assets/logo.png" LOGO_POS=top-right LOGO_OPACITY=0.86 \
+LOGO_PATH="$PWD/assets/logo.png" LOGO_OPACITY=1 \
   node index.js --serve --port 7860
 ```
 
