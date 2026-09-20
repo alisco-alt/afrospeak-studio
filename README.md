@@ -156,8 +156,32 @@ automatiquement, et le JSON est extrait même si la réponse est bruitée.
 ## 2️⃣ Médias : banques libres + réseaux sociaux
 
 ### Sources ouvertes (aucune configuration)
-Openverse (~700 M médias CC), Wikimedia Commons, Internet Archive, NASA,
-Mastodon. Avec clés facultatives : Pexels, Pixabay, Unsplash.
+Openverse, Wikimedia Commons, Internet Archive et NASA sont interrogés sans
+clé. La recherche de médias expose dans l'interface un catalogue de **54 pays
+africains**, avec des alias français/anglais, capitales, villes, peuples et
+langues ; Burkina Faso, Mali et Niger sont proposés en tête. Une recherche
+« Africa » ne transforme jamais un résultat générique en résultat local.
+
+Avec clés facultatives : Pexels (photos + vidéos), Pixabay (photos + vidéos),
+Unsplash (photos) et Coverr (clips curatés HD/4K, attribution requise).
+La rubrique affiche pour chaque source son statut (intégrée, clé manquante ou
+consultation manuelle), le type de média et la licence. Mixkit, Videvo,
+Videezy, Dareful et Mazwai restent des liens manuels : leurs licences varient
+par asset et aucune intégration automatique non documentée n'est prétendue.
+
+Pour ajouter les fournisseurs vidéo optionnels sans exposer les clés au
+navigateur :
+
+```bash
+export PEXELS_API_KEY="…"
+export PIXABAY_API_KEY="…"
+export COVERR_API_KEY="…"
+export UNSPLASH_ACCESS_KEY="…"
+```
+
+Le catalogue machine est disponible via `GET /api/media/catalog` et la
+recherche via `GET /api/media/search?q=...&video=1&images=1`. Les résultats
+conservent fournisseur, page source, auteur, licence et crédit.
 
 ### Scraping réseaux sociaux avec cookies de session
 

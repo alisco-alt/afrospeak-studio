@@ -864,22 +864,47 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
     <!-- ═══ MÉDIAS ═══ -->
     <section class="page" id="p-media">
       <div class="head">
-        <div><h1>Banque <span class="grad">d'images</span></h1>
-          <p class="sub">Wikimedia, Openverse, Coverr — licence et crédit affichés pour chaque média.</p></div>
+        <div><h1>Banque <span class="grad">images & vidéos</span></h1>
+          <p class="sub">54 pays couverts · clips vidéo prioritaires · licence, crédit et statut d’accès affichés.</p></div>
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="hero-input">
           <div class="fieldwrap">
             <span class="ic">🔍</span>
-            <textarea id="mediaQuery" placeholder="Rechercher un visuel : africa economy, fintech, sahara…" style="font-size:15px;padding:14px 14px 14px 46px;min-height:50px"></textarea>
+            <textarea id="mediaQuery" placeholder="Pays, capitale, ville, peuple, langue, activité… ex. Burkina Faso entrepreneuriat" style="font-size:15px;padding:14px 14px 14px 46px;min-height:50px"></textarea>
           </div>
           <button class="btn pri go" onclick="searchMedia()">Rechercher</button>
         </div>
-        <div class="row" style="margin-top:12px">
+        <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap">
           <label class="check on" id="mediaImg"><input type="checkbox" checked> Images</label>
           <label class="check on" id="mediaVid"><input type="checkbox" checked> Vidéos</label>
+          <span class="hint" style="align-self:center">Les clips Pexels/Pixabay apparaissent si leur clé est configurée ; Wikimedia Commons et Internet Archive restent ouverts.</span>
         </div>
+        <div id="mediaSearchMeta" style="display:none;margin-top:12px"></div>
       </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div><h3>Banques réellement disponibles</h3>
+            <p class="hint" style="margin-top:4px">Un fournisseur est interrogé par le pipeline seulement quand son statut est « intégré ». Les licences payantes ou à attribution ne sont jamais masquées.</p></div>
+          <span class="tag g" id="mediaCoverage">Chargement du catalogue…</span>
+        </div>
+        <div id="mediaProviders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:14px"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div><h3>Repères africains</h3>
+            <p class="hint" style="margin-top:4px">Les trois priorités sont placées en tête. Un clic lance une recherche ancrée sur le pays et sa capitale, sans transformer un visuel « Africa » en visuel local.</p></div>
+          <span class="tag o">Burkina Faso · Mali · Niger</span>
+        </div>
+        <div id="mediaPriorityCountries" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:14px"></div>
+        <details style="margin-top:14px">
+          <summary style="cursor:pointer;color:var(--txt-2);font-size:13px">Afficher les 54 pays</summary>
+          <div id="mediaCountryGrid" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px"></div>
+        </details>
+      </div>
+
       <div id="mediaResults" class="grid g4"></div>
     </section>
 
@@ -944,8 +969,18 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
         <div class="row">
           <div class="field"><label>ElevenLabs <span class="hint">— voix premium</span></label>
             <input type="text" id="kEleven" placeholder="sk_…"></div>
-          <div class="field"><label>Pexels <span class="hint">— vidéos HD</span></label>
+          <div class="field"><label>Pexels <span class="hint">— photos + vidéos HD</span></label>
             <input type="text" id="kPexels" placeholder="Clé API Pexels"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Pixabay <span class="hint">— photos + vidéos libres</span></label>
+            <input type="text" id="kPixabay" placeholder="Clé API Pixabay"></div>
+          <div class="field"><label>Unsplash <span class="hint">— photographie premium</span></label>
+            <input type="text" id="kUnsplash" placeholder="Access key Unsplash"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Coverr <span class="hint">— clips curatés HD/4K</span></label>
+            <input type="text" id="kCoverr" placeholder="Clé API Coverr"></div>
         </div>
       </div>
 
@@ -1255,6 +1290,7 @@ function go(page){
   $$('.page').forEach(function(p){ p.classList.toggle('on', p.id === 'p-'+page); });
   window.scrollTo({ top:0, behavior:'smooth' });
   if(page === 'dash') renderDash();
+  if(page === 'media') loadMediaCatalog();
 }
 window.go = go;
 $$('.nav').forEach(function(n){
@@ -1843,7 +1879,7 @@ $('#btnNews').addEventListener('click', function(){
 $('#btnSaveBrand').addEventListener('click', function(){ toast('Identité enregistrée.', 'ok'); });
 $('#btnSaveKeys').addEventListener('click', function(){
   var keys = {};
-  ['kGroq','kOpenrouter','kEleven','kPexels'].forEach(function(id){
+  ['kGroq','kOpenrouter','kEleven','kPexels','kPixabay','kUnsplash','kCoverr'].forEach(function(id){
     var el = $('#'+id); if(el && el.value.trim()) keys[id.slice(1).toLowerCase()] = el.value.trim();
   });
   apiTry('/api/config', {method:'POST', headers:{'Content-Type':'application/json'},
@@ -2144,27 +2180,105 @@ function loadLibrary(){
   }).join('');
 }
 
-/* ─── Banque d'images ─── */
-function searchMedia(){
-  var q = ($('#mediaQuery')||{}).value || '';
-  if(!q.trim()){ toast('Entrez une requête.', ''); return; }
-  var results = $('#mediaResults');
-  results.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><span class="spin" style="display:inline-block;width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite"></span><p style="margin-top:14px;color:var(--txt-2)">Recherche en cours…</p></div>';
-  apiTry('/api/media/search?q='+encodeURIComponent(q)).then(function(j){
-    var items = j.results || j.media || j || [];
-    if(!Array.isArray(items)) items = [];
-    if(!items.length){ results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Aucun résultat.</p></div>'; return; }
-    results.innerHTML = items.slice(0, 24).map(function(m){
-      return '<div class="card" style="padding:10px">'+
-        '<img src="'+esc(m.thumbnail||m.url||'')+'" loading="lazy" style="width:100%;height:130px;object-fit:cover;border-radius:var(--r-sm)">'+
-        '<div style="margin-top:8px;font-size:11px;color:var(--txt-2)">'+esc((m.title||'').slice(0,40))+'</div>'+
-        '<div style="font-size:10px;color:var(--txt-3)">'+esc(m.source||m.license||'')+'</div>'+
-      '</div>';
+/* ─── Banque d'images & vidéos ───
+ * Le précédent rendu appelait `thumbnail`/`source`, alors que l'API renvoie
+ * `thumb`/`provider`, et oubliait complètement `video=1`. Résultat : la
+ * rubrique paraissait vide même lorsque les banques répondaient. Cette
+ * couche affiche maintenant le catalogue avant toute recherche et conserve
+ * les métadonnées de provenance dans chaque carte. */
+var mediaCatalogLoaded = false;
+function mediaPill(c){
+  return '<button class="chip" type="button" onclick="searchMediaPreset(decodeURIComponent(\''+
+    encodeURIComponent(c.name)+'\'))">'+esc(c.name)+'</button>';
+}
+function loadMediaCatalog(){
+  if(mediaCatalogLoaded) return;
+  var providers = $('#mediaProviders');
+  if(providers) providers.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:18px"><span class="spin"></span><p>Lecture du catalogue…</p></div>';
+  apiTry('/api/media/catalog').then(function(j){
+    if(!j){
+      if(providers) providers.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Catalogue indisponible. Vérifiez le backend.</p></div>';
+      return;
+    }
+    mediaCatalogLoaded = true;
+    var coverage = j.coverage || {};
+    var badge = $('#mediaCoverage');
+    if(badge) badge.textContent = (coverage.countries || 54)+' pays · '+(coverage.regions || 5)+' régions';
+    if(providers) providers.innerHTML = (j.providers || []).map(function(p){
+      var state = p.status === 'integrated' ? (p.configured ? 'actif' : 'clé manquante') : 'lien manuel';
+      var cls = p.status === 'integrated' && p.configured ? 'g' : p.status === 'manual' ? 'n' : 'o';
+      return '<div style="padding:10px 11px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg-elev)">'+
+        '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">'+
+          '<a href="'+esc(p.url)+'" target="_blank" rel="noopener" style="font-weight:700;color:var(--txt)">'+esc(p.label)+'</a>'+
+          '<span class="tag '+cls+'">'+esc(state)+'</span></div>'+
+        '<div style="font-size:11px;color:var(--txt-2);margin-top:5px">'+esc((p.kinds||[]).join(' · '))+' · '+esc(p.access)+'</div>'+
+        '<div style="font-size:10px;color:var(--txt-3);margin-top:4px;line-height:1.35">'+esc(p.license)+'<br>'+esc(p.note)+'</div></div>';
     }).join('');
-  }).catch(function(){
-    results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Backend requis pour la recherche.</p></div>';
+    var priority = j.priority || [];
+    var pbox = $('#mediaPriorityCountries');
+    if(pbox) pbox.innerHTML = priority.map(mediaPill).join('');
+    var all = j.countries || [];
+    var cbox = $('#mediaCountryGrid');
+    if(cbox) cbox.innerHTML = all.map(mediaPill).join('');
   });
 }
+window.searchMediaPreset = function(q){
+  var input = $('#mediaQuery');
+  if(input) input.value = q + ' activités, lieux, personnes';
+  searchMedia();
+};
+function searchMedia(){
+  var q = ($('#mediaQuery')||{}).value || '';
+  if(!q.trim()){ toast('Entrez un pays, une ville ou un sujet.', ''); return; }
+  loadMediaCatalog();
+  var results = $('#mediaResults');
+  var metaBox = $('#mediaSearchMeta');
+  if(!results) return;
+  results.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px"><span class="spin" style="display:inline-block;width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite"></span><p style="margin-top:14px;color:var(--txt-2)">Recherche photos et clips dans les banques…</p></div>';
+  if(metaBox) { metaBox.style.display = 'block'; metaBox.innerHTML = '<span class="hint">Recherche ancrée géographiquement…</span>'; }
+  var images = $('#mediaImg input') ? $('#mediaImg input').checked : true;
+  var videos = $('#mediaVid input') ? $('#mediaVid input').checked : true;
+  if(!images && !videos){
+    results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Sélectionnez Images ou Vidéos.</p></div>';
+    if(metaBox) metaBox.style.display = 'none';
+    return;
+  }
+  var url = '/api/media/search?q='+encodeURIComponent(q)+'&limit=36&images='+(images?'1':'0')+'&video='+(videos?'1':'0')+'&format='+(S.format === 'vertical' ? 'vertical' : 'landscape');
+  apiTry(url).then(function(j){
+    if(!j){
+      results.innerHTML = '<div class="empty" style="grid-column:1/-1"><p>Backend requis pour rechercher les banques.</p><small>Le catalogue reste consultable ; démarrez le serveur puis réessayez.</small></div>';
+      if(metaBox) metaBox.innerHTML = '<span class="tag r">Backend indisponible</span>';
+      return;
+    }
+    var items = Array.isArray(j.results) ? j.results : [];
+    var m = j.meta || {};
+    if(metaBox){
+      var countries = (m.countries || []).map(function(c){ return c.name + ' · ' + c.capital; }).join(' / ');
+      metaBox.innerHTML = '<span class="tag g">'+items.length+' résultat(s)</span> '+
+        (countries ? '<span class="tag n">Ancrage : '+esc(countries)+'</span> ' : '<span class="tag n">Recherche panafricaine</span>')+
+        '<span class="hint">Sources : '+esc((m.providers || []).join(', ') || 'aucune réponse')+'</span>';
+    }
+    if(!items.length){
+      results.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="big">◌</div><p>Aucun résultat précis pour cette requête.</p><small>Essayez une capitale, une ville, une langue ou une activité en français ou en anglais.</small></div>';
+      return;
+    }
+    results.innerHTML = items.map(function(m){
+      var thumb = m.thumb || '';
+      var visual = m.kind === 'video'
+        ? (thumb ? '<div style="position:relative"><img src="'+esc(thumb)+'" loading="lazy" style="width:100%;height:145px;object-fit:cover;border-radius:var(--r-sm)" alt=""><span style="position:absolute;left:9px;bottom:8px;background:rgba(0,0,0,.76);padding:4px 7px;border-radius:5px;color:#fff;font-size:11px">▶ CLIP</span></div>'
+          : '<div style="height:145px;display:grid;place-items:center;background:var(--bg2);border-radius:var(--r-sm);font-size:28px">🎬</div>')
+        : '<img src="'+esc(thumb || m.url || '')+'" loading="lazy" style="width:100%;height:145px;object-fit:cover;border-radius:var(--r-sm)" alt="">';
+      var link = m.pageUrl || m.url || '#';
+      return '<article class="card" style="padding:10px;cursor:pointer" onclick="window.open(\''+esc(link).replace(/'/g, '%27')+'\',\'_blank\',\'noopener\')">'+
+        visual+
+        '<div style="margin-top:8px;display:flex;justify-content:space-between;gap:6px;align-items:center"><span class="tag '+(m.kind === 'video' ? 'o' : 'g')+'">'+(m.kind === 'video' ? 'VIDÉO' : 'PHOTO')+'</span><span class="lic">'+esc(m.provider || '')+'</span></div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--txt-2);line-height:1.35;max-height:31px;overflow:hidden">'+esc(m.title || 'Sans titre')+'</div>'+
+        '<div style="font-size:10px;color:var(--txt-3);margin-top:5px;line-height:1.35">'+esc(m.credit || m.license || 'Licence à vérifier')+(m.width ? ' · '+m.width+'×'+m.height : '')+'</div>'+
+      '</article>';
+    }).join('');
+  });
+}
+$('#mediaQuery').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); searchMedia(); } });
 
 /* ─── Démarrage ─── */
 renderStyles();

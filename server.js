@@ -44,6 +44,7 @@ const presets = require('./lib/presets');
 const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');
 const mediaLib = require('./lib/media');
+const mediaCatalog = require('./lib/mediaCatalog');
 const tts = require('./lib/tts');
 const pipeline = require('./lib/pipeline');
 const autopilot = require('./lib/autopilot');
@@ -207,7 +208,8 @@ app.get('/api/config', (req, res) => ok(res, {
     tts: tts.availableProviders(),
     mediaProviders: {
       pexels: !!config.keys().pexels, pixabay: !!config.keys().pixabay,
-      unsplash: !!config.keys().unsplash, openverse: true, wikimedia: true, nasa: true,
+      unsplash: !!config.keys().unsplash, coverr: !!config.keys().coverr,
+      openverse: true, wikimedia: true, nasa: true,
     },
   },
 }));
@@ -251,13 +253,42 @@ app.get('/api/trends', wrap(async (req, res) => ok(res, await sources.trends(req
 
 /* ------------------------------ Médias ------------------------------ */
 
+/* Le catalogue est séparé de la recherche : il est donc visible même quand
+ * une clé optionnelle manque ou qu'une banque distante est momentanément
+ * lente. `configured` décrit l'accès local, jamais la présence de résultats
+ * pour un pays donné. */
+app.get('/api/media/catalog', (req, res) => ok(res, mediaCatalog.publicCatalog(config.keys())));
+
 app.get('/api/media/search', wrap(async (req, res) => {
-  const results = await mediaLib.search(req.query.q || 'africa', {
+  const rawQuery = String(req.query.q || 'africa').trim() || 'africa';
+  const enriched = mediaCatalog.enrichQuery(rawQuery);
+  const wantVideo = req.query.video === '1';
+  const wantImages = req.query.images !== '0';
+  const limit = Math.min(60, Math.max(1, Number(req.query.limit) || 24));
+  const found = await mediaLib.search(enriched.query, {
     format: req.query.format || 'landscape',
-    wantVideo: req.query.video === '1',
-    limit: Number(req.query.limit) || 24,
+    wantVideo,
+    limit: Math.min(60, limit * (wantVideo && wantImages ? 2 : 1)),
   });
-  ok(res, { results: results.map(r => ({ ...r, credit: mediaLib.creditLine(r) })) });
+  /* Le moteur peut ramener photos et clips dans la même recherche. Les
+   * cases de la bibliothèque doivent toutefois être fiables : « vidéos »
+   * ne doit pas afficher une photo avec un badge vidéo, et inversement. */
+  const filtered = found.filter(asset => {
+    if (asset.kind === 'video') return wantVideo;
+    return wantImages;
+  }).slice(0, limit);
+  ok(res, {
+    results: filtered.map(r => ({ ...r, credit: mediaLib.creditLine(r) })),
+    meta: {
+      query: rawQuery,
+      expandedQuery: enriched.query,
+      countries: enriched.countries.map(c => ({ code: c.code, name: c.name, capital: c.capital, region: c.region })),
+      providers: [...new Set(filtered.map(r => r.provider).filter(Boolean))],
+      videoRequested: wantVideo,
+      imageRequested: wantImages,
+      catalog: mediaCatalog.publicCatalog(config.keys()).coverage,
+    },
+  });
 }));
 
 /* ── SERVEUR DE MÉDIAS : LA PORTE NE DONNE PAS LES CLEFS ──────────────
