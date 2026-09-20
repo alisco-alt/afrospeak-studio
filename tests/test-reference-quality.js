@@ -117,11 +117,12 @@ assert(['circleopen', 'zoomin'].includes(renderer.transitionFor([
   { sectionIndex: 0, kind: 'broll' },
   { sectionIndex: 0, kind: 'data', motionType: 'dataSlide' },
 ], 1, 0, style)));
-assert.strictEqual(renderer.transitionFor([
+assert.notStrictEqual(renderer.transitionFor([
   { sectionIndex: 0, sectionHeading: 'A' },
   { sectionIndex: 0, sectionHeading: 'A' },
   { sectionIndex: 0, sectionHeading: 'A' },
-], 2, 0, style), 'cut');
+], 2, 0, style), 'cut',
+  'le preset vertical premium ne doit pas imposer une coupe nette');
 
 const meta = pipeline.writeMeta({
   brief: { topic: 'Dette du Sénégal' },
