@@ -640,14 +640,19 @@ app.delete('/api/library/:name', (req, res) => {
   ok(res, { deleted: true });
 });
 
-app.get('/api/health', (req, res) => ok(res, {
-  version: '1.0.0',
-  ffmpeg: util.FFMPEG,
-  node: process.version,
-  uptime: process.uptime(),
-  mem: Math.round(os.totalmem() / 1e9) + ' Go',
-  cpus: os.cpus().length,
-  output: DIRS.output,
+app.get('/api/health', wrap(async (req, res) => {
+  const render = await util.ffmpegStatus();
+  ok(res, {
+    version: '1.0.0',
+    ffmpeg: util.FFMPEG,
+    ffmpegReady: render.ready,
+    render,
+    node: process.version,
+    uptime: process.uptime(),
+    mem: Math.round(os.totalmem() / 1e9) + ' Go',
+    cpus: os.cpus().length,
+    output: DIRS.output,
+  });
 }));
 
 /* Les routes API inconnues renvoient du JSON, pas la page HTML */

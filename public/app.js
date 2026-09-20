@@ -910,7 +910,11 @@ async function loadHealth() {
     const h = await api('/api/health');
     const p = S.platform || await loadPlatform();
     $('#healthBox').innerHTML = `
-      <div class="kv"><span>Moteur vidéo</span><b>FFmpeg · ${h.cpus} cœur(s) · ${h.mem}</b></div>
+      <div class="kv"><span>Moteur vidéo</span><b>${h.ffmpegReady
+        ? 'FFmpeg prêt · libass + libx264'
+        : 'FFmpeg indisponible — rendu impossible'}</b></div>
+      <div class="kv"><span>Binaire FFmpeg</span><b>${esc(h.render && h.render.ffmpegPath || h.ffmpeg || 'inconnu')}</b></div>
+      <div class="kv"><span>Ressources</span><b>${h.cpus} cœur(s) · ${h.mem}</b></div>
       <div class="kv"><span>Node.js</span><b>${h.node}</b></div>
       <div class="kv"><span>Base de données</span><b>${p && p.db.neon ? 'Neon Postgres' : 'locale'}</b></div>
       <div class="kv"><span>Stockage</span><b>${p && p.storage.mode === 's3' ? 'Cloudflare R2' : 'disque éphémère'}</b></div>
