@@ -152,15 +152,15 @@ async function doctor() {
   say.banner();
   console.log(`${c.b}Diagnostic de l'environnement${c.r}\n`);
 
-  // FFmpeg
-  try {
-    const { stderr } = await util.ffmpeg(['-version'], { loglevel: 'info' }).catch(e => ({ stderr: e.stderr || '' }));
-    say.ok(`FFmpeg   ${c.grey}${util.FFMPEG}${c.r}`);
-  } catch (e) { say.err('FFmpeg introuvable'); }
-  try {
-    await util.run(util.FFPROBE, ['-version']);
-    say.ok(`FFprobe  ${c.grey}disponible${c.r}`);
-  } catch (e) { say.err('FFprobe introuvable'); }
+  // FFmpeg : la sonde vérifie exactement le binaire utilisé par le rendu.
+  const render = await util.ffmpegStatus({ force: true });
+  if (render.ready) {
+    say.ok(`FFmpeg   ${c.grey}${render.ffmpegPath}${c.r} · libass + libx264`);
+    say.ok(`FFprobe  ${c.grey}${render.ffprobePath}${c.r}`);
+  } else {
+    say.err(`Rendu FFmpeg indisponible · ${c.grey}${render.ffmpegPath}${c.r}`);
+    say.info(render.error || 'Vérifiez FFmpeg, FFprobe, libass et libx264.');
+  }
 
   // LLM local
   const L = await llm.status();

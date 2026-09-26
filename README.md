@@ -23,6 +23,16 @@ node index.js --doctor     # diagnostic complet de l'environnement
 node index.js --serve      # interface web sur http://localhost:7860
 ```
 
+L'incrustation vidéo utilise exclusivement le PNG fourni `168917.png`.
+Déposez-le dans `assets/168917.png` avant un rendu : aucun ancien logo ni
+fallback n'est sélectionné si ce fichier manque.
+
+```bash
+cd /home/user/afrospeak-studio
+# après dépôt du fichier fourni :
+node index.js --serve --port 7860
+```
+
 **Aucune clé API n'est requise** : le studio produit des vidéos dès
 l'installation (moteur de script local, voix Google TTS, images libres).
 
@@ -96,7 +106,7 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 |---|---|
 | `index.js` | **Orchestrateur CLI** — enchaîne les 6 étapes de bout en bout |
 | `server.js` | **Serveur web** — API REST + interface + routes SaaS |
-| `lib/llm.js` | **LLM local** — Ollama / DeepSeek-R1, raisonnement, hors ligne |
+| `lib/llm.js` | **LLM cloud** — OpenRouter prioritaire, Groq en secours ; Ollama optionnel |
 | `lib/scriptwriter.js` | Écriture du script : hook, développement, CTA |
 | `lib/sources.js` | Veille : 23 flux RSS (actu + **ligne éditoriale**) + extraction d'articles |
 | `lib/ligne.js` | **Ligne éditoriale** — émancipation, unité, souveraineté : boussole des sujets |
@@ -112,36 +122,67 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 
 ---
 
-## 1️⃣ Scripts par IA locale gratuite (Ollama / DeepSeek)
+## 1️⃣ Scripts IA — OpenRouter prioritaire
 
-Le studio privilégie un **modèle de raisonnement installé sur votre machine** :
-pas de clé, pas de quota, pas d'envoi de données.
+Le studio utilise en priorité les modèles configurés sur **OpenRouter**, puis
+les fournisseurs de secours disponibles (Groq, Gemini, Cerebras, etc.). Il n'a
+besoin d'aucune installation Ollama pour fonctionner. La cascade reste bornée,
+avec repli automatique vers AfroWriter si tous les fournisseurs échouent.
+
+Configurez les clés dans votre environnement, puis vérifiez l'ordre avec :
 
 ```bash
-curl -fsSL https://ollama.com/install.sh | sh
-ollama pull deepseek-r1:7b       # ~4,7 Go — recommandé (raisonnement)
-ollama serve
+npm run doctor
 ```
 
-Détection et priorité automatiques :
-`deepseek-r1` › `qwq` › `qwen3` › `qwen2.5` › `llama3.x` › `mistral` › `gemma`
+**Chaîne de repli** (jamais de blocage) :
+1. OpenRouter et ses modèles `:free`
+2. autres fournisseurs cloud configurés
+3. serveur local compatible OpenAI explicitement disponible
+4. **Moteur AfroWriter** intégré — templates + matière RSS
+
+Ollama est conservé uniquement comme adaptateur facultatif pour les personnes
+qui le souhaitent. Il est désactivé par défaut et ne sera jamais sondé ni
+utilisé sans cette activation explicite :
+
+```bash
+export ENABLE_OLLAMA=1
+```
 
 Le bloc `<think>…</think>` des modèles de raisonnement est retiré
 automatiquement, et le JSON est extrait même si la réponse est bruitée.
-
-**Chaîne de repli** (jamais de blocage) :
-1. Ollama local
-2. Serveur local compatible OpenAI (llama.cpp, LM Studio, vLLM)
-3. Clé distante si vous en avez configuré une
-4. **Moteur AfroWriter** intégré — templates + matière RSS
 
 ---
 
 ## 2️⃣ Médias : banques libres + réseaux sociaux
 
 ### Sources ouvertes (aucune configuration)
-Openverse (~700 M médias CC), Wikimedia Commons, Internet Archive, NASA,
-Mastodon. Avec clés facultatives : Pexels, Pixabay, Unsplash.
+Openverse, Wikimedia Commons, Internet Archive et NASA sont interrogés sans
+clé. La recherche de médias expose dans l'interface un catalogue de **54 pays
+africains**, avec des alias français/anglais, capitales, villes, peuples et
+langues ; Burkina Faso, Mali et Niger sont proposés en tête. Une recherche
+« Africa » ne transforme jamais un résultat générique en résultat local.
+
+Avec clés facultatives : Pexels (photos + vidéos), Pixabay (photos + vidéos),
+Unsplash (photos) et Coverr (clips curatés HD/4K, attribution requise).
+La rubrique affiche pour chaque source son statut (intégrée, clé manquante ou
+consultation manuelle), le type de média et la licence. Mixkit, Videvo,
+Videezy, Dareful et Mazwai restent des liens manuels : leurs licences varient
+par asset et aucune intégration automatique non documentée n'est prétendue.
+
+Pour ajouter les fournisseurs vidéo optionnels sans exposer les clés au
+navigateur :
+
+```bash
+export PEXELS_API_KEY="…"
+export PIXABAY_API_KEY="…"
+export COVERR_API_KEY="…"
+export UNSPLASH_ACCESS_KEY="…"
+```
+
+Le catalogue machine est disponible via `GET /api/media/catalog` et la
+recherche via `GET /api/media/search?q=...&video=1&images=1`. Les résultats
+conservent fournisseur, page source, auteur, licence et crédit.
 
 ### Scraping réseaux sociaux avec cookies de session
 
@@ -187,6 +228,8 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 - **Mixage** : voix compressée + normalisée (EBU R128, −16 LUFS), musique
   auto-duckée par *sidechain*.
 - Limitation automatique des threads FFmpeg pour ne pas saturer les petites machines.
+- **Transitions motivées par le contenu** : coupe dans une même idée, fondu à un changement de chapitre, ponctuation dédiée pour une carte chiffrée ou une citation — plutôt qu'un cycle décoratif fixe.
+- **Contrôle qualité traçable** (`p.quality`) : cadence, doublons de visuels, couverture, timing de voix, chiffres affichés et conformité du master sont résumés dans les logs et le projet.
 
 ### Synchronisation mot à mot
 
@@ -197,6 +240,14 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 | OpenAI | estimée pondérée |
 
 Les timings alimentent à la fois les sous-titres incrustés et le fichier `.srt`.
+
+### Contrôle qualité et références
+
+Le rapport `p.quality` est produit après la timeline, après les médias et après
+le master. Il signale les plans trop longs, les doublons, les visuels manquants,
+les chevauchements de mots et les chiffres affichés sans trace dans la narration.
+Voir [AUDIT-VIDEOS-REFERENCE.md](AUDIT-VIDEOS-REFERENCE.md) pour la méthode de
+comparaison avec des vidéos de référence et la limite d'accès aux liens Facebook.
 
 ---
 
@@ -211,10 +262,15 @@ propres et sigles en cyan, mots forts (« record », « flambée »…)
 surlignés, micro pop d'échelle à l'ouverture de chaque groupe.
 Disponible dans tous les styles verticaux (`viral`, `bankable`, `brut`,
 `impact`) ; `karaoke`, « un mot à la fois » et « par phrase » restent
-disponibles. Réglages : `CAPTION_PILL_TAIL` (tenue du nuage après le
-mot), `CAPTION_PILL=0` (désactiver), `captionPill: 'brand'` (couleur de
-marque). Karaoké mot surligné, un mot à la fois, ou par phrase. Police
-grasse, contour noir, voile sombre pour la lisibilité. La largeur des
+disponibles. En vertical, le layout manuel regroupe 3 mots par défaut et
+n'autorise jamais plus de 4 ; il limite la boîte à 85 % de la largeur, avec
+marges symétriques. Le nuage jaune reste individuel sous le mot réellement
+prononcé, sans plaque globale derrière la phrase.
+Réglages : `CAPTION_PILL_TAIL` (tenue du nuage après le mot),
+`CAPTION_WORD_GAP_EM` (écart typographique), `CAPTION_PILL=0` (désactiver),
+`captionPill: 'brand'` (couleur de marque).
+Karaoké mot surligné, un mot à la fois, ou par phrase. Police grasse, contour
+noir, voile sombre pour la lisibilité. La largeur des
 lignes est calculée sur les **métriques réelles des polices** : jamais de
 débordement.
 
@@ -232,11 +288,11 @@ Source : PeriscopeFilm / Internet Archive
 - Les crédits complets (auteur, licence, URL) sont aussi écrits dans le
   fichier `_youtube.txt` prêt pour la description.
 
-> **Avertissement.** Les médias issus des réseaux sociaux restent la propriété
-> de leurs auteurs. Le crédit incrusté ne vaut pas licence. Réservez cet usage
-> au **court extrait cité** à des fins d'information ou de commentaire, et
-> retirez tout média sur demande de l'ayant droit. Pour un usage commercial
-> sans risque, privilégiez les banques libres (Pexels, Pixabay, Openverse).
+> **Avertissement.** Le crédit incrusté ne vaut pas licence. Le pipeline ne
+> télécharge pas les réseaux sociaux, YouTube standard, Bing, les images de
+> presse ou les vignettes sans preuve structurée de droit. Utilisez uniquement
+> une licence Creative Commons/domaine public, une licence fournisseur ou une
+> autorisation explicite ; conservez toujours l'URL, la licence et l'auteur.
 
 ---
 
@@ -302,8 +358,9 @@ output/
 
 | Style | Inspiration | Plans | Sous-titres |
 |---|---|---|---|
+| **viral** | shorts faceless premium | 1,4–2,6 s | nuage pop géant, cartes chiffres |
 | **ecofin** | Agence Écofin | 5–9 s | phrase, sobre |
-| **brut** | Brut | 1,8–3,4 s | karaoké géant |
+| **brut** | Brut | 1,8–3,4 s | nuage pop géant |
 | **moneyradar** | Money Radar | 2,6–5 s | karaoké, grade sombre |
 | **doc** | documentaire | 7–12 s | discret, Ken Burns lent |
 
