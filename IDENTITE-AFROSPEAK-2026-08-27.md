@@ -1,5 +1,11 @@
 # Identité de la chaîne AfroSpeak — relevé du 27 août 2026
 
+> **Mise à jour renderer :** la couche vidéo active est désormais exclusivement
+> `assets/168917.png`, opacité native pleine, en haut à droite. Les références
+> aux anciens PNG ci-dessous documentent l'audit historique et ne sont plus
+> des choix de rendu ; si `168917.png` manque, aucun logo de substitution n'est
+> incrusté.
+
 Document de travail pour caler le studio sur la chaîne **réelle**, et non sur
 l'idée qu'on s'en fait. Sources : le flux RSS public de la chaîne
 (`youtube.com/feeds/videos.xml?channel_id=UCTjpcgRxsR7TiFJi8Nrkb7A`), les pages
@@ -201,27 +207,28 @@ Le choix de ① ne demande donc pas de câblage, seulement un nettoyage (ci‑de
 ### 8.1 Ce que le moteur impose (lib/renderer.js)
 
 ```
-logoW = LOGO_WIDTH || round(W * 0,11)      // ≈118 px en 1080 vertical, ≈211 px en 1920 paysage
-marge = H * 0,028 · opacité fixe 0,85 · positions : top-center ou top-right
-greffe: scale=w:-1:flags=lanczos, format=rgba, colorchannelmixer=aa=0,85, overlay:format=auto
+logoW = LOGO_WIDTH || round(W * 0,13)      // médaillon lisible en vertical, bloc horizontal plus large
+marge = H * 0,026 · opacité pleine par défaut · top-center en vertical, top-right en paysage
+greffe: scale=w:-1:flags=lanczos, format=rgba, overlay:format=auto (alpha natif du PNG conservé)
 ```
 
-Trois conséquences, dans l'ordre où elles pourrissent un rendu :
+Les points qui causaient la perte de lisibilité sont maintenant traités :
 
-1. **aucun color‑key** : `colorchannelmixer=aa=` *multiplie* l'alpha, il ne détourne
-   pas. Un logo posé sur fond noir peint un **rectangle noir** sur les rushs
-   (invisible sur le `#0B0F14` des slides, très visible en plan de jour).
-   → **exigence n°1 : un PNG à alpha réel.**
-2. **`scale=w:-1` ne garde que la largeur** : toute marge morte dans le PNG est
-   retirée de la marque visible. Un emblème recadré au contour rend ~30 % plus
-   grand que le même fichier paddingué.
-3. **deux étages de texte = illisible à 118 px** : `findLogo()` (l.144‑156) le dit
-   déjà — c'est pour ça que la pastille, et non le bloc, sert de filigrane.
+1. **Alpha natif conservé** : le renderer ne multiplie plus le canal alpha du
+   PNG. Les pixels du logo sont à opacité pleine par défaut ; les zones
+   transparentes naturelles restent transparentes, sans rectangle noir peint
+   sur les rushs.
+2. **Un seul logo par plan** : le médaillon est réservé au vertical et le bloc
+   horizontal au paysage. Le texte de secours n'est pas ajouté lorsqu'un PNG
+   est disponible : les deux éléments ne peuvent plus se superposer.
+3. **Taille et ancrage lisibles** : le médaillon est plus grand en 9:16 et
+   centré dans la bande haute ; le bloc horizontal est plus large en 16:9 et
+   reste en haut à droite. Les fichiers et leurs couleurs ne sont pas
+   retouchés.
 
-Et un point de palette : or/vert/noir convergent avec les couleurs du studio
-(`#F5A623` / `#00A651` / `#0B0F14`), mais le **vert foncé de « SPEAK » s'éteint**
-sur les images étalonnées sombres (`lut.js` écrase les ombres) → prévoir une
-déclinaison **1 couleur** pour l'incrustation.
+La palette originale or/vert/noir est donc conservée telle quelle. Une
+opacité différente reste possible volontairement avec `LOGO_OPACITY`, mais
+elle n'est plus imposée par les presets.
 
 ### 8.2 Mesure, et non opinion
 
@@ -254,20 +261,19 @@ Planches témoins : `assets/marque-2026-08/comparaison-fond-{moyen,sombre}.png`
 
 | format | quoi | réglage |
 |---|---|---|
-| **9:16 court** | ① | `logoPos: 'top-center'` (déjà le défaut du style Impact). Le rail d'actions de YouTube occupe le bord droit, le titre/n@ le bas : le haut centré est la seule bande libre. 118 px de large, y = 3,5 % H. |
-| **16:9 long** | ① | `top-right` avec `LOGO_WIDTH=150`‑ish, ou `top-left` si les cartes de fin « s'assoient » dessus — position non prévue par le code à ce jour. |
-| **1:1** | ① | `top-center`, 118 px. |
+| **9:16 court** | ① | médaillon `top-center`, plus grand et pleinement opaque par défaut. Le rail d'actions de YouTube occupe le bord droit : le haut centré est la bande la plus sûre. |
+| **16:9 long** | ② | bloc horizontal `top-right`, plus large pour conserver « AFRO SPEAK » et la signature lisibles. |
+| **1:1** | ② | bloc horizontal, sauf surcharge explicite de `LOGO_VERTICAL_PATH`. |
 | **miniature** | ② | via `LOGO_COMPLET` (`public/logo.png` / `assets/logo.png`), coin, ~14 % de la largeur — jamais le filigrane. |
 | **carte d'intro/outro, habillage** | ② | pleine largeur, tagline lisible. |
 | **avatar chaîne** | ① | centré dans un **cercle de 66 %** de 800 × 800 : YouTube recadre en rond, la queue de bulle est coupée sinon. |
 | **bannière** | ② | dans la zone sûre 1235 × 335 centrée (2048 × 1152) : le bloc horizontal, pas le médaillon. |
 | **dernier plan d'un 16:9** | rien | la carte de fin porte déjà le nom et le @ → `logoOverlay: false` sur ce plan. |
 
-⚠ **`logoSize`, `logoOpacity`, `logoFade` des presets sont déclarés mais jamais
-lus** (aucune occurrence hors `lib/presets.js:185`, qui ne lit que `logoPos`) :
-promettre un réglage par format exige de les câbler dans le renderer. Non fait —
-ça changerait la taille du bug dès le prochain rendu, et le test en cours doit
-rester sur les réglages mesurés.
+`logoWidthRatio`, `logoMarginRatio` et `logoOpacity` sont lus par le renderer.
+La valeur par défaut de `logoOpacity` est désormais `1` : les couleurs restent
+pleines. `LOGO_OPACITY` ne sert qu'à demander volontairement une transparence
+spéciale, et `LOGO_POS` permet de surcharger l'ancrage format par format.
 
 ### 8.4 Procédure quand les PNG sont redéposés
 

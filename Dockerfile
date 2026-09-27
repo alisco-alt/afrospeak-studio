@@ -123,6 +123,10 @@ RUN mkdir -p $HOME/.local/share/fonts \
 # sinon tout reste dans le conteneur (éphémère, d'où le téléversement S3).
 RUN mkdir -p data/projects data/cache data/work data/cookies output
 
+# Échoue au build si le chemin FFmpeg réellement utilisé par le serveur
+# n'est pas capable de produire un MP4 lisible.
+RUN node scripts/smoke-render.js
+
 EXPOSE 7860
 
 # Sonde de santé : l'hébergeur redémarre le conteneur s'il ne répond plus

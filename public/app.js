@@ -37,7 +37,8 @@ const S = {
   me: null, platform: null, presets: null, feeds: [],
   format: 'vertical', style: 'brut',
   trends: [], news: [], selNews: [], videos: [],
-  polls: new Map(), autoFeeds: new Set(),
+  polls: new Map(), visualRailPolls: new Map(), visualRailProject: null,
+  autoFeeds: new Set(),
 };
 
 /* ─────────────── Notifications & modale ─────────────── */
@@ -249,6 +250,7 @@ async function submitVideo() {
     $('#fTopic').value = '';
     S.selNews = []; renderSelNews();
     go('dash');
+    loadVisualRail(j.video.id, topic);
     await loadDash();
     pollVideo(j.video.id);
   } catch (e) {
@@ -295,6 +297,84 @@ async function loadDash() {
     refreshActiveBadge();
   } catch (e) {
     $('#dashVideos').innerHTML = `<div class="empty"><p>${esc(e.message)}</p></div>`;
+  }
+
+  /* La bande suit en lecture seule le projet le plus récent : elle montre
+   * les assets effectivement retenus par le pipeline, sans relancer une
+   * recherche réseau et sans ralentir la génération. */
+  const focus = videos.find(v => ['queued', 'running', 'awaiting_review'].includes(v.status))
+    || videos[0];
+  if (focus) loadVisualRail(focus.id, focus.topic || focus.title || '');
+}
+
+function renderVisualRail(sb, projectId, topic) {
+  const card = $('#visualRailCard');
+  const rail = $('#visualRail');
+  const meta = $('#visualRailMeta');
+  if (!card || !rail) return;
+  card.style.display = '';
+  const shots = Array.isArray(sb && sb.shots) ? sb.shots : [];
+  const covered = shots.filter(s => s.asset && s.asset.file).length;
+  const status = sb && sb.status ? sb.status : 'running';
+  if (meta) meta.textContent = `${topic || 'Projet en cours'} · ${covered}/${shots.length || '—'} plans couverts · les médias restent hors du MP4`;
+  if (!shots.length) {
+    rail.innerHTML = '<div class="visual-rail-empty"><span class="spin"></span> Le storyboard prépare les requêtes visuelles…</div>';
+    return;
+  }
+  const signature = shots.map(s => `${s.index}:${s.asset && s.asset.file || ''}`).join('|') + ':' + status;
+  if (S.visualRailSignature === signature && S.visualRailProject === projectId) return;
+  S.visualRailSignature = signature;
+  S.visualRailProject = projectId;
+  rail.innerHTML = shots.map(s => {
+    const a = s.asset || {};
+    const has = !!a.file;
+    const src = has ? '/api/media/file?p=' + encodeURIComponent(a.file) : '';
+    const isVideo = !!(a.info && a.info.isImage === false);
+    const visual = has
+      ? (isVideo
+        ? `<video src="${esc(src)}" muted loop autoplay playsinline preload="metadata"></video><span class="visual-rail-play">▶ VIDÉO</span>`
+        : `<img src="${esc(src)}" loading="lazy" alt="" onerror="this.style.opacity='.25'">`)
+      : '<span>⌁</span>';
+    return `<div class="visual-rail-shot ${has ? '' : 'visual-rail-missing'}"
+      ${has ? `onclick="reviewStoryboard('${esc(projectId)}')"` : ''}
+      title="${esc(s.query || s.visual || 'Visuel en recherche')}">
+      <div class="visual-rail-media">${visual}</div>
+      <div class="visual-rail-shot-body">
+        <div class="visual-rail-shot-top"><span class="tag ${has ? (isVideo ? 'g' : 'n') : 'o'}">Plan ${Number(s.index) + 1}</span>
+          <span class="tag ${has ? 'g' : 'o'}">${has ? (isVideo ? 'vidéo' : 'image') : 'en recherche'}</span></div>
+        <div class="visual-rail-shot-query">${esc(s.query || s.visual || 'Recherche ciblée en cours…')}</div>
+        <div class="visual-rail-shot-src">${has ? esc(a.provider || 'source réelle') : 'Le pipeline prépare ce plan'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadVisualRail(projectId, topic) {
+  const card = $('#visualRailCard');
+  const rail = $('#visualRail');
+  if (!card || !rail || !projectId) return;
+  card.style.display = '';
+  if (!S.visualRailPolls.has(projectId)) {
+    rail.innerHTML = '<div class="visual-rail-empty"><span class="spin"></span> Pool visuel en préparation…</div>';
+  }
+  const refresh = async () => {
+    try {
+      const { storyboard } = await api('/api/projects/' + encodeURIComponent(projectId) + '/storyboard');
+      renderVisualRail(storyboard, projectId, topic || storyboard.title);
+      if (['awaiting_review', 'done', 'error', 'cancelled'].includes(storyboard.status)) {
+        const timer = S.visualRailPolls.get(projectId);
+        if (timer) clearInterval(timer);
+        S.visualRailPolls.delete(projectId);
+      }
+    } catch (e) {
+      /* Le fichier projet peut ne pas être visible pendant les premières
+       * secondes : on laisse la bande en attente plutôt que d'afficher une
+       * fausse absence de médias. */
+    }
+  };
+  await refresh();
+  if (!S.visualRailPolls.has(projectId)) {
+    S.visualRailPolls.set(projectId, setInterval(refresh, 5000));
   }
 }
 
@@ -391,9 +471,13 @@ window.watchVideo = async id => {
   const { video: v } = await api('/api/videos/' + id);
   const vert = v.format === 'vertical';
   openModal(v.title || v.topic, `
-    <div style="display:grid;place-items:center;background:#000;border-radius:var(--r);overflow:hidden">
-      <video src="${esc(v.videoUrl)}" controls autoplay playsinline
-        style="max-height:60vh;${vert ? 'max-width:340px;' : 'width:100%;'}display:block"></video>
+    <div style="display:flex;justify-content:center;align-items:center;background:#000;border-radius:var(--r);overflow:hidden">
+      <div style="${vert
+        ? 'height:min(60vh,720px);aspect-ratio:9/16;max-width:340px;'
+        : 'width:100%;max-height:60vh;aspect-ratio:16/9;'}">
+        <video src="${esc(v.videoUrl)}" controls autoplay playsinline
+          style="width:100%;height:100%;object-fit:contain;display:block"></video>
+      </div>
     </div>
     <div class="btns" style="margin-top:16px">
       <a class="btn pri" href="${esc(v.videoUrl)}" download>⬇ Télécharger le MP4</a>
@@ -826,7 +910,11 @@ async function loadHealth() {
     const h = await api('/api/health');
     const p = S.platform || await loadPlatform();
     $('#healthBox').innerHTML = `
-      <div class="kv"><span>Moteur vidéo</span><b>FFmpeg · ${h.cpus} cœur(s) · ${h.mem}</b></div>
+      <div class="kv"><span>Moteur vidéo</span><b>${h.ffmpegReady
+        ? 'FFmpeg prêt · libass + libx264'
+        : 'FFmpeg indisponible — rendu impossible'}</b></div>
+      <div class="kv"><span>Binaire FFmpeg</span><b>${esc(h.render && h.render.ffmpegPath || h.ffmpeg || 'inconnu')}</b></div>
+      <div class="kv"><span>Ressources</span><b>${h.cpus} cœur(s) · ${h.mem}</b></div>
       <div class="kv"><span>Node.js</span><b>${h.node}</b></div>
       <div class="kv"><span>Base de données</span><b>${p && p.db.neon ? 'Neon Postgres' : 'locale'}</b></div>
       <div class="kv"><span>Stockage</span><b>${p && p.storage.mode === 's3' ? 'Cloudflare R2' : 'disque éphémère'}</b></div>

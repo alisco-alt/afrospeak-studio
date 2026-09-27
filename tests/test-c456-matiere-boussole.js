@@ -1,7 +1,7 @@
 'use strict';
 /* Tests fonctionnels — correctifs 4, 5, 6 (run « Sénégal / FMI »).
  *   C4 : ré-étiquetage local des sections (fin du faux « body manquant »)
- *   C5 : matière ×3 + boussole émancipation dans chaque rédaction
+ *   C5 : matière compacte + boussole émancipation dans chaque rédaction
  *   C6 : timeout edge-tts 75 s
  * Sans réseau : assertions sur les fonctions pures et les sources. */
 const fs = require('fs');
@@ -52,8 +52,8 @@ const scriptDeux = { sections: [{ kind: 'hook', shots: [{ narration: 'a b c' }] 
 sw.reetiqueterSections(scriptDeux.sections);
 check('script à 2 sections : pas de « body » inventé', !scriptDeux.sections.some(s => s.kind === 'body'));
 
-/* ── C5 : matière ×3 + boussole ───────────────────────────────────── */
-console.log('— C5 : matière ×3 + boussole émancipation —');
+/* ── C5 : matière compacte + boussole ─────────────────────────────── */
+console.log('— C5 : matière compacte + boussole émancipation —');
 check('SYSTEM porte la boussole (BOUSSOLE ÉDITORIALE AFROSPEAK)', sw.SYSTEM.includes('BOUSSOLE ÉDITORIALE AFROSPEAK'));
 check('SYSTEM parle d\'émancipation', /émancipation/.test(sw.SYSTEM));
 
@@ -68,7 +68,7 @@ check('redacteurChef : CONSIGNE câblée sur la boussole',
   /const CONSIGNE = CONSIGNE_BASE \+ require\('\.\/ligne'\)\.blocPrompt\(\);/.test(lu('lib/redacteurChef.js')));
 check('pipeline : bloc « LECTURE COMPLÈTE DES ARTICLES » présent', lu('lib/pipeline.js').includes('LECTURE COMPLÈTE DES ARTICLES'));
 check('planifierChapitres : 12 articles / 2 100 car.', lu('lib/scriptwriter.js').includes("'\\n\\nMATIÈRE PREMIÈRE (textes lus, intégraux quand disponibles) :\\n' + sources.slice(0, 12)"));
-check('redigerSequentiel : matière ×3 aussi', /MATIÈRE PREMIÈRE \(textes lus[^)]*\)[^\n]*\n\s*\.map\(\(a, i\) => \[i \+ 1\]\)[\s\S]{0,80}\.slice\(0, 2700\)/.test(lu('lib/scriptwriter.js')) || /sources\.slice\(0, 12\)[\s\S]{0,120}slice\(0, 2700\)/.test(lu('lib/scriptwriter.js')));
+check('redigerSequentiel : matière compacte', /sources\.slice\(0, 4\)[\s\S]{0,180}slice\(0, 1400\)/.test(lu('lib/scriptwriter.js')));
 
 /* ── C6 : timeout edge-tts 75 s ───────────────────────────────────── */
 console.log('— C6 : timeout edge-tts 75 s —');

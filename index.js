@@ -136,9 +136,6 @@ ${c.b}MODES${c.r}
   --watch [--every M]      Production en continu toutes les M minutes
   --serve [--port P]       Lance l'interface web
   --doctor                 Diagnostic complet de l'environnement
-  --qc <fichier.mp4>       Contrôle qualité mesuré d'une vidéo existante
-                           (noirs, silences, loudness, logo — mêmes seuils
-                           que le contrôle du master en production)
   --list                   Liste les vidéos produites
   --help                   Cette aide
 
@@ -160,7 +157,6 @@ async function doctor() {
   if (render.ready) {
     say.ok(`FFmpeg   ${c.grey}${render.ffmpegPath}${c.r} · libass + libx264`);
     say.ok(`FFprobe  ${c.grey}${render.ffprobePath}${c.r}`);
-    say.ok(`QC master  ${c.grey}noirs, silences, loudness${c.r} · logo ${render.ssim ? 'SSIM' : 'PSNR (repli)'}`);
   } else {
     say.err(`Rendu FFmpeg indisponible · ${c.grey}${render.ffmpegPath}${c.r}`);
     say.info(render.error || 'Vérifiez FFmpeg, FFprobe, libass et libx264.');
@@ -244,50 +240,6 @@ async function doctor() {
   console.log(`\n  ${c.b}Sorties${c.r}`);
   say.kv('Vidéos', DIRS.output);
   say.kv('Cookies', path.join(DIRS.data, 'cookies'));
-  console.log();
-}
-
-/* ─────────────── Contrôle qualité mesuré d'une vidéo ─────────────── */
-/**
- * qcFile — contrôle qualité MESURÉ d'un fichier vidéo existant.
- * Réutilise exactement les mêmes seuils que le contrôle du master en
- * production (lib/masterQC.js) : structure, segments noirs, trous d'air,
- * loudness et présence du logo sur des images tirées du fichier.
- * Usage : node index.js --qc output/ma-video.mp4 [--format vertical]
- */
-async function qcFile(file, a) {
-  const path0 = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
-  if (!fs.existsSync(path0)) {
-    say.err(`Fichier introuvable : ${path0}`);
-    process.exitCode = 2;
-    return;
-  }
-  const masterQC = require('./lib/masterQC');
-  const logo = path.join(DIRS.assets, '168917.png');
-  say.banner();
-  console.log(`${c.b}Contrôle qualité mesuré${c.r}  ${c.grey}${path0}${c.r}\n`);
-  const report = await masterQC.qcMaster(path0, {
-    format: typeof a.format === 'string' ? a.format : 'landscape',
-    logoPath: fs.existsSync(logo) ? logo : null,
-    skipLogo: !fs.existsSync(logo),
-  });
-  for (const ch of report.checks) {
-    const icone = ch.ok ? c.green + '✓' + c.r : c.red + '✗' + c.r;
-    console.log(`  ${icone} ${String(ch.id).padEnd(14)} ${c.grey}${ch.detail}${c.r}`);
-  }
-  for (const s of (report.skipped || [])) {
-    console.log(`  ${c.gold}·${c.r} ${String('NON VÉRIFIÉ').padEnd(14)} ${c.grey}${s}${c.r}`);
-  }
-  console.log();
-  if (report.passed) {
-    say.ok(`CONFORME — ${masterQC.summary(report)}`);
-  } else {
-    say.err(`NON CONFORME — ${masterQC.summary(report)}`);
-    for (const e of report.issues.filter(i => i.severity === 'error')) {
-      say.info(`  ${e.code} : ${e.message}`);
-    }
-    process.exitCode = 1;
-  }
   console.log();
 }
 
@@ -410,12 +362,6 @@ async function main() {
 
   if (a.help || a.h) { console.log(HELP); return; }
   if (a.doctor) return doctor();
-
-  if (typeof a.qc === 'string') return qcFile(a.qc, a);
-  if (a.qc === true) {
-    console.log(`${c.red}--qc nécessite un fichier :${c.r} ${c.grey}node index.js --qc output/ma-video.mp4${c.r}`);
-    return;
-  }
 
   if (a.list) {
     const files = fs.existsSync(DIRS.output) ? fs.readdirSync(DIRS.output).filter(f => f.endsWith('.mp4')) : [];

@@ -3,6 +3,12 @@
 Architecture validée : **vitrine Vercel + moteur Render**.
 Compter **20 minutes**. Aucune carte bancaire, 0 €/mois.
 
+> Important : l'adresse publique Vercel est en général `https://<nom>.vercel.app`,
+> pas `afrospeak.vercel.com` (qui n'est pas l'URL d'une application Vercel).
+> Vercel sert uniquement l'interface ; la vidéo est calculée par le backend
+> Render/Koyeb, qui doit répondre avec `ffmpegReady: true` sur `/api/health`. Pour
+> changer de backend, modifiez `BACKEND_URL` dans Vercel puis redéployez.
+
 ---
 
 ## Pourquoi deux hébergeurs

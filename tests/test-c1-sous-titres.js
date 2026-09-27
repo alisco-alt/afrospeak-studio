@@ -1,6 +1,6 @@
 'use strict';
-/* Test de fumée — CORRECTIF 1 : moteur pop, mot prononcé blanc / important bleu foncé.
- * Sans FFmpeg : textmetrics bascule sur son repli d'estimation.
+/* Test de fumée — sous-titres verticaux premium : mot actif blanc sur pastille jaune opaque,
+ * mots en attente blancs, sans fond global ni couleur concurrente.
  * Run « Sénégal / FMI » — session arena/01a0716a. */
 const captions = require('../lib/captions');
 
@@ -19,13 +19,12 @@ const words = mots.map(([word, start, end]) => ({ word, start, end }));
     format: 'vertical', mode: 'pop', fontName: 'Montserrat Black',
     primary: '#FFFFFF', highlight: '#58A6FF', entity: '#58A6FF',
     pill: '#FFE14D', pillText: '#FFFFFF', accentOnPill: '#0D47A1',
-    upper: false,
+    upper: false, activeBox: true,
   });
 
   /* Couleurs ASS attendues : hexToAss → &H00BBGGRR, puis alpha 00 retiré. */
   const BLANC = '&HFFFFFF';                       // #FFFFFF
-  const BLEU_FONCE = '&HA1470D';                  // #0D47A1 (BGR: A1 47 0D)
-  const BLEU_ENT = '&HFFA658';                    // #58A6FF (BGR: FF A6 58)
+  const JAUNE = '&H4DE1FF';                      // #FFE14D (BGR: 4D E1 FF)
 
   const ev = (layer, s) => ass.split('\n').filter(l => l.startsWith(`Dialogue: ${layer},`) && l.includes(s));
 
@@ -33,15 +32,15 @@ const words = mots.map(([word, start, end]) => ({ word, start, end }));
   const check = (nom, cond) => { if (cond) { ok++; console.log('  ✓ ' + nom); } else { ko++; console.log('  ✗ ' + nom); } };
 
   console.log('— Mot actif (calque 3) —');
-  check('FMI (sigle) actif en BLEU FONCÉ sur le nuage', ev(3, 'FMI').some(l => l.includes(`\\c${BLEU_FONCE}`)));
-  check('Senegal (nom propre) actif en BLEU FONCÉ', ev(3, 'Senegal').some(l => l.includes(`\\c${BLEU_FONCE}`)));
-  check('3,8 (chiffre clé) actif en BLEU FONCÉ', ev(3, '3,8').some(l => l.includes(`\\c${BLEU_FONCE}`)));
+  check('FMI (sigle) actif en BLANC sur le nuage jaune', ev(3, 'FMI').some(l => l.includes(`\\c${BLANC}`)));
+  check('Senegal (nom propre) actif en BLANC', ev(3, 'Senegal').some(l => l.includes(`\\c${BLANC}`)));
+  check('3,8 (chiffre clé) actif en BLANC', ev(3, '3,8').some(l => l.includes(`\\c${BLANC}`)));
   check('« sur » (mot neutre) actif en BLANC', ev(3, 'sur').some(l => l.includes(`\\c${BLANC}`)));
   check('aucun mot actif en cyan #4FC3F7 (&H7FC304)', !ass.includes('&H7FC304'));
 
   console.log('— Copie de base (calque 2) —');
-  check('FMI inactif en BLEU #58A6FF', ev(2, 'FMI').some(l => l.includes(`\\c${BLEU_ENT}`)));
-  check('« du » inactif sans couleur (blanc)', !ev(2, 'du,').some(l => l.includes(`\\c${BLEU_FONCE}`)));
+  check('FMI inactif sans couleur concurrente', !ev(2, 'FMI').some(l => l.includes('&HFFA658')));
+  check('« du » inactif sans couleur concurrente', !ev(2, 'du,').some(l => l.includes('&HA1470D')));
 
   console.log('— Divers —');
   check('pastilles (calque 1) jaunes présentes', ass.includes('Dialogue: 1,') && ass.includes('\\p1'));
@@ -49,8 +48,10 @@ const words = mots.map(([word, start, end]) => ({ word, start, end }));
   check(`17 mots actifs (reçu ${n3})`, n3 === 17);
   check('« Rien » après « 2026. » (fin de phrase) → BLANC, pas nom propre',
     ev(3, 'Rien').some(l => l.includes(`\\c${BLANC}`)));
-  check('« croissance » = mot fort → BLEU FONCÉ (attendu)',
-    ev(3, 'croissance').some(l => l.includes(`\\c${BLEU_FONCE}`)));
+  check('« croissance » actif en BLANC',
+    ev(3, 'croissance').some(l => l.includes(`\\c${BLANC}`)));
+  check('pastille jaune opaque', ass.includes(`\\alpha&H00&\\c${JAUNE}\\p1`));
+  check('aucune plaque de phrase globale', !ass.split('\n').some(l => l.startsWith('Dialogue: 0,')));
 
   console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
   process.exit(ko ? 1 : 0);

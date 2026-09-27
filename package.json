@@ -10,6 +10,7 @@
     "start": "node index.js --serve",
     "serve": "node server.js",
     "doctor": "node index.js --doctor",
+    "render:check": "node scripts/smoke-render.js",
     "auto": "node index.js --auto",
     "watch": "node index.js --watch",
     "cles": "node scripts/configurer-cles.js"
