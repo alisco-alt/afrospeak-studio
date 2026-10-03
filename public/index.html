@@ -648,7 +648,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
             <option value="F">Féminine — Denise, claire et professionnelle</option>
           </select>
           <span id="voiceCloneDefaultHint" class="hint" style="display:block;margin-top:6px">
-            Une voix clonée activée dans Configuration devient automatiquement la voix de vos vidéos.
+            Après création dans Configuration, votre profil vocal local devient la voix par défaut des nouvelles vidéos.
           </span>
         </div>
 
@@ -913,7 +913,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
             <input type="text" id="kOpenrouter" placeholder="sk-or-…"></div>
         </div>
         <div class="row">
-          <div class="field"><label>ElevenLabs <span class="hint">— voix premium</span></label>
+          <div class="field"><label>ElevenLabs <span class="hint">— TTS distant facultatif, sans lien avec votre voix locale</span></label>
             <input type="text" id="kEleven" placeholder="sk_…"></div>
           <div class="field"><label>Pexels <span class="hint">— vidéos HD</span></label>
             <input type="text" id="kPexels" placeholder="Clé API Pexels"></div>
@@ -921,11 +921,15 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
       </div>
 
       <div class="card" id="voiceCloneCard" style="margin-top:16px">
-        <h3>Votre voix signature <span class="tag o">clonage vocal</span></h3>
+        <h3>Votre voix signature <span class="tag g">local · gratuit</span></h3>
         <p class="hint" style="display:block;margin:0 0 12px">
-          Préparez 1 à 2 minutes de parole claire, sans musique, réverbération ni autre voix.
-          Le format MP3 à 192 kb/s ou plus est recommandé. Une fois clonée, votre voix sera utilisée automatiquement pour chaque nouvelle vidéo.
+          OpenVoice V2 + MeloTTS : clonage de timbre et narration en français sur le serveur qui héberge AfroSpeak Studio.
+          Les modèles ouverts sont gratuits à l’usage ; aucune clé ElevenLabs et aucun service de clonage payant ne sont utilisés.
+          Un extrait propre de 15 à 120 secondes est recommandé.
         </p>
+        <div class="btns" style="margin-bottom:10px">
+          <button class="btn" id="btnInstallOpenVoice">Installer le moteur local gratuit</button>
+        </div>
         <div class="row">
           <div class="field">
             <label>Nom de la voix</label>
@@ -938,20 +942,19 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
         </div>
         <label style="display:flex;align-items:flex-start;gap:9px;margin:10px 0 14px;cursor:pointer;font-size:12px;color:var(--txt-2)">
           <input type="checkbox" id="voiceCloneConsent" style="margin-top:2px">
-          <span>Je confirme qu’il s’agit de ma voix ou que j’ai l’autorisation de la cloner, et j’accepte l’envoi de cet extrait à ElevenLabs. L’audio source n’est pas conservé par AfroSpeak Studio.</span>
+          <span>Je confirme qu’il s’agit de ma voix ou que j’ai l’autorisation de la cloner. J’accepte le traitement de l’extrait sur mon serveur AfroSpeak ; le fichier source temporaire sera supprimé après création du profil.</span>
         </label>
         <div class="btns">
-          <button class="btn pri" id="btnCloneVoice">Cloner et activer ma voix</button>
+          <button class="btn pri" id="btnCloneVoice">Créer et activer ma voix locale</button>
           <button class="btn" id="btnPreviewClone" hidden>▶ Écouter un aperçu</button>
-          <button class="btn dan" id="btnDeleteClone" hidden>Supprimer le clone</button>
+          <button class="btn dan" id="btnDeleteClone" hidden>Supprimer mon profil vocal</button>
         </div>
         <div id="voiceCloneStatus" class="note" style="margin-top:12px" aria-live="polite">
-          Configurez votre clé API ElevenLabs ci-dessus pour commencer.
+          Vérification du moteur vocal local…
         </div>
         <audio id="voiceClonePreviewAudio" controls preload="none" style="display:none;width:100%;margin-top:10px"></audio>
         <div class="hint" style="display:block;margin-top:8px">
-          Le clonage et la synthèse passent par ElevenLabs et dépendent des droits/quota de votre compte.
-          Le clone est stocké chez ElevenLabs ; l’extrait envoyé est uniquement traité en mémoire par ce serveur.
+          L’installation télécharge les poids OpenVoice/MeloTTS une seule fois et demande plusieurs Go de stockage et de mémoire ; un GPU compatible PyTorch peut accélérer la génération, le CPU fonctionne aussi mais peut être lent. Le fichier audio brut n’est pas conservé : seul l’embedding vocal reste sur ce serveur, dans <code>data/voice-clone</code>. Aucun audio n’est envoyé à ElevenLabs.
         </div>
       </div>
 
@@ -1089,7 +1092,8 @@ var S = {
   history: [],        // §5 · sujets précédents, persistés côté serveur
   videos: [],
   voiceClone: null,
-  voiceCloneKeyAvailable: false,
+  voiceCloneEngine: null,
+  voiceCloneInstalling: false,
   polls: {},
   online: false
 };
@@ -1186,61 +1190,110 @@ function voiceRequest(url, method, payload){
 
 function updateVoiceCloneUI(){
   var profile = S.voiceClone;
-  var active = !!(profile && profile.voiceId && !profile.requiresVerification && S.voiceCloneKeyAvailable);
+  var engine = S.voiceCloneEngine || {};
+  var configured = !!(profile && profile.provider === 'openvoice' && profile.voiceId);
+  var active = configured && !!engine.ready && engine.voiceReady !== false;
   var status = $('#voiceCloneStatus');
+  var installButton = $('#btnInstallOpenVoice');
   var cloneButton = $('#btnCloneVoice');
   var previewButton = $('#btnPreviewClone');
   var deleteButton = $('#btnDeleteClone');
   if (!status) return;
+
+  if (installButton) {
+    installButton.hidden = !!engine.ready;
+    installButton.disabled = !!engine.installing || engine.canInstall === false;
+    installButton.textContent = engine.installing ? 'Installation en cours…' : 'Installer le moteur local gratuit';
+    installButton.title = engine.message || '';
+  }
   if (cloneButton) {
-    cloneButton.disabled = !S.voiceCloneKeyAvailable;
-    cloneButton.textContent = profile && profile.voiceId ? 'Recloner et remplacer ma voix' : 'Cloner et activer ma voix';
+    cloneButton.disabled = !engine.ready || !!S.voiceCloneInstalling;
+    cloneButton.textContent = configured ? 'Remplacer ma voix locale' : 'Créer et activer ma voix locale';
   }
   if (previewButton) {
-    previewButton.hidden = !active;
-    previewButton.style.display = active ? '' : 'none';
-    previewButton.disabled = !S.voiceCloneKeyAvailable;
+    previewButton.hidden = !configured;
+    previewButton.style.display = configured ? '' : 'none';
+    previewButton.disabled = !engine.ready || !!S.voiceCloneInstalling;
   }
   if (deleteButton) {
-    var canDelete = !!(profile && profile.voiceId);
-    deleteButton.hidden = !canDelete;
-    deleteButton.style.display = canDelete ? '' : 'none';
-    deleteButton.disabled = !S.voiceCloneKeyAvailable;
+    deleteButton.hidden = !configured;
+    deleteButton.style.display = configured ? '' : 'none';
+    deleteButton.disabled = !!S.voiceCloneInstalling;
   }
-  if (profile && profile.voiceId && profile.requiresVerification) {
-    status.className = 'note warn';
-    status.textContent = 'Le clone « ' + profile.name + ' » existe, mais ElevenLabs demande une vérification. Terminez-la dans votre compte avant de générer une vidéo.';
-  } else if (profile && profile.voiceId && !S.voiceCloneKeyAvailable) {
-    status.className = 'note warn';
-    status.textContent = 'Le clone « ' + profile.name + ' » est enregistré, mais la clé API ElevenLabs n’est pas disponible. Réenregistrez-la pour réactiver cette voix.';
+
+  if (engine.installing) {
+    status.className = 'note';
+    var progress = (engine.progress || []).slice(-2).join(' · ');
+    status.textContent = engine.message + (progress ? ' ' + progress : '');
   } else if (active) {
     status.className = 'note';
-    status.textContent = 'Voix active : « ' + profile.name + ' ». Elle sera utilisée automatiquement pour chaque nouvelle vidéo.';
-  } else if (!S.voiceCloneKeyAvailable) {
+    status.textContent = 'Voix locale active : « ' + profile.name + ' ». Elle devient la signature de toutes les nouvelles vidéos ; aucune API payante ne sera appelée.';
+  } else if (configured && !engine.ready) {
     status.className = 'note warn';
-    status.textContent = 'Ajoutez puis enregistrez votre clé API ElevenLabs dans le bloc « Clés API » ci-dessus.';
+    status.textContent = 'Le profil « ' + profile.name + ' » reste la voix par défaut, mais le moteur local est indisponible. Les générations échoueront clairement : aucune voix payante ne prendra le relais. ' + (engine.message || 'Réinstallez OpenVoice.');
+  } else if (configured && engine.voiceReady === false) {
+    status.className = 'note warn';
+    status.textContent = 'Le profil « ' + profile.name + ' » est enregistré mais son embedding local manque. Rechargez l’extrait ou supprimez ce profil avant toute nouvelle génération.';
+  } else if (!engine.ready) {
+    status.className = 'note warn';
+    status.textContent = (engine.message || 'Le moteur vocal local n’est pas installé.') + (engine.canInstall === false && !engine.installing && Number(engine.memoryLimitGB) > 0 && Number(engine.memoryLimitGB) < 2 ? ' Lancez le studio sur une machine avec plusieurs Go de mémoire.' : '');
   } else {
     status.className = 'note';
-    status.textContent = 'Aucune voix clonée active. Votre extrait sera envoyé à ElevenLabs ; AfroSpeak Studio ne conserve pas le fichier audio source.';
+    status.textContent = 'Moteur local prêt. Chargez votre extrait : il sera traité sur votre serveur AfroSpeak, sans envoi à ElevenLabs ni à un service de clonage.';
   }
+
   var formHint = $('#voiceCloneDefaultHint');
   if (formHint) {
-    formHint.textContent = active
-      ? 'Voix par défaut active : « ' + profile.name + ' ». Elle prime sur le choix de timbre ci-dessus pour chaque nouvelle vidéo.'
-      : 'Une voix clonée activée dans Configuration devient automatiquement la voix de vos vidéos.';
+    formHint.textContent = configured
+      ? 'Voix locale par défaut : « ' + profile.name + ' ». Elle prime sur le choix de timbre pour toutes les nouvelles vidéos.'
+      : 'Après création, le profil vocal local deviendra automatiquement la voix par défaut des nouvelles vidéos.';
   }
 }
 
+var openVoicePollTimer = null;
+function refreshOpenVoiceStatus(){
+  return voiceRequest('/api/voices/local/status', 'GET').then(function(result){
+    S.voiceCloneEngine = Object.assign({}, result.engine || {}, {
+      voiceConfigured: !!result.voiceConfigured,
+      voiceReady: !!result.voiceReady,
+    });
+    updateVoiceCloneUI();
+    if (S.voiceCloneEngine.installing && !openVoicePollTimer) {
+      openVoicePollTimer = setTimeout(function(){
+        openVoicePollTimer = null;
+        refreshOpenVoiceStatus().catch(function(){});
+      }, 3000);
+    }
+    return S.voiceCloneEngine;
+  });
+}
+
 function loadVoiceCloneProfile(){
-  return apiTry('/api/config').then(function(j){
-    if (!j || !j.config) return;
-    var c = j.config;
-    S.voiceClone = c.voiceClone || null;
-    S.voiceCloneKeyAvailable = !!(c._has && c._has.elevenlabs);
-    if (S.voiceClone && S.voiceClone.name && $('#voiceCloneName')) {
-      $('#voiceCloneName').value = S.voiceClone.name;
+  return Promise.all([
+    voiceRequest('/api/config', 'GET').catch(function(){ return null; }),
+    voiceRequest('/api/voices/local/status', 'GET').catch(function(){ return null; }),
+  ]).then(function(results){
+    var response = results[0];
+    if (response && response.config) {
+      S.voiceClone = response.config.voiceClone || null;
+      if (S.voiceClone && S.voiceClone.name && $('#voiceCloneName')) {
+        $('#voiceCloneName').value = S.voiceClone.name;
+      }
+    }
+    var runtime = results[1];
+    if (runtime && runtime.engine) {
+      S.voiceCloneEngine = Object.assign({}, runtime.engine, {
+        voiceConfigured: !!runtime.voiceConfigured,
+        voiceReady: !!runtime.voiceReady,
+      });
     }
     updateVoiceCloneUI();
+    if (S.voiceCloneEngine && S.voiceCloneEngine.installing && !openVoicePollTimer) {
+      openVoicePollTimer = setTimeout(function(){
+        openVoicePollTimer = null;
+        refreshOpenVoiceStatus().catch(function(){});
+      }, 3000);
+    }
   });
 }
 
@@ -1535,7 +1588,7 @@ function submitVideo(){
     }
   }
 
-  var cloneActif = !!(S.voiceClone && S.voiceClone.voiceId && !S.voiceClone.requiresVerification && S.voiceCloneKeyAvailable);
+  var cloneActif = !!(S.voiceClone && S.voiceClone.provider === 'openvoice' && S.voiceClone.voiceId);
   var body = {
     topic: topic,
     angle: $('#fAngle').value.trim(),
@@ -1544,7 +1597,7 @@ function submitVideo(){
     // Le clone actif prime sur les voix de catalogue, pour sujet comme script.
     voiceGender: cloneActif ? '' : ($('#fVoixGenre') ? $('#fVoixGenre').value : ''),
     voiceId: cloneActif ? S.voiceClone.voiceId : '',
-    voiceProvider: cloneActif ? 'elevenlabs' : 'auto',
+    voiceProvider: cloneActif ? 'openvoice' : 'auto',
     format: S.format,
     style: S.style,
     minutes: +$('#fMin').value,
@@ -1862,7 +1915,6 @@ $('#btnSaveKeys').addEventListener('click', function(){
   });
   voiceRequest('/api/config', 'POST', {keys:keys}).then(function(r){
     toast('Configuration enregistrée.', 'ok');
-    S.voiceCloneKeyAvailable = !!(r.config && r.config._has && r.config._has.elevenlabs);
     updateVoiceCloneUI();
     return loadVoiceCloneProfile();
   }).catch(function(e){
@@ -1879,17 +1931,44 @@ function lireAudioEnBase64(file){
   });
 }
 
+$('#btnInstallOpenVoice').addEventListener('click', async function(){
+  var button = $('#btnInstallOpenVoice');
+  button.disabled = true;
+  button.textContent = 'Démarrage de l’installation…';
+  $('#voiceCloneStatus').className = 'note';
+  $('#voiceCloneStatus').textContent = 'Installation locale : téléchargement des dépendances Python et des poids OpenVoice. Cela peut prendre plusieurs minutes.';
+  try {
+    var result = await voiceRequest('/api/voices/local/setup', 'POST', {});
+    S.voiceCloneEngine = result.engine || S.voiceCloneEngine;
+    updateVoiceCloneUI();
+    if (S.voiceCloneEngine && S.voiceCloneEngine.installing) {
+      refreshOpenVoiceStatus().catch(function(){});
+      toast('Installation locale démarrée.', 'ok');
+    } else if (S.voiceCloneEngine && S.voiceCloneEngine.ready) {
+      toast('Le moteur vocal local est prêt.', 'ok');
+    }
+  } catch (e) {
+    $('#voiceCloneStatus').className = 'note warn';
+    $('#voiceCloneStatus').textContent = e.message;
+    toast('Installation impossible : ' + e.message, 'err');
+  } finally {
+    updateVoiceCloneUI();
+  }
+});
+
 $('#btnCloneVoice').addEventListener('click', async function(){
   var button = $('#btnCloneVoice');
   var file = $('#voiceCloneFile').files && $('#voiceCloneFile').files[0];
-  if (!S.voiceCloneKeyAvailable) { toast('Enregistrez d’abord votre clé ElevenLabs.', 'err'); return; }
+  if (!S.voiceCloneEngine || !S.voiceCloneEngine.ready) { toast('Installez d’abord le moteur local OpenVoice.', 'err'); return; }
   if (!file) { toast('Choisissez un extrait audio de votre voix.', 'err'); return; }
   if (file.size > 16 * 1024 * 1024) { toast('Le fichier doit faire 16 Mo maximum.', 'err'); return; }
-  if (!$('#voiceCloneConsent').checked) { toast('Confirmez le consentement au clonage de cette voix.', 'err'); return; }
+  if (!$('#voiceCloneConsent').checked) { toast('Confirmez que vous êtes autorisé à cloner cette voix.', 'err'); return; }
+  S.voiceCloneInstalling = true;
   button.disabled = true;
-  button.textContent = 'Clonage en cours…';
+  button.textContent = 'Création du profil local…';
   $('#voiceCloneStatus').className = 'note';
-  $('#voiceCloneStatus').textContent = 'Envoi sécurisé à ElevenLabs et création de la voix. Cela peut prendre un moment…';
+  $('#voiceCloneStatus').textContent = 'Traitement de l’extrait sur votre serveur AfroSpeak. L’audio n’est envoyé à aucun fournisseur.';
+  updateVoiceCloneUI();
   try {
     var dataUrl = await lireAudioEnBase64(file);
     var comma = dataUrl.indexOf(',');
@@ -1902,32 +1981,33 @@ $('#btnCloneVoice').addEventListener('click', async function(){
       consent: true,
     });
     S.voiceClone = result.voiceClone || null;
+    S.voiceCloneEngine = Object.assign({}, result.engine || S.voiceCloneEngine || {}, {
+      ready: true, voiceConfigured: true, voiceReady: true,
+    });
     $('#voiceCloneFile').value = '';
     $('#voiceCloneConsent').checked = false;
     updateVoiceCloneUI();
-    toast(S.voiceClone && S.voiceClone.requiresVerification
-      ? 'Clone créé — vérification demandée par ElevenLabs.'
-      : 'Votre voix est clonée et activée pour les prochaines vidéos.', 'ok');
+    toast('Profil vocal local créé et activé pour les prochaines vidéos.', 'ok');
   } catch (e) {
     $('#voiceCloneStatus').className = 'note warn';
     $('#voiceCloneStatus').textContent = e.message;
-    toast('Clonage impossible : ' + e.message, 'err');
+    toast('Création locale impossible : ' + e.message, 'err');
   } finally {
-    button.disabled = false;
+    S.voiceCloneInstalling = false;
     updateVoiceCloneUI();
   }
 });
 
 $('#btnPreviewClone').addEventListener('click', async function(){
   var profile = S.voiceClone;
-  if (!profile || !profile.voiceId || profile.requiresVerification) return;
+  if (!profile || !profile.voiceId || profile.provider !== 'openvoice') return;
   var button = $('#btnPreviewClone');
   button.disabled = true;
   button.textContent = 'Préparation de l’aperçu…';
   try {
     var result = await voiceRequest('/api/tts/preview', 'POST', {
       text: 'Bonjour, je suis la voix d’AfroSpeak. Voici un aperçu de ma voix pour les prochaines vidéos.',
-      provider: 'elevenlabs', lang: 'fr', voiceId: profile.voiceId, lockVoice: true,
+      provider: 'openvoice', lang: 'fr', voiceId: profile.voiceId, lockVoice: true,
     });
     var audio = $('#voiceClonePreviewAudio');
     audio.src = apiUrl(result.url);
@@ -1936,7 +2016,7 @@ $('#btnPreviewClone').addEventListener('click', async function(){
     try { await audio.play(); }
     catch(e) { toast('Aperçu prêt : appuyez sur Lecture dans le lecteur audio.', 'ok'); }
   } catch (e) {
-    toast('Aperçu indisponible : ' + e.message, 'err');
+    toast('Aperçu local indisponible : ' + e.message, 'err');
   } finally {
     button.disabled = false;
     button.textContent = '▶ Écouter un aperçu';
@@ -1945,16 +2025,20 @@ $('#btnPreviewClone').addEventListener('click', async function(){
 
 $('#btnDeleteClone').addEventListener('click', async function(){
   if (!S.voiceClone || !S.voiceClone.voiceId) return;
-  if (!confirm('Supprimer définitivement cette voix clonée de votre compte ElevenLabs et rétablir la voix automatique d’AfroSpeak ?')) return;
+  if (!confirm('Supprimer le profil vocal local et rétablir la voix automatique d’AfroSpeak pour les prochaines vidéos ?')) return;
   var button = $('#btnDeleteClone');
   button.disabled = true;
   try {
-    await voiceRequest('/api/voices/clone', 'DELETE');
-    S.voiceClone = null;
+    var result = await voiceRequest('/api/voices/clone', 'DELETE');
+    S.voiceClone = result.voiceClone || null;
+    if (S.voiceCloneEngine) {
+      S.voiceCloneEngine.voiceConfigured = false;
+      S.voiceCloneEngine.voiceReady = false;
+    }
     var audio = $('#voiceClonePreviewAudio');
     audio.pause(); audio.removeAttribute('src'); audio.style.display = 'none';
     updateVoiceCloneUI();
-    toast('Clone supprimé chez ElevenLabs. Les prochaines vidéos utiliseront la voix automatique.', 'ok');
+    toast('Profil vocal supprimé du serveur local. Les prochaines vidéos utiliseront la voix automatique.', 'ok');
   } catch (e) {
     toast('Suppression impossible : ' + e.message, 'err');
   } finally {

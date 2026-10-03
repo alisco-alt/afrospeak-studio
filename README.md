@@ -190,25 +190,54 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 
 ### Synchronisation mot à mot
 
-| Fournisseur | Précision |
+| Moteur | Précision |
 |---|---|
-| ElevenLabs | **exacte** (timings caractère par caractère) |
-| Google TTS (gratuit) | mesurée par segments courts (~±80 ms) |
-| OpenAI | estimée pondérée |
+| Edge TTS | exacte quand les timings natifs sont disponibles |
+| OpenVoice V2 + MeloTTS | durée audio mesurée ; répartition des mots estimée |
+| Google TTS (gratuit) | mesurée par segments courts |
+| OpenAI / ElevenLabs (facultatifs) | selon les timings fournis par le service |
 
-Les timings alimentent à la fois les sous-titres incrustés et le fichier `.srt`.
+Les timings alimentent les sous-titres incrustés et le fichier `.srt`. Le clone
+local n’utilise pas l’API d’alignement d’un fournisseur payant.
 
-### Voix signature personnalisée
+### Voix signature locale (OpenVoice V2 + MeloTTS)
 
-Dans **Configuration → Votre voix signature**, ajoutez une clé API ElevenLabs,
-importez 1 à 2 minutes de parole propre (MP3 à 192 kb/s ou plus recommandé)
-et confirmez votre autorisation. Le clone devient automatiquement la voix des
-prochaines vidéos (y compris le pilote automatique) ; un aperçu audio peut être
-écouté avant la production.
-L’extrait source est traité en mémoire et n’est pas conservé par AfroSpeak
-Studio. Le clone est hébergé par ElevenLabs ; le bouton de suppression le retire
-également de ce compte. La disponibilité du clonage et de la synthèse dépend du
-compte et du quota ElevenLabs.
+Dans **Configuration → Votre voix signature**, installez le moteur local une
+seule fois, puis importez un extrait de votre voix (15 à 120 secondes de parole
+claire, sans musique ni autre locuteur). Les dépôts officiels
+[OpenVoice V2](https://github.com/myshell-ai/OpenVoice) et
+[MeloTTS](https://github.com/myshell-ai/MeloTTS) publient respectivement le
+clonage de timbre et la synthèse française sous licences MIT. Aucune clé API,
+facturation à la minute ou connexion ElevenLabs n’est requise pour créer le
+profil et générer la narration clonée.
+
+L’extrait est transmis uniquement à votre propre serveur AfroSpeak pour
+l’inférence locale ; il est normalisé temporairement, puis supprimé. Seul
+l’embedding vocal est conservé dans `data/voice-clone/`. Le profil devient la
+voix par défaut de toutes les nouvelles vidéos, y compris celles du pilote
+automatique. **Si OpenVoice ou son profil manque, le rendu s’arrête avec une
+erreur : il ne bascule ni vers une API payante, ni vers une autre voix, ni vers
+le silence.** L’aperçu utilise le même moteur local ; le bouton de suppression
+retire l’embedding et désactive la signature. Un ancien identifiant ElevenLabs
+présent dans un `config.json` est ignoré par AfroSpeak ; aucune requête de
+migration ni suppression distante n’est faite. Si un clone y a déjà été créé,
+sa suppression éventuelle se fait manuellement dans le compte correspondant.
+
+L’installation automatique est disponible dans l’interface ou en CLI :
+
+```bash
+npm run setup:openvoice
+```
+
+Elle crée un environnement Python isolé et télécharge une fois les dépendances
+et les poids publics dans `data/openvoice/` (dossier exclu de Git). Python 3.9 ou
+3.10, Git, curl et plusieurs Go de stockage/mémoire sont nécessaires. Le CPU
+fonctionne sans frais d’API, mais peut être lent ; l’installateur détecte un GPU
+NVIDIA et installe PyTorch CUDA 12.1, sinon utilise PyTorch CPU.
+Le Dockerfile léger du studio vise 512 Mo de RAM et **ne peut pas héberger ce
+modèle** : utilisez la machine qui exécute le serveur ou un hôte doté de
+ressources suffisantes et d’un volume `data/` persistant. Les éventuels frais
+d’hébergement ou d’électricité restent indépendants du modèle.
 
 ---
 

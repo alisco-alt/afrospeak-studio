@@ -46,6 +46,9 @@ const scriptwriter = require('./lib/scriptwriter');
 const mediaLib = require('./lib/media');
 const tts = require('./lib/tts');
 const voiceClone = require('./lib/voiceClone');
+const openvoice = require('./lib/openvoice');
+voiceClone.cleanupTemps();
+openvoice.cleanupTemps();
 const pipeline = require('./lib/pipeline');
 const autopilot = require('./lib/autopilot');
 const social = require('./lib/social');
@@ -228,23 +231,39 @@ app.post('/api/config', wrap(async (req, res) => {
 
 app.get('/api/voices', wrap(async (req, res) => ok(res, { voices: await tts.listVoices() })));
 
-/* Clone personnel : l'extrait est envoyé en mémoire à ElevenLabs et n'est
- * jamais écrit localement. L'accord explicite protège contre le clonage
- * d'une voix tierce sans autorisation. */
+/* Moteur local gratuit : ces routes ne contactent aucun fournisseur vocal.
+ * L’installation télécharge les poids publics ; l’échantillon de l’utilisateur
+ * reste sur le serveur AfroSpeak et est effacé après l’extraction du timbre. */
+app.get('/api/voices/local/status', auth.required, wrap(async (req, res) => {
+  const profile = config.load().voiceClone || {};
+  ok(res, {
+    engine: openvoice.status(),
+    voiceConfigured: voiceClone.isConfigured(profile),
+    voiceReady: voiceClone.hasEmbedding(profile),
+  });
+}));
+
+app.post('/api/voices/local/setup', auth.required, (req, res) => {
+  try {
+    const result = openvoice.startInstall();
+    ok(res, { started: result.started, engine: result.status });
+  } catch (e) {
+    fail(res, e, Number(e && e.status) || 500);
+  }
+});
+
 app.post('/api/voices/clone', auth.required, async (req, res) => {
   let sample = null;
   try {
     const body = req.body || {};
     if (body.consent !== true) {
-      return fail(res, Object.assign(new Error('Confirmez que cette voix est la vôtre ou que vous avez l’autorisation de la cloner.'), { status: 400 }), 400);
-    }
-    if (!config.keys().elevenlabs) {
-      return fail(res, Object.assign(new Error('Ajoutez d’abord votre clé API ElevenLabs dans Configuration.'), { status: 400 }), 400);
+      return fail(res, Object.assign(new Error('Confirmez qu’il s’agit de votre voix ou que vous avez l’autorisation de la cloner.'), { status: 400 }), 400);
     }
     sample = voiceClone.decodeBase64Sample(body.audioBase64, body.mimeType, body.fileName);
-    // Libère tout de suite la grosse chaîne base64 ; le binaire ne sera gardé
-    // qu'en mémoire le temps de l'appel de clonage.
+    // Le gros champ base64 est vidé avant toute inférence. Le binaire sera
+    // normalisé dans data/ puis effacé par cloneVoice après extraction.
     body.audioBase64 = '';
+    const previous = config.load().voiceClone || {};
     const profile = await voiceClone.cloneVoice({
       name: body.name,
       buffer: sample.buffer,
@@ -252,7 +271,16 @@ app.post('/api/voices/clone', auth.required, async (req, res) => {
       fileName: `sample${sample.format.ext}`,
     });
     config.save({ voiceClone: profile });
-    ok(res, { voiceClone: profile, defaultForFutureVideos: true });
+    if (previous.voiceId && previous.voiceId !== profile.voiceId
+      && voiceClone.isConfigured(previous)) {
+      try { voiceClone.deleteVoice(previous.voiceId); } catch (e) {}
+    }
+    ok(res, {
+      voiceClone: profile,
+      defaultForFutureVideos: true,
+      localOnly: true,
+      engine: openvoice.status(),
+    });
   } catch (e) {
     fail(res, e, Number(e && e.status) || 500);
   } finally {
@@ -261,16 +289,20 @@ app.post('/api/voices/clone', auth.required, async (req, res) => {
   }
 });
 
-app.delete('/api/voices/clone', auth.required, async (req, res) => {
+app.delete('/api/voices/clone', auth.required, (req, res) => {
   try {
     const profile = config.load().voiceClone || {};
-    if (!profile.voiceId) {
-      return ok(res, { voiceClone: profile, deleted: false });
+    if (!profile.voiceId || !voiceClone.isConfigured(profile)) {
+      const cleared = voiceClone.emptyProfile();
+      config.save({ voiceClone: cleared });
+      return ok(res, { voiceClone: cleared, deleted: false });
     }
-    const result = await voiceClone.deleteVoice(profile.voiceId);
-    const cleared = { provider: 'elevenlabs', voiceId: '', name: '', createdAt: '', requiresVerification: false };
+    const result = voiceClone.validVoiceId(profile.voiceId)
+      ? voiceClone.deleteVoice(profile.voiceId)
+      : { deleted: false, alreadyMissing: true };
+    const cleared = voiceClone.emptyProfile();
     config.save({ voiceClone: cleared });
-    ok(res, { voiceClone: cleared, deleted: true, alreadyMissing: !!result.alreadyMissing });
+    ok(res, { voiceClone: cleared, deleted: true, alreadyMissing: !!result.alreadyMissing, localOnly: true });
   } catch (e) {
     fail(res, e, Number(e && e.status) || 500);
   }
