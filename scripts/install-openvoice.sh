@@ -68,6 +68,13 @@ if [ ! -f "$OPENVOICE_REPO/openvoice/api.py" ]; then
   git clone --depth 1 https://github.com/myshell-ai/OpenVoice.git "$OPENVOICE_REPO"
 fi
 
+# AfroSpeak utilise get_se(..., vad=True), qui passe par le VAD de
+# whisper-timestamped. faster-whisper ne sert qu’au découpage Whisper facultatif
+# d’OpenVoice et force l’installation de PyAV 10, fragile à compiler sur les
+# FFmpeg récents. On garde cet import paresseux pour éviter cette dépendance.
+say "Préparation des dépendances OpenVoice utilisées par AfroSpeak…"
+"$PYTHON" "$APP_ROOT/scripts/patch_openvoice_dependencies.py" "$OPENVOICE_REPO"
+
 say "Installation d’OpenVoice V2…"
 "$PYTHON" -m pip install -e "$OPENVOICE_REPO"
 say "Installation de MeloTTS (français)…"
