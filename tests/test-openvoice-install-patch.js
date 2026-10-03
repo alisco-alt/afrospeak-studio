@@ -61,6 +61,10 @@ try {
     installer.includes('myshell-ai/OpenVoiceV2/resolve/$OPENVOICE_MODEL_REVISION')
       && installer.includes('converter/checkpoint.pth')
       && !installer.includes('myshell-public-repo-host.s3.amazonaws.com/openvoice/checkpoints_v2_0417.zip'));
+  check('préserve pkg_resources pour librosa et ne retélécharge pas UniDic à chaque reprise',
+    installer.includes("'setuptools<82'")
+      && installer.includes('Dictionnaire UniDic déjà installé.')
+      && installer.includes('dicrc'));
 } catch (e) {
   ko++;
   console.error('  ✗ erreur du test : ' + (e.stack || e.message));

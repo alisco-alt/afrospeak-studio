@@ -43,8 +43,10 @@ fi
 PY_VERSION=$($PYTHON -c 'import sys; print("%d.%d" % sys.version_info[:2])')
 case "$PY_VERSION" in 3.9|3.10) ;; *) fail "Le Python configuré est en version $PY_VERSION ; Python 3.9 ou 3.10 est requis." ;; esac
 
-say "Mise à jour de pip…"
-"$PYTHON" -m pip install --upgrade pip setuptools wheel
+say "Mise à jour de pip et des outils de construction…"
+# Les dépendances historiques d'OpenVoice/MeloTTS importent pkg_resources,
+# retiré des versions récentes de setuptools (>= 82).
+"$PYTHON" -m pip install --upgrade pip 'setuptools<82' wheel
 
 TORCH_INDEX=${AFROSPEAK_OPENVOICE_TORCH_INDEX_URL:-}
 if [ -z "$TORCH_INDEX" ]; then
@@ -79,7 +81,20 @@ say "Installation d’OpenVoice V2…"
 "$PYTHON" -m pip install -e "$OPENVOICE_REPO"
 say "Installation de MeloTTS (français)…"
 "$PYTHON" -m pip install git+https://github.com/myshell-ai/MeloTTS.git
-"$PYTHON" -m unidic download
+UNIDIC_READY=$($PYTHON - <<'PY'
+import os
+try:
+    import unidic
+    print("yes" if os.path.isfile(os.path.join(unidic.DICDIR, "dicrc")) else "no")
+except Exception:
+    print("no")
+PY
+)
+if [ "$UNIDIC_READY" = yes ]; then
+  say "Dictionnaire UniDic déjà installé."
+else
+  "$PYTHON" -m unidic download
+fi
 
 # MeloTTS/OpenVoice utilise ponctuellement NLTK pour le prétraitement du texte.
 "$PYTHON" - <<'PY'
