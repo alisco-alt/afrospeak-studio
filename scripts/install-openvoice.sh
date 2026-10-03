@@ -11,9 +11,9 @@ export XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$OPENVOICE_HOME/cache"}
 export NLTK_DATA=${NLTK_DATA:-"$OPENVOICE_HOME/nltk_data"}
 OPENVOICE_REPO="$OPENVOICE_HOME/OpenVoice"
 CHECKPOINTS="$OPENVOICE_HOME/checkpoints_v2"
+OPENVOICE_MODEL_REVISION="fd981100305a0e4291f93a9ad169c6d9f7bed54a"
+OPENVOICE_MODEL_BASE="https://huggingface.co/myshell-ai/OpenVoiceV2/resolve/$OPENVOICE_MODEL_REVISION"
 rm -f "$OPENVOICE_HOME/.openvoice-ready"
-ZIP_FILE="$OPENVOICE_HOME/openvoice_checkpoints_v2.zip"
-CHECKPOINT_URL="https://myshell-public-repo-host.s3.amazonaws.com/openvoice/checkpoints_v2_0417.zip"
 
 say() { printf '%s\n' "$*"; }
 fail() { say "ERREUR OpenVoice : $*" >&2; exit 1; }
@@ -88,52 +88,34 @@ for resource in ("averaged_perceptron_tagger", "punkt"):
     nltk.download(resource, quiet=True)
 PY
 
-if [ ! -f "$CHECKPOINTS/converter/checkpoint.pth" ] || [ ! -f "$CHECKPOINTS/base_speakers/ses/fr.pth" ]; then
-  say "Téléchargement des poids officiels OpenVoice V2…"
-  curl -fL --retry 3 --connect-timeout 20 "$CHECKPOINT_URL" -o "$ZIP_FILE"
-  "$PYTHON" - "$ZIP_FILE" "$OPENVOICE_HOME" <<'PY'
-import os
-import sys
-import zipfile
-from pathlib import Path
+download_model_file() {
+  relative_path=$1
+  destination="$CHECKPOINTS/$relative_path"
+  if [ -s "$destination" ]; then return; fi
+  say "  → $relative_path"
+  mkdir -p "$(dirname "$destination")"
+  temporary="$destination.part"
+  rm -f "$temporary"
+  if ! curl -fL --retry 3 --connect-timeout 20 \
+      "$OPENVOICE_MODEL_BASE/$relative_path?download=true" -o "$temporary"; then
+    rm -f "$temporary"
+    fail "Téléchargement impossible depuis le dépôt officiel Hugging Face : $relative_path"
+  fi
+  [ -s "$temporary" ] || fail "Fichier de poids vide : $relative_path"
+  mv "$temporary" "$destination"
+}
 
-archive = Path(sys.argv[1])
-home = Path(sys.argv[2]).resolve()
-target_root = home / "checkpoints_v2"
-written = 0
-with zipfile.ZipFile(str(archive)) as zf:
-    for info in zf.infolist():
-        raw = info.filename.replace("\\", "/")
-        parts = [p for p in raw.split("/") if p not in ("", ".")]
-        if not parts or info.is_dir():
-            continue
-        if "checkpoints_v2" in parts:
-            parts = parts[parts.index("checkpoints_v2") + 1:]
-        elif parts[0] in ("base_speakers", "converter"):
-            pass
-        else:
-            continue
-        if not parts or any(p == ".." for p in parts):
-            continue
-        destination = (target_root / Path(*parts)).resolve()
-        if os.path.commonpath((str(target_root.resolve()), str(destination))) != str(target_root.resolve()):
-            continue
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with zf.open(info, "r") as source, destination.open("wb") as output:
-            while True:
-                block = source.read(1024 * 1024)
-                if not block:
-                    break
-                output.write(block)
-        written += 1
-print("Fichiers de poids extraits :", written)
-PY
-  rm -f "$ZIP_FILE"
-fi
+say "Téléchargement des poids V2 officiels depuis Hugging Face (révision $OPENVOICE_MODEL_REVISION)…"
+download_model_file "converter/config.json"
+download_model_file "converter/checkpoint.pth"
+# MeloTTS utilise ces embeddings source pour les langues disponibles dans le studio.
+for speaker in en-default es fr jp kr zh; do
+  download_model_file "base_speakers/ses/$speaker.pth"
+done
 
-[ -f "$CHECKPOINTS/converter/config.json" ] || fail "config.json du convertisseur absent après extraction des poids."
-[ -f "$CHECKPOINTS/converter/checkpoint.pth" ] || fail "checkpoint.pth du convertisseur absent après extraction des poids."
-[ -f "$CHECKPOINTS/base_speakers/ses/fr.pth" ] || fail "Embedding de la voix française fr.pth absent après extraction des poids."
+[ -s "$CHECKPOINTS/converter/config.json" ] || fail "config.json du convertisseur absent après téléchargement."
+[ -s "$CHECKPOINTS/converter/checkpoint.pth" ] || fail "checkpoint.pth du convertisseur absent après téléchargement."
+[ -s "$CHECKPOINTS/base_speakers/ses/fr.pth" ] || fail "Embedding de la voix française fr.pth absent après téléchargement."
 
 say "Vérification des imports et des fichiers de modèles…"
 "$PYTHON" - <<'PY'

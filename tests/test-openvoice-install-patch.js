@@ -56,6 +56,11 @@ try {
     second.status === 0
       && fs.readFileSync(path.join(repo, 'setup.py'), 'utf8') === setupAfterFirst
       && fs.readFileSync(path.join(sourceDir, 'se_extractor.py'), 'utf8') === extractorAfterFirst);
+  const installer = fs.readFileSync(path.resolve(__dirname, '../scripts/install-openvoice.sh'), 'utf8');
+  check('télécharge les poids officiels depuis une révision Hugging Face épinglée',
+    installer.includes('myshell-ai/OpenVoiceV2/resolve/$OPENVOICE_MODEL_REVISION')
+      && installer.includes('converter/checkpoint.pth')
+      && !installer.includes('myshell-public-repo-host.s3.amazonaws.com/openvoice/checkpoints_v2_0417.zip'));
 } catch (e) {
   ko++;
   console.error('  ✗ erreur du test : ' + (e.stack || e.message));
