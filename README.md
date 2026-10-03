@@ -198,6 +198,18 @@ Les archives longues sont automatiquement **découpées en extraits courts**
 
 Les timings alimentent à la fois les sous-titres incrustés et le fichier `.srt`.
 
+### Voix signature personnalisée
+
+Dans **Configuration → Votre voix signature**, ajoutez une clé API ElevenLabs,
+importez 1 à 2 minutes de parole propre (MP3 à 192 kb/s ou plus recommandé)
+et confirmez votre autorisation. Le clone devient automatiquement la voix des
+prochaines vidéos (y compris le pilote automatique) ; un aperçu audio peut être
+écouté avant la production.
+L’extrait source est traité en mémoire et n’est pas conservé par AfroSpeak
+Studio. Le clone est hébergé par ElevenLabs ; le bouton de suppression le retire
+également de ce compte. La disponibilité du clonage et de la synthèse dépend du
+compte et du quota ElevenLabs.
+
 ---
 
 ## 4️⃣ Incrustations et gestion des droits

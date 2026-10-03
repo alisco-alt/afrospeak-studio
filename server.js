@@ -45,6 +45,7 @@ const sources = require('./lib/sources');
 const scriptwriter = require('./lib/scriptwriter');
 const mediaLib = require('./lib/media');
 const tts = require('./lib/tts');
+const voiceClone = require('./lib/voiceClone');
 const pipeline = require('./lib/pipeline');
 const autopilot = require('./lib/autopilot');
 const social = require('./lib/social');
@@ -227,6 +228,54 @@ app.post('/api/config', wrap(async (req, res) => {
 
 app.get('/api/voices', wrap(async (req, res) => ok(res, { voices: await tts.listVoices() })));
 
+/* Clone personnel : l'extrait est envoyé en mémoire à ElevenLabs et n'est
+ * jamais écrit localement. L'accord explicite protège contre le clonage
+ * d'une voix tierce sans autorisation. */
+app.post('/api/voices/clone', auth.required, async (req, res) => {
+  let sample = null;
+  try {
+    const body = req.body || {};
+    if (body.consent !== true) {
+      return fail(res, Object.assign(new Error('Confirmez que cette voix est la vôtre ou que vous avez l’autorisation de la cloner.'), { status: 400 }), 400);
+    }
+    if (!config.keys().elevenlabs) {
+      return fail(res, Object.assign(new Error('Ajoutez d’abord votre clé API ElevenLabs dans Configuration.'), { status: 400 }), 400);
+    }
+    sample = voiceClone.decodeBase64Sample(body.audioBase64, body.mimeType, body.fileName);
+    // Libère tout de suite la grosse chaîne base64 ; le binaire ne sera gardé
+    // qu'en mémoire le temps de l'appel de clonage.
+    body.audioBase64 = '';
+    const profile = await voiceClone.cloneVoice({
+      name: body.name,
+      buffer: sample.buffer,
+      mimeType: sample.format.mime,
+      fileName: `sample${sample.format.ext}`,
+    });
+    config.save({ voiceClone: profile });
+    ok(res, { voiceClone: profile, defaultForFutureVideos: true });
+  } catch (e) {
+    fail(res, e, Number(e && e.status) || 500);
+  } finally {
+    if (sample && sample.buffer) sample.buffer.fill(0);
+    if (req.body && typeof req.body.audioBase64 === 'string') req.body.audioBase64 = '';
+  }
+});
+
+app.delete('/api/voices/clone', auth.required, async (req, res) => {
+  try {
+    const profile = config.load().voiceClone || {};
+    if (!profile.voiceId) {
+      return ok(res, { voiceClone: profile, deleted: false });
+    }
+    const result = await voiceClone.deleteVoice(profile.voiceId);
+    const cleared = { provider: 'elevenlabs', voiceId: '', name: '', createdAt: '', requiresVerification: false };
+    config.save({ voiceClone: cleared });
+    ok(res, { voiceClone: cleared, deleted: true, alreadyMissing: !!result.alreadyMissing });
+  } catch (e) {
+    fail(res, e, Number(e && e.status) || 500);
+  }
+});
+
 /* ------------------------------ Veille ------------------------------ */
 
 app.get('/api/news', wrap(async (req, res) => {
@@ -386,6 +435,7 @@ app.post('/api/script', wrap(async (req, res) => {
 app.post('/api/tts/preview', wrap(async (req, res) => {
   const v = await tts.speak(String(req.body.text || 'Bonjour, ici AfroSpeak.').slice(0, 600), {
     provider: req.body.provider || 'auto', lang: req.body.lang || 'fr', voiceId: req.body.voiceId,
+    lockVoice: req.body.lockVoice === true,
   });
   ok(res, { duration: v.duration, provider: v.provider, exact: v.exact, url: '/api/media/file?p=' + encodeURIComponent(v.file), words: v.words.slice(0, 40) });
 }));
