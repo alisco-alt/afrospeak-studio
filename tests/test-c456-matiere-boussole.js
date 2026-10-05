@@ -6,7 +6,7 @@
  * Sans réseau : assertions sur les fonctions pures et les sources. */
 const fs = require('fs');
 const path = require('path');
-const RACINE = '/home/user/afrospeak-studio';
+const RACINE = path.join(__dirname, '..');
 const sw = require(RACINE + '/lib/scriptwriter');
 
 let ok = 0, ko = 0;

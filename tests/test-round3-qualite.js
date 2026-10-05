@@ -96,13 +96,24 @@ console.log('— Q4 · punch d\'accroche sur le plan 0 —');
   const toile = ch => +ch.find(l => l.startsWith('scale=')).split(':')[0].slice(6);
   const w0 = toile(renderer.kenBurns({ index: 0, duration: 2 }, ctx));
   const w1 = toile(renderer.kenBurns({ index: 1, duration: 2 }, ctx));
-  check(`plan 0 plus zoomé que les autres (toile ${w0} > ${w1})`, w0 > w1);
-  check('amplitude ×1,6 exacte (0,06 → 0,096)', w0 === Math.round(1080 * 1.096 / 2) * 2);
+  check(`plan 0 plus zoomé que le plan 1 (toile ${w0} > ${w1})`, w0 > w1);
+  check('amplitude ×1,6 exacte sur plan 0 (0,06 → 0,096)', w0 === Math.round(1080 * 1.096 / 2) * 2);
+  /* ROUND 5 (audit montage) : l'amplitude VARIE par plan (cycle 1,05→1,18)
+   * au lieu d'être constante — plan 1 = base × 1,35 → 0,081. */
+  check('amplitude VARIEE par plan (plan 1 = base × 1,35 → 0,081)',
+    w1 === Math.round(1080 * 1.081 / 2) * 2);
+  check('planche d\'amplitude dans la bande 1,05 → 1,18 (plans 0-5)',
+    [0, 1, 2, 3, 4, 5].every(i => {
+      const w = toile(renderer.kenBurns({ index: i, duration: 2 }, ctx));
+      const amp = w / 1080 - 1;
+      return amp >= 0.0499 && amp <= 0.1801;
+    }));
   const wCap = toile(renderer.kenBurns({ index: 0, duration: 2 }, { ...ctx, style: { zoom: 0.2, hookPunch: true } }));
   check('plafond 14 % respecté (zoom 20 % → toile +14 %)', wCap === Math.round(1080 * 1.14 / 2) * 2);
   process.env.HOOK_PUNCH = '0';
   const wOff = toile(renderer.kenBurns({ index: 0, duration: 2 }, ctx));
-  check('HOOK_PUNCH=0 → plus de punch', wOff === w1);
+  check('HOOK_PUNCH=0 → plus de punch (plan 0 redevenu base × 1,0 = 6 %)',
+    wOff === Math.round(1080 * 1.06 / 2) * 2);
   delete process.env.HOOK_PUNCH;
   const wSansStyle = toile(renderer.kenBurns({ index: 0, duration: 2 }, { ...ctx, style: { zoom: 0.06 } }));
   check('sans hookPunch dans le style → punch quand même (défaut actif, convention progressBar)',
