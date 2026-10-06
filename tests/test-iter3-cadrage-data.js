@@ -173,13 +173,19 @@ const estVert = ([r, g, b]) => g > 150 && r < 90 && b < 90;
         !!cand && cand.presse === true);
       if (cand) {
         console.log('    → candidat : ' + cand.chaine + ' — ' + String(cand.titre).slice(0, 70));
-        /* Téléchargement d'un extrait muet (3 s) — le cœur du correctif D. */
+        /* Téléchargement d'un extrait muet (3 s) — le cœur du correctif D.
+         * La liste classée entière est tentée : la chaîne nationale en
+         * tête peut être non téléchargeable (PO token YouTube), le
+         * candidat suivant prend le relais. */
         try {
-          const got = await archivesVideo.telecharger(cand, { secondes: 3 });
+          const liste = await archivesVideo.chercherTop(
+            ['burkina raffinerie or'], { jours: 45, onLog: () => {} });
+          const got = await archivesVideo.telechargerMeilleur(liste, { secondes: 3 });
           check('extrait téléchargé et muté (piste audio retirée)',
-            fs.existsSync(got.file) && fs.statSync(got.file).size > 30000
+            !!got && fs.existsSync(got.file) && fs.statSync(got.file).size > 30000
             && !got.info.hasAudio);
-          check('crédit source présent', /Dailymotion|YouTube/.test(got.citation.source)
+          check('crédit source présent', !!got
+            && /Dailymotion|YouTube/.test(got.citation.source)
             && String(got.chaine).length > 1);
         } catch (e) {
           check('téléchargement de l’extrait (' + String(e.message).slice(0, 60) + ')', false);
