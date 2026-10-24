@@ -120,5 +120,51 @@ console.log('— demander le silence ne réveille aucun service —');
 check('tts accepte le fournisseur silence',
   typeof tts.speak === 'function' && tts.availableProviders().includes('silence'));
 
-console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
-process.exit(ko ? 1 : 0);
+/* ── 6 bis. Les chiffres parlés deviennent des cartes ─────────────── */
+console.log('— « sept cent mille barils » est une donnée —');
+const carte = n => scriptwriter.figureDepuisNarration(n);
+check('nombre écrit en toutes lettres → carte',
+  (carte('Le projet doit traiter sept cent mille barils de pétrole brut.') || {}).value === '700 000 barils');
+check('pourcentage écrit → carte',
+  (carte('Le Kenya détient soixante-dix pour cent du marché.') || {}).value === '70 pour cent');
+check('très grand montant compacté',
+  (carte('Un milliard de dollars pour le port.') || {}).value === '1 Mds $');
+check('un petit nombre sans unité ne fait pas une carte',
+  carte('Les deux pays négocient un monopole.') === null);
+
+/* ── 7. Les requêtes ne tournent plus en boucle sur 38 plans ────────── */
+console.log('— 38 plans, 38 recherches différentes —');
+(async () => {
+  const segs = Array.from({ length: 38 }, (_, i) => ({
+    index: i,
+    text: NARRATIONS[i % NARRATIONS.length],
+    narration: NARRATIONS[i % NARRATIONS.length],
+    visual: '',
+    queries: [],
+  }));
+  await mediaFetcher.buildQueries(segs, { topic: TOPIC, useLLM: false });
+  mediaFetcher.diversifier(segs, TOPIC);
+  const tetes = segs.map(x => (x.queries || [])[0] || '').filter(Boolean);
+  const distinctes = new Set(tetes.map(q => q.toLowerCase()));
+  check('chaque plan demande une scène distincte',
+    distinctes.size === tetes.length, `${distinctes.size}/${tetes.length}`);
+
+  /* La personne du SUJET n'ouvre plus un plan qui ne la nomme pas. */
+  console.log('— le milliardaire n’est pas le sujet de chaque phrase —');
+  check('mention réelle reconnue',
+    mediaFetcher.mentionnePersonne('Le Kenya négocie avec Aliko Dangote', 'Aliko Dangote') === true);
+  check('simple contexte non reconnu',
+    mediaFetcher.mentionnePersonne('Les pêcheurs craignent pour la mangrove', 'Aliko Dangote') === false);
+  const pecheurs = segs.find(x => /pêcheurs/.test(x.narration));
+  check('un plan sur les pêcheurs ne s’ouvre pas sur Dangote',
+    pecheurs && !/dangote/i.test(String((pecheurs.queries || [])[0] || '')),
+    pecheurs && (pecheurs.queries || [])[0]);
+
+  /* Aucune requête française : les banques d'images répondent en anglais. */
+  const francaises = tetes.filter(q => /\b(craignent|accorde|pêcheurs|ministre|redoutent)\b/i.test(q));
+  check('aucune phrase française envoyée au moteur d’images',
+    francaises.length === 0, JSON.stringify(francaises.slice(0, 3)));
+
+  console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
+  process.exit(ko ? 1 : 0);
+})();
