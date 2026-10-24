@@ -121,6 +121,8 @@ ${c.b}PRODUCTION${c.r}
   --quality <q>            draft | high | max                 (défaut: high)
   --voice <p>              auto | elevenlabs | openai | google
   --captions <m>           karaoke | word | phrase | none
+  --review                 Pause de validation des médias avant montage
+                           (désactivée en CLI : pilote automatique)
 
 ${c.b}MÉDIAS & RÉSEAUX SOCIAUX${c.r}
   --social                 Active le scraping réseaux/archives
@@ -274,11 +276,21 @@ function briefFromArgs(a, topic) {
     socialAccounts: accounts,
     music: a.music !== 'false' && a['no-music'] !== true,
     sourceUrls: typeof a.url === 'string' ? [a.url] : [],
+    /* La validation des médias est un point d'arrêt d'INTERFACE. En CLI,
+     * elle laissait le studio sans vidéo : le pipeline s'arrêtait en
+     * `awaiting_review`, personne ne pouvait approuver, et la commande
+     * affichait malgré tout « Vidéo prête ». `--review` la réactive pour
+     * un rendu supervisé. */
+    review: a.review === true,
   };
 }
 
 /** Produit une vidéo et affiche la progression en direct. */
 async function produce(brief) {
+  /* Le point d'arrêt de validation est piloté par l'interface. En ligne de
+   * commande, « pilote automatique » veut dire : on monte. `--review`
+   * rétablit la pause pour un rendu supervisé. */
+  process.env.MEDIA_REVIEW = brief.review ? '1' : '0';
   const proj = pipeline.createProject(brief);
   say.kv('Projet', proj.id);
   say.kv('Sujet', `${c.b}${brief.topic}${c.r}`);
@@ -311,6 +323,28 @@ async function produce(brief) {
     clearInterval(iv); render();
     if (process.stdout.isTTY) process.stdout.write('\n');
     const done = pipeline.loadProject(proj.id);
+
+    /* ── LE PIPELINE NE LÈVE JAMAIS : IL CONSIGNE ────────────────────
+     * `run()` capture volontairement ses erreurs et les écrit dans le
+     * projet (`status: 'error'`, `error: ...`). L'interface web le sait
+     * (elle teste `p.result`) ; la CLI, non : elle annonçait
+     * « Vidéo prête » puis plantait sur `done.result.video` —
+     * « Cannot read properties of null ». Constaté sur un run réel sans
+     * réseau. On lit donc le statut AVANT de parler de succès. */
+    if (!done || done.status !== 'done' || !done.result) {
+      console.log();
+      if (done && done.status === 'awaiting_review') {
+        say.warn('Validation des médias en attente — aucune vidéo montée.');
+        say.info('Approuvez dans l’interface (node index.js --serve), ou relancez sans --review.');
+      } else if (done && done.status === 'cancelled') {
+        say.warn('Production annulée.');
+      } else {
+        say.err('Production en échec : ' + ((done && done.error) || 'résultat absent'));
+        process.exitCode = 1;
+      }
+      return null;
+    }
+
     console.log();
     say.ok(`${c.b}${c.green}Vidéo prête${c.r}`);
     say.kv('Titre', done.script.title);
