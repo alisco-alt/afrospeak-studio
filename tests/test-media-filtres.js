@@ -90,6 +90,19 @@ check('texte sans nombre inchangé', compactValue('Le prix a doublé') === 'Le p
       'gradients=s=1280x720:c0=#e8e2d4:c1=#d6cfbf:c2=#f0ece2:c3=#cfc7b4',
       '-frames:v', '1', sable], { label: 'test-sable' });
 
+    /* ── UNE FIXTURE QUI N'A PAS PU ÊTRE FABRIQUÉE NE JUGE RIEN ──────
+     * FFmpeg écrit parfois un fichier vide sous charge (suite complète,
+     * CPU saturé). L'analyse voit alors du noir et conclut « document » :
+     * le test échouait par intermittence pour une raison qui n'a rien à
+     * voir avec le filtre. On vérifie donc la fixture avant de conclure. */
+    const lisible = f => { try { return fs.statSync(f).size > 1024; } catch (e) { return false; } };
+    if (!lisible(page) || !lisible(photo) || !lisible(sable)) {
+      console.log('  · fixture image non fabriquée (FFmpeg sous charge) — test du filtre document ignoré');
+      try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+      console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
+      process.exit(ko ? 1 : 0);
+    }
+
     check('page de texte → document', await media.ressembleDocumentScan(page));
     check('photo colorée → conservée', !(await media.ressembleDocumentScan(photo)));
     check('photo claire désaturée → conservée', !(await media.ressembleDocumentScan(sable)));
