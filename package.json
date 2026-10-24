@@ -12,7 +12,9 @@
     "doctor": "node index.js --doctor",
     "auto": "node index.js --auto",
     "watch": "node index.js --watch",
-    "cles": "node scripts/configurer-cles.js"
+    "cles": "node scripts/configurer-cles.js",
+    "test": "node tests/run-tests.js",
+    "test:moteur": "node tests/run-tests.js"
   },
   "keywords": [
     "video",
