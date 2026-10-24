@@ -158,6 +158,8 @@ trompaient chaque nouvel intervenant. **−1 087 lignes, −139 Ko.**
 | `voiceClone`, `ambiance`, `biblio` appelés mais jamais commités | `Cannot find module './voiceClone'` au démarrage | modules écrits (contrat exact du pipeline) |
 | Ambiance générée puis **jetée** | `ctx.ambienceFile` n'était lu nulle part | branchée dans `renderer.buildAudio` (vérifié : −91 dB → −17 dB sur un mix sans voix) |
 | Bibliothèque locale jamais alimentée | aucun écrivain d'index | `media.download()` indexe chaque média validé ; score vérifié (0,4 / 0 sur hors-sujet) |
+| `craft/agent_monteur` appelé à deux endroits, **module jamais livré** | `Cannot find module './craft/agent_monteur'` à **chaque** production (bruit dans les journaux) ; sa sortie `shot.edit` n'était lue par aucun moteur de rendu | appels retirés ; la direction de montage reste assurée par `agentMonteur` |
+| `numfix.js` appelé, **module jamais livré** | `compactValue()` absent → les cartes chiffrées affichaient « soixante-dix pour cent » au lieu de « 70 % » — contraire à l'effet recherché | module écrit et testé (nombres en lettres → 70 %, 2,6 MDS $, 120 000) |
 | `-t 0.000` = « pas de limite » pour FFmpeg | **19 Go** écrits sur un script d'un seul plan, puis `No space left on device` | le clip est pris tel quel quand `audioStart = 0` |
 | CLI annonçait « Vidéo prête » après un échec | `run()` ne lève pas, il consigne ; la CLI ne lisait pas `status` | statut lu avant d'annoncer quoi que ce soit |
 | La CLI s'arrêtait en `awaiting_review` sans personne pour approuver | `MEDIA_REVIEW=1` par défaut, y compris en CLI | `--review` explicite ; le mode CLI reste automatique |
@@ -173,6 +175,7 @@ trompaient chaque nouvel intervenant. **−1 087 lignes, −139 Ko.**
 | 3 | Fondre `social-phase1-additions` dans `social.js` | −1 fichier, −679 l. de surface | faible |
 | 4 | Dédupliquer `assTime` (captions ↔ overlays) | −10 l., une seule vérité ASS | nul |
 | 5 | Consolider les **33 documents `.md`** de la racine en un `ETAT.md` + archive | 33 → 3 fichiers ; fin des docs contradictoires | nul |
+| 5 bis | Vérifier en CI qu'aucun `require()` ne pointe vers un fichier absent | aurait évité les **5 modules fantômes** de la branche du 24/10 | nul |
 | 6 | Purger les exports jamais appelés (190) | surface réduite, moins de faux chemins | faible, à faire après 1 |
 | 7 | Trancher `package-lock.json` (suivi git **et** dans `.gitignore`) | builds reproductibles | nul |
 
@@ -191,3 +194,24 @@ jeter des fournisseurs.
 | Ont-ils ajouté de l'inutile ? | **Partiellement.** 3 modules manquants, 1 fonctionnalité non branchée (ambiance), 1 fichier JS mort, 3 images de debug, des dizaines d'exports orphelins. |
 | Ont-ils cassé quelque chose ? | **Oui, une fois** : la branche du 24/10 ne démarrait plus (`Cannot find module`). Réparé ici. |
 | Le code a-t-il de la valeur ? | **Oui, très majoritairement.** Le moteur tient debout et produit ; le problème est la maintenance, pas l'utilité. |
+
+
+---
+
+## 7. Validation de bout en bout (exécutée)
+
+Faute de réseau dans l'environnement d'analyse, la chaîne a été validée avec
+une voix de remplacement (`--voice silence`) et le repli visuel du studio :
+
+```
+Script fourni (3 phrases) → 1 plan de narration → timeline 5 plans
+  → voix (repli silencieux, timings mesurés) → visuels (repli éditorial)
+  → audio (mix + ambiance) → sous-titres ASS → rendu
+Résultat : output/le-cacao-ivoirien_3e2e84.mp4
+           1080×1920 · 9,77 s · 693 Ko · + .srt + miniature + _youtube.txt
+```
+
+**La branche produit donc bien une vidéo complète après réparation.** Les sept
+suites de tests passent (160 assertions), le serveur démarre, les trois modules
+manquants existent, et les deux fonctionnalités qui étaient générées sans être
+utilisées (ambiance, bibliothèque) sont désormais branchées.
