@@ -1,0 +1,78 @@
+{
+  "id": "afrospeak-voice",
+  "title": "AfroSpeak — la tech, dans ta langue",
+  "fps": 30,
+  "durationInFrames": 330,
+  "sources": [
+    {
+      "label": "Concept",
+      "value": "1 notion tech = 1 scène jouée par la mascotte, dans la langue du public"
+    },
+    {
+      "label": "Langues du bandeau",
+      "value": "WO · BM · FR · EN · SW · HA · YO · LN · PT"
+    }
+  ],
+  "cam": [
+    {
+      "at": 0,
+      "z": 1.2,
+      "x": 2.1,
+      "y": 1.9
+    },
+    {
+      "at": 78,
+      "z": 1.05,
+      "x": -1.0,
+      "y": 0
+    },
+    {
+      "at": 168,
+      "z": 1.14,
+      "x": 3.1,
+      "y": -2.8
+    },
+    {
+      "at": 250,
+      "z": 1.0,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "at": 329,
+      "z": 0.92,
+      "x": 0,
+      "y": 2.4
+    }
+  ],
+  "beats": [
+    {
+      "at": 0,
+      "name": "HOOK — la cabine",
+      "vo": "Une notion tech. Une langue. Une voix.",
+      "sfx": "room tone + clic micro",
+      "action": "Cabine voix, micro sur pied, Samba en think. Titre « LA TECH, DANS TA LANGUE », waveform."
+    },
+    {
+      "at": 84,
+      "name": "LA VOIX — la mascotte parle",
+      "vo": "Ici, on ne lit pas des slides : on joue les concepts. Et on les joue en wolof, en bambara, en swahili…",
+      "sfx": "voix + ondes",
+      "action": "Samba speak (bouche animée), anneaux sonores, waveform pleine échelle, marquee des langues."
+    },
+    {
+      "at": 186,
+      "name": "LE SYSTÈME — design system",
+      "vo": "Même design system, même mascotte, deux formats : vertical pour les réseaux, horizontal pour YouTube.",
+      "sfx": "ui clicks + whoosh",
+      "action": "Panneaux UI : compteur langues, chips formats 16:9/9:16/1:1, graphe couverture."
+    },
+    {
+      "at": 252,
+      "name": "OUTRO — branding",
+      "vo": "AfroSpeak. Abonne-toi : un concept par jour, dans ta langue.",
+      "sfx": "sting + logo",
+      "action": "Logo lockup, mascotte cheer, waveform qui se referme."
+    }
+  ]
+}
