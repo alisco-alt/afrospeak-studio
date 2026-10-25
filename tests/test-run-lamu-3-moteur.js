@@ -29,19 +29,38 @@ const check = (nom, cond, detail) => {
 
 /* ── 1. `exclude` est un Set, quelle que soit la forme reçue ────────── */
 console.log('— l’agent monteur remplace enfin ses doublons —');
-/* On ne télécharge rien : on vérifie que `acquire` accepte les deux
- * formes sans lever, ce qui était le point de rupture. Aucun fournisseur
- * n'étant configuré ici, la fonction rend simplement null. */
+/* On n'interroge AUCUN réseau : un faux fournisseur rend deux candidats
+ * déjà présents dans les exclusions. La boucle de `acquire` appelle donc
+ * `exclude.has(...)` — exactement la ligne qui levait
+ * « exclude.has is not a function » quand l'appelant passait un tableau.
+ * Aucun téléchargement n'est tenté : les deux candidats sont écartés. */
 (async () => {
-  let leve = false;
-  try { await media.acquire(['kenya refinery'], { exclude: ['a.jpg'], tries: 1 }); }
-  catch (e) { leve = /exclude\.has/.test(e.message); }
-  check('un tableau d’exclusions ne casse plus acquire', leve === false);
+  const fauxCandidats = [
+    { url: 'https://exemple.test/deja-vu.jpg', provider: 'faux', width: 2000, height: 1500 },
+    { url: 'https://exemple.test/deja-vu-2.jpg', provider: 'faux', width: 2000, height: 1500 },
+  ];
+  media.PROVIDERS.__test = async () => fauxCandidats;
 
-  let leve2 = false;
-  try { await media.acquire(['kenya refinery'], { exclude: new Set(['a.jpg']), tries: 1 }); }
-  catch (e) { leve2 = /exclude\.has/.test(e.message); }
-  check('un Set d’exclusions continue de fonctionner', leve2 === false);
+  const essai = async (exclude) => {
+    try {
+      const r = await media.acquire(['kenya refinery'], {
+        exclude, tries: 1, providers: ['__test'], download: false,
+      });
+      return { leve: false, resultat: r };
+    } catch (e) {
+      return { leve: /exclude\.has/.test(e.message), erreur: e.message };
+    }
+  };
+
+  const tab = await essai(['https://exemple.test/deja-vu.jpg']);
+  check('un tableau d’exclusions ne casse plus acquire', tab.leve === false, tab.erreur);
+  check('les candidats déjà exclus ne sont pas téléchargés', tab.resultat === null);
+
+  const set = await essai(new Set(['https://exemple.test/deja-vu.jpg']));
+  check('un Set d’exclusions continue de fonctionner', set.leve === false, set.erreur);
+  check('les deux candidats exclus rendent null', set.resultat === null);
+
+  delete media.PROVIDERS.__test;
 
   /* ── 2. La piste d'ambiance se génère ─────────────────────────────── */
   console.log('— l’ambiance n’est plus jetée par une option mal nommée —');

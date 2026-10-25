@@ -6,7 +6,12 @@
  * Sans réseau : assertions sur les fonctions pures et les sources. */
 const fs = require('fs');
 const path = require('path');
-const RACINE = '/home/user/afrospeak-studio';
+/* ── LA RACINE SE DÉDUIT DU FICHIER, ELLE NE SE DEVINE PAS ───────────
+ * Ce test portait un chemin absolu de machine de développement. Il ne
+ * passait que sur CETTE machine-là : partout ailleurs, il échouait sur
+ * « Cannot find module …/lib/scriptwriter » avant d'avoir vérifié quoi
+ * que ce soit. Un test doit tourner depuis n'importe quel clone. */
+const RACINE = path.resolve(__dirname, '..');
 const sw = require(RACINE + '/lib/scriptwriter');
 
 let ok = 0, ko = 0;
