@@ -108,7 +108,26 @@ Si cette ligne affiche `AfroWriter (repli local, aucun LLM)`, la clé n'a pas
 | `lib/overlays.js` | Incrustations : crédits, titres, cartes chiffres, lower-thirds |
 | `lib/music.js` | Lit musical généré (aucun droit) |
 | `lib/autopilot.js` | Production en continu |
+| `lib/motion3d/` | **Moteur 3D** — scènes, mascotte Kanu, rastériseur, habillage : [MOTEUR-3D.md](MOTEUR-3D.md) |
 | `server.js` | API REST + SSE + interface web |
+
+---
+
+## 🎬 Moteur 3D (nouveau)
+
+Le studio sait désormais produire des **scènes 3D animées** avec un
+personnage récurrent — sans GPU, sans crédit, sans photo stock. Un plan est
+une fonction du temps, écrite en JavaScript : reproductible au bit près,
+rééditable, et déclinable en 9:16 comme en 16:9 depuis la même source.
+
+```bash
+node scripts/motion3d.js --still  --scene hook --format vertical --t 6.6
+node scripts/motion3d.js --scene hook --format both --fps 30   # 9:16 + 16:9
+node tests/test-motion3d.js                                    # 51 assertions
+```
+
+→ Recommandation technique, mesures de coût, POC de 12,6 s et liste des
+modules à ajouter : **[MOTEUR-3D.md](MOTEUR-3D.md)**.
 
 ---
 
