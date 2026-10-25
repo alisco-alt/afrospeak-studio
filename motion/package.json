@@ -1,0 +1,22 @@
+{
+  "name": "afrospeak-motion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Moteur motion design 2.5D d'AfroSpeak Studio (Remotion self-hosted, zéro crédit payant)",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts",
+    "qa": "node tools/qa-frames.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.538",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "remotion": "^4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  }
+}

@@ -698,9 +698,47 @@ async function bootstrap() {
     ? '  ║   ⚠ AFROSPEAK_THREADS bride FFmpeg à ' + ffThreads + '/' + nCores + ' cœurs — retire cette variable du .env'
     : null;
 
-  app.listen(PORT, '0.0.0.0', () => {
+  /* ── UN PORT DÉJÀ PRIS N'EST PAS UNE PANNE, C'EST UNE ADRESSE ───────
+   * Constaté chez l'utilisateur : une instance précédente tournait encore
+   * sur 7860, `npm start` a rendu
+   *   « [FATAL] uncaughtException: listen EADDRINUSE … 0.0.0.0:7860 »
+   * suivi d'une pile d'appels, PUIS le préchauffage DNS a continué. Le
+   * serveur n'écoutait nulle part et le processus faisait semblant de
+   * vivre : impossible de savoir s'il fallait ouvrir le navigateur.
+   *
+   * `listen` n'avait aucun gestionnaire d'erreur : EADDRINUSE remontait
+   * donc jusqu'au `uncaughtException` global, dont le rôle est justement
+   * de ne jamais arrêter le studio.
+   * Désormais : on essaie le port suivant (jusqu'à +10) en le DISANT, et
+   * si aucun n'est libre, on explique quoi faire et on sort en erreur. */
+  let _port = Number(PORT) || 7860;
+  let _essais = 0;
+  const demarrer = () => {
+    const serveur = app.listen(_port, '0.0.0.0', () => afficherBanniere(_port));
+    serveur.on('error', (e) => {
+      if (e.code !== 'EADDRINUSE') {
+        console.error('Démarrage impossible :', e.message);
+        process.exit(1);
+      }
+      if (_essais === 0) {
+        console.log(`\n  Le port ${_port} est déjà utilisé — une instance du studio tourne `
+          + 'peut-être encore. On essaie le port suivant…');
+      }
+      _essais++;
+      if (_essais > 10) {
+        console.error(`\n  Aucun port libre entre ${PORT} et ${Number(PORT) + 10}.`
+          + '\n  Arrêtez l’instance existante  : fuser -k ' + PORT + '/tcp'
+          + '\n  ou choisissez un port       : node index.js --serve --port 8000\n');
+        process.exit(1);
+      }
+      _port++;
+      demarrer();
+    });
+  };
+
+  const afficherBanniere = (port) => {
     const l = [
-      `  ║   AfroSpeak Studio  ▸  http://localhost:${PORT}`,
+      `  ║   AfroSpeak Studio  ▸  http://localhost:${port}`,
       `  ║   Base    : ${dbState.mode === 'neon' ? 'Neon Postgres' : 'locale (JSON)'}`,
       `  ║   Stockage: ${stState.mode === 's3' ? 'objet S3/R2' : 'disque local (éphémère)'}`,
       ligneLLM,
@@ -712,7 +750,9 @@ async function bootstrap() {
     l.forEach(x => console.log(x));
     console.log('  ╚' + '═'.repeat(52) + '╝\n');
     autopilot.bootIfEnabled();
-  });
+  };
+
+  demarrer();
 }
 
 bootstrap().catch(e => {

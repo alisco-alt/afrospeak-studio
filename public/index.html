@@ -529,6 +529,30 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
   display:grid;place-items:center;flex-shrink:0;transition:all var(--t-fast)}
 .x:hover{background:var(--surface-3);color:var(--txt)}
 
+
+/* ── Motion Design (plans 2.5D) ── */
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1240px){.g2{grid-template-columns:1fr}}
+.mshot{padding:18px}
+.mshot h4{font-size:15px;font-weight:800;margin:0 0 6px}
+.mshot .beats{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.mbeat{display:flex;gap:8px;font-size:11.5px;color:var(--txt-2)}
+.mbeat b{color:var(--gold);font-variant-numeric:tabular-nums;min-width:52px}
+.mfmts{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.mfmt{padding:6px 10px;border:1px solid var(--line-2);border-radius:8px;font-size:11px;cursor:pointer;color:var(--txt-2);user-select:none}
+.mfmt.on{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+.mrow{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line-1);font-size:12.5px;flex-wrap:wrap}
+.mrow:last-child{border-bottom:none}
+.mbar{height:6px;background:var(--bg-elev);border-radius:99px;overflow:hidden;flex:1;min-width:120px}
+.mbar i{display:block;height:100%;background:linear-gradient(90deg,#F5A623,#FF8C1A);width:0%}
+.mstat{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:99px}
+.mstat.done{background:rgba(0,196,106,.14);color:#4ce09a}
+.mstat.running{background:var(--gold-soft);color:var(--gold)}
+.mstat.error,.mstat.cancelled{background:rgba(255,90,101,.14);color:#ff9ba3}
+.mstat.queued{background:var(--bg-elev);color:var(--txt-3)}
+.mtpl{display:inline-block;vertical-align:2px;margin-left:8px;padding:3px 9px;border-radius:99px;font-size:9.5px;font-weight:900;letter-spacing:1.4px}
+.mtpl-explainer{background:rgba(255,176,32,.16);color:#ffb020;border:1px solid rgba(255,176,32,.4)}
+.mtpl-cinematic{background:rgba(217,205,178,.14);color:#d9cdb2;border:1px solid rgba(217,205,178,.4)}
 </style>
 </head>
 <body>
@@ -547,6 +571,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
 
     <div class="navlbl">Créer</div>
     <div class="nav on" data-p="studio"><span class="ico">✦</span> Studio</div>
+    <div class="nav" data-p="motion"><span class="ico">◭</span> Motion</div>
     <div class="nav" data-p="dash"><span class="ico">▤</span> Tableau de bord
       <span class="badge" id="badgeActive" style="display:none">0</span></div>
     <div class="nav" data-p="library"><span class="ico">▶</span> Ma bibliothèque</div>
@@ -782,6 +807,20 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
         </div>
         <div class="trend-scroll" id="histScroll" style="display:none"></div>
       </div>
+    </section>
+
+    <!-- ═══ TABLEAU DE BORD ═══ -->
+
+    <!-- ═══ MOTION DESIGN ═══ -->
+    <section class="page" id="p-motion">
+      <div class="head">
+        <div><h1>Motion <span class="grad">design</span></h1>
+          <p class="sub">Plans 100 % animés — mascotte, décors 2.5D et UI premium — rendus par le moteur auto-hébergé. Zéro crédit payant.</p></div>
+        <button class="btn ghost" onclick="renderMotion()">↻ Rafraîchir</button>
+      </div>
+      <div class="card" style="margin-bottom:16px"><div id="motionCap"></div></div>
+      <div class="grid g2" id="motionShots" style="margin-bottom:16px"></div>
+      <div class="card"><h3>Rendus motion <span class="cnt" id="motionCount">0</span></h3><div id="motionRenders"></div></div>
     </section>
 
     <!-- ═══ TABLEAU DE BORD ═══ -->
@@ -1220,6 +1259,7 @@ function go(page){
   $$('.page').forEach(function(p){ p.classList.toggle('on', p.id === 'p-'+page); });
   window.scrollTo({ top:0, behavior:'smooth' });
   if(page === 'dash') renderDash();
+  if(page === 'motion') renderMotion();
 }
 window.go = go;
 $$('.nav').forEach(function(n){
@@ -2087,6 +2127,102 @@ setInterval(function(){
     });
   });
 }, 8000);
+
+/* ══════════ §M · MOTION DESIGN ══════════
+ * Pilote le moteur 2.5D (motion/) via l'API /api/motion/* :
+ * capacité machine, scripts de plan JSON, rendus multi-format + voix off.
+ * Le polling réutilise la même philosophie que le tableau de bord. */
+var MOTION = { shots: [], cap: null, poll: null };
+
+function renderMotion(){
+  apiTry('/api/motion/shots').then(function(j){
+    if(!j){
+      $('#motionCap').innerHTML = '<div class="empty"><div class="big">◭</div><p>Moteur motion injoignable — le backend tourne-t-il ?</p></div>';
+      $('#motionShots').innerHTML = '';
+      return;
+    }
+    MOTION.shots = j.shots || []; MOTION.cap = j.capacite;
+    var c = MOTION.cap;
+    $('#motionCap').innerHTML = '<div style="font-size:12.5px;line-height:1.7;padding:4px 2px">' + (c.ok
+      ? '<b style="color:#4ce09a">● Prêt à rendre</b> — mode <b>' + esc(c.mode) + '</b> · RAM disponible ' + c.memoireDispoMo + ' Mo · formats ' + esc((c.formats||[]).map(function(f){return f.suffix}).join(', '))
+      : '<b style="color:#ff9ba3">● Rendu indisponible sur cette machine</b> — mode ' + esc(c.mode) +
+        (c.raisons && c.raisons.length ? ' : ' + esc(c.raisons.join(' ; ')) : '') +
+        '<br><small style="color:var(--txt-3)">Solutions sans coût : installer le moteur sur une machine ≥ 2 Go de RAM (npm install dans motion/), ou déclarer MOTION_WORKER_URL vers une autre instance du studio. Voir MOTION-INTEGRATION.md.</small>') +
+      '</div>';
+    $('#motionShots').innerHTML = MOTION.shots.map(function(s){
+      var shot = s.shot || {};
+      var beats = (shot.beats || []).map(function(b){
+        return '<div class="mbeat"><b>' + fmtDur((b.at || 0) / (shot.fps || 30)) + '</b><span>' + esc(b.name || '') + '</span></div>';
+      }).join('');
+      var invalide = (s.erreurs || []).length;
+      return '<div class="card mshot">' +
+        '<h4>' + esc(shot.title || s.id) +
+          ' <span class="mtpl mtpl-' + esc(String(shot.template || '?')) + '" title="Registre du plan">' + esc(String(shot.template || '?').toUpperCase()) + '</span></h4>' +
+        '<div style="font-size:11px;color:var(--txt-3)">' + ((shot.durationInFrames || 0) / (shot.fps || 30)).toFixed(1) + ' s · ' + (shot.beats || []).length + ' beats · ' + (shot.sources || []).length + ' sources vérifiables' +
+          (shot.music === 'tension' ? ' · <span style="color:#78f0ff">musique tendue (procédurale)</span>' : '') + '</div>' +
+        '<div class="beats">' + beats + '</div>' +
+        '<div class="mfmts" data-shot="' + esc(s.id) + '">' +
+          '<span class="mfmt on" data-f="16x9">Horizontal 16:9</span>' +
+          '<span class="mfmt on" data-f="9x16">Vertical 9:16</span>' +
+          '<span class="mfmt on" data-f="voix">Voix off (TTS gratuit)</span>' +
+        '</div>' +
+        (invalide
+          ? '<div style="color:#ff9ba3;font-size:11px">Plan invalide : ' + esc(s.erreurs.join(' ; ')) + '</div>'
+          : '<button class="btn pri sm blk" ' + (c.ok ? '' : 'disabled') + ' onclick="motionLancer(\'' + esc(s.id) + '\')">◆ Lancer le rendu</button>') +
+        '</div>';
+    }).join('');
+    $$('#motionShots .mfmt').forEach(function(el){
+      el.addEventListener('click', function(){ el.classList.toggle('on'); });
+    });
+    motionPoll(true);
+  });
+}
+
+function motionChoix(shotId){
+  var box = document.querySelector('.mfmts[data-shot="' + shotId + '"]');
+  if(!box) return { formats: ['16x9', '9x16'], voix: true };
+  var f = [];
+  if(box.querySelector('.mfmt[data-f="16x9"]').classList.contains('on')) f.push('16x9');
+  if(box.querySelector('.mfmt[data-f="9x16"]').classList.contains('on')) f.push('9x16');
+  return { formats: f.length ? f : ['16x9'], voix: box.querySelector('.mfmt[data-f="voix"]').classList.contains('on') };
+}
+
+function motionLancer(shotId){
+  var choix = motionChoix(shotId);
+  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix }) };
+  if (BACKEND_URL) o.credentials = 'include';
+  if (TOKEN) o.headers.authorization = 'Bearer ' + TOKEN;
+  fetch(apiUrl('/api/motion/renders'), o)
+    .then(function(r){ return r.json().catch(function(){ return { ok: false, error: 'Réponse illisible' }; }); })
+    .then(function(j){
+      if(j && j.ok){ toast('Rendu motion mis en file.'); motionPoll(true); }
+      else toast((j && j.error) || 'Lancement refusé.', 'err');
+    })
+    .catch(function(){ toast('Backend injoignable.', 'err'); });
+}
+
+function motionPoll(force){
+  apiTry('/api/motion/renders?limit=12').then(function(j){
+    var rows = (j && j.rendus) || [];
+    $('#motionCount').textContent = rows.length;
+    $('#motionRenders').innerHTML = rows.length ? rows.map(function(r){
+      var lien = r.video_url ? '<a class="btn xs ghost" href="' + esc(r.video_url) + '" target="_blank">▶ voir</a>' : '';
+      var srt = r.srt_url ? '<a class="btn xs ghost" href="' + esc(r.srt_url) + '" download>.srt</a>' : '';
+      return '<div class="mrow">' +
+        '<span class="mstat ' + esc(r.status) + '">' + esc(r.status) + '</span>' +
+        '<b style="min-width:150px">' + esc(r.topic || r.id) + '</b>' +
+        '<span style="color:var(--txt-3);font-size:11px">' + esc((r.formats || []).join(' + ')) + (r.voix ? ' · VO' : '') + '</span>' +
+        '<div class="mbar"><i style="width:' + Math.round((r.progress || 0) * 100) + '%"></i></div>' +
+        '<span style="font-size:11px;color:var(--txt-3);min-width:110px;text-align:right">' + esc(r.step || '') + '</span>' + lien + srt +
+        '</div>';
+    }).join('') : '<div class="empty"><div class="big">◭</div><p>Aucun rendu motion pour l'instant — lancez un plan ci-dessus.</p></div>';
+    var actif = rows.some(function(r){ return r.status === 'queued' || r.status === 'running'; });
+    clearTimeout(MOTION.poll);
+    if(actif || force) MOTION.poll = setTimeout(function(){ motionPoll(false); }, 4000);
+  });
+}
+window.renderMotion = renderMotion;
+window.motionLancer = motionLancer;
 </script>
 </body>
 </html>
