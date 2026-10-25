@@ -550,6 +550,9 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
 .mstat.running{background:var(--gold-soft);color:var(--gold)}
 .mstat.error,.mstat.cancelled{background:rgba(255,90,101,.14);color:#ff9ba3}
 .mstat.queued{background:var(--bg-elev);color:var(--txt-3)}
+.mtpl{display:inline-block;vertical-align:2px;margin-left:8px;padding:3px 9px;border-radius:99px;font-size:9.5px;font-weight:900;letter-spacing:1.4px}
+.mtpl-explainer{background:rgba(255,176,32,.16);color:#ffb020;border:1px solid rgba(255,176,32,.4)}
+.mtpl-cinematic{background:rgba(217,205,178,.14);color:#d9cdb2;border:1px solid rgba(217,205,178,.4)}
 </style>
 </head>
 <body>
@@ -2153,7 +2156,8 @@ function renderMotion(){
       }).join('');
       var invalide = (s.erreurs || []).length;
       return '<div class="card mshot">' +
-        '<h4>' + esc(shot.title || s.id) + '</h4>' +
+        '<h4>' + esc(shot.title || s.id) +
+          ' <span class="mtpl mtpl-' + esc(String(shot.template || '?')) + '" title="Registre du plan">' + esc(String(shot.template || '?').toUpperCase()) + '</span></h4>' +
         '<div style="font-size:11px;color:var(--txt-3)">' + ((shot.durationInFrames || 0) / (shot.fps || 30)).toFixed(1) + ' s · ' + (shot.beats || []).length + ' beats · ' + (shot.sources || []).length + ' sources vérifiables</div>' +
         '<div class="beats">' + beats + '</div>' +
         '<div class="mfmts" data-shot="' + esc(s.id) + '">' +

@@ -1,42 +1,47 @@
 import React from 'react';
 import { Composition } from 'remotion';
-import { ShotPhp2Shell } from './shots/ShotPhp2Shell';
-import { ShotAfroSpeak } from './shots/ShotAfroSpeak';
-import { SHOTS } from './data/shots';
+import { Explainer } from './templates/Explainer';
+import { Cinematic } from './templates/Cinematic';
+import type { ShotScript } from './data/shots';
+import php2shell from '../shots/php2shell-hook.json';
+import afrospeak from '../shots/afrospeak-voice.json';
 
 /**
- * 1 plan JSON = 2 compositions (16:9 + 9:16).
- * Le pont lib/motion.js du studio rend exactement ces identifiants :
- *   `${shot.id}-16x9` / `${shot.id}-9x16`
+ * RACINE REMOTION — une composition par plan × format, nommée
+ * `<shotId>-<fmt>` : c'est le contrat d'appel du studio
+ * (lib/motion.js → rendreComposition(`${shotId}-${fmt}`)).
+ * Le template (Explainer référence A / Cinematic référence B) est
+ * choisi par `shot.template`, pas par le format.
  */
-const COMPONENTS: Record<string, React.FC> = {
-  'php2shell-hook': ShotPhp2Shell,
-  'afrospeak-voice': ShotAfroSpeak,
-};
 
-export const FORMATS = [
+const SHOTS: ShotScript[] = [
+  php2shell as unknown as ShotScript,
+  afrospeak as unknown as ShotScript,
+];
+
+const FORMATS = [
   { suffix: '16x9', width: 1920, height: 1080 },
   { suffix: '9x16', width: 1080, height: 1920 },
-] as const;
+];
+
+const ShotComp: React.FC<{ shot: ShotScript }> = ({ shot }) =>
+  shot.template === 'cinematic' ? <Cinematic shot={shot} /> : <Explainer shot={shot} />;
 
 export const RemotionRoot: React.FC = () => (
   <>
     {SHOTS.map((shot) =>
-      FORMATS.map((f) => {
-        const Comp = COMPONENTS[shot.id];
-        if (!Comp) return null;
-        return (
-          <Composition
-            key={`${shot.id}-${f.suffix}`}
-            id={`${shot.id}-${f.suffix}`}
-            component={Comp}
-            width={f.width}
-            height={f.height}
-            fps={shot.fps}
-            durationInFrames={shot.durationInFrames}
-          />
-        );
-      }),
+      FORMATS.map((fmt) => (
+        <Composition
+          key={`${shot.id}-${fmt.suffix}`}
+          id={`${shot.id}-${fmt.suffix}`}
+          component={ShotComp}
+          durationInFrames={shot.durationInFrames}
+          fps={shot.fps}
+          width={fmt.width}
+          height={fmt.height}
+          defaultProps={{ shot }}
+        />
+      )),
     )}
   </>
 );

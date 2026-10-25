@@ -23,6 +23,7 @@ const CHECKS = [
   { id: 'afrospeak-voice-9x16', frames: [10, 60, 120, 210, 300] },
 ];
 
+fs.mkdirSync(path.join(process.cwd(), 'out'), { recursive: true });
 const tmp = fs.mkdtempSync(path.join(process.cwd(), 'out/qa-'));
 const bundled = await bundle({ entryPoint: ENTRY });
 
