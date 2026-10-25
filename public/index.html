@@ -2215,7 +2215,7 @@ function motionPoll(force){
         '<div class="mbar"><i style="width:' + Math.round((r.progress || 0) * 100) + '%"></i></div>' +
         '<span style="font-size:11px;color:var(--txt-3);min-width:110px;text-align:right">' + esc(r.step || '') + '</span>' + lien + srt +
         '</div>';
-    }).join('') : '<div class="empty"><div class="big">◭</div><p>Aucun rendu motion pour l'instant — lancez un plan ci-dessus.</p></div>';
+    }).join('') : '<div class="empty"><div class="big">◭</div><p>Aucun rendu motion pour l\'instant — lancez un plan ci-dessus.</p></div>';
     var actif = rows.some(function(r){ return r.status === 'queued' || r.status === 'running'; });
     clearTimeout(MOTION.poll);
     if(actif || force) MOTION.poll = setTimeout(function(){ motionPoll(false); }, 4000);
