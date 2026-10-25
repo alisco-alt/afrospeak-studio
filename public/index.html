@@ -553,6 +553,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
 .mtpl{display:inline-block;vertical-align:2px;margin-left:8px;padding:3px 9px;border-radius:99px;font-size:9.5px;font-weight:900;letter-spacing:1.4px}
 .mtpl-explainer{background:rgba(255,176,32,.16);color:#ffb020;border:1px solid rgba(255,176,32,.4)}
 .mtpl-cinematic{background:rgba(217,205,178,.14);color:#d9cdb2;border:1px solid rgba(217,205,178,.4)}
+.mfig{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.6px;color:#78f0ff;border:1px solid rgba(120,240,255,.35);background:rgba(120,240,255,.08);border-radius:99px;padding:1px 7px;margin-left:6px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -2141,7 +2142,7 @@ function renderMotion(){
       $('#motionShots').innerHTML = '';
       return;
     }
-    MOTION.shots = j.shots || []; MOTION.cap = j.capacite;
+    MOTION.shots = j.shots || []; MOTION.cap = j.capacite; MOTION.styles = j.styles || [];
     var c = MOTION.cap;
     $('#motionCap').innerHTML = '<div style="font-size:12.5px;line-height:1.7;padding:4px 2px">' + (c.ok
       ? '<b style="color:#4ce09a">● Prêt à rendre</b> — mode <b>' + esc(c.mode) + '</b> · RAM disponible ' + c.memoireDispoMo + ' Mo · formats ' + esc((c.formats||[]).map(function(f){return f.suffix}).join(', '))
@@ -2151,8 +2152,15 @@ function renderMotion(){
       '</div>';
     $('#motionShots').innerHTML = MOTION.shots.map(function(s){
       var shot = s.shot || {};
-      var beats = (shot.beats || []).map(function(b){
-        return '<div class="mbeat"><b>' + fmtDur((b.at || 0) / (shot.fps || 30)) + '</b><span>' + esc(b.name || '') + '</span></div>';
+      var figs = s.figures || [];
+      var beats = (shot.beats || []).map(function(b, bi){
+        var f = figs[bi];
+        return '<div class="mbeat"><b>' + fmtDur((b.at || 0) / (shot.fps || 30)) + '</b><span>' + esc(b.name || '') +
+          (f ? '<i class="mfig" title="Figure animée ' + (f.auto ? 'détectée dans la narration' : 'forcée par le plan') + '">◔ ' + esc(f.type) + (f.auto ? ' auto' : '') + '</i>' : '') +
+          '</span></div>';
+      }).join('');
+      var styles = (MOTION.styles || []).map(function(st){
+        return '<span class="mfmt mstyle" data-s="' + esc(st.id) + '" title="' + esc(st.label || st.id) + '">' + esc(st.id) + '</span>';
       }).join('');
       var invalide = (s.erreurs || []).length;
       return '<div class="card mshot">' +
@@ -2166,13 +2174,23 @@ function renderMotion(){
           '<span class="mfmt on" data-f="9x16">Vertical 9:16</span>' +
           '<span class="mfmt on" data-f="voix">Voix off (TTS gratuit)</span>' +
         '</div>' +
+        '<div class="mfmts mstyles" data-shot="' + esc(s.id) + '">' +
+          '<span class="mfmt mstyle on" data-s="">Style du registre</span>' + styles +
+        '</div>' +
         (invalide
           ? '<div style="color:#ff9ba3;font-size:11px">Plan invalide : ' + esc(s.erreurs.join(' ; ')) + '</div>'
           : '<button class="btn pri sm blk" ' + (c.ok ? '' : 'disabled') + ' onclick="motionLancer(\'' + esc(s.id) + '\')">◆ Lancer le rendu</button>') +
         '</div>';
     }).join('');
     $$('#motionShots .mfmt').forEach(function(el){
-      el.addEventListener('click', function(){ el.classList.toggle('on'); });
+      el.addEventListener('click', function(){
+        if (el.classList.contains('mstyle')) {
+          $$('.mstyles[data-shot="' + el.parentElement.getAttribute('data-shot') + '"] .mstyle').forEach(function(x){ x.classList.remove('on'); });
+          el.classList.add('on');
+          return;
+        }
+        el.classList.toggle('on');
+      });
     });
     motionPoll(true);
   });
@@ -2189,7 +2207,9 @@ function motionChoix(shotId){
 
 function motionLancer(shotId){
   var choix = motionChoix(shotId);
-  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix }) };
+  var sel = document.querySelector('.mstyles[data-shot="' + shotId + '"] .mstyle.on');
+  var style = sel && sel.getAttribute('data-s') ? sel.getAttribute('data-s') : null;
+  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix, style: style }) };
   if (BACKEND_URL) o.credentials = 'include';
   if (TOKEN) o.headers.authorization = 'Bearer ' + TOKEN;
   fetch(apiUrl('/api/motion/renders'), o)
@@ -2215,7 +2235,7 @@ function motionPoll(force){
         '<div class="mbar"><i style="width:' + Math.round((r.progress || 0) * 100) + '%"></i></div>' +
         '<span style="font-size:11px;color:var(--txt-3);min-width:110px;text-align:right">' + esc(r.step || '') + '</span>' + lien + srt +
         '</div>';
-    }).join('') : '<div class="empty"><div class="big">◭</div><p>Aucun rendu motion pour l'instant — lancez un plan ci-dessus.</p></div>';
+    }).join('') : '<div class="empty"><div class="big">◭</div><p>Aucun rendu motion pour l’instant — lancez un plan ci-dessus.</p></div>';
     var actif = rows.some(function(r){ return r.status === 'queued' || r.status === 'running'; });
     clearTimeout(MOTION.poll);
     if(actif || force) MOTION.poll = setTimeout(function(){ motionPoll(false); }, 4000);

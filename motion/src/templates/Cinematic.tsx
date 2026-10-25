@@ -2,7 +2,7 @@ import React from 'react';
 import { AbsoluteFill, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { useLayout } from '../ds/layout';
 import { fonts } from '../ds/tokens';
-import { THEMES, type Theme } from '../ds/themes';
+import { THEMES, applyStylePack, type StylePack, type Theme } from '../ds/themes';
 import { CamPreset, Parallax, World, camKeys } from '../library/Camera';
 import { LightLeak, Particles } from '../library/Atmosphere';
 import { CaptionWords, KineticTitle, MarkerStat } from '../library/Kinetic';
@@ -11,6 +11,8 @@ import { KenBurns, type KenBurnsDirection } from '../library/KenBurns';
 import { BrandCard } from '../library/BrandCard';
 import { FilmFinish } from '../library/FilmFinish';
 import type { CinematicBeat, ShotScript } from '../data/shots';
+import { figureDuBeat, modeParDefaut } from '../data/figures.js';
+import { FigureFull, FigureOverlay, type FigureSpec } from '../library/Charts';
 
 /**
  * TEMPLATE « CINEMATIC » — référence B (afrospeak-voice).
@@ -55,12 +57,12 @@ const CROSSFADE = 10; // frames de fondu — le cinématographique ne snappe jam
 
 const isVerticalSafe = (height: number, width: number) => height > width;
 
-export const Cinematic: React.FC<{ shot: ShotScript }> = ({ shot }) => {
+export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | null }> = ({ shot, stylePack }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const L = useLayout();
   const { u, width, height } = L;
-  const theme: Theme = THEMES.cinematic;
+  const theme: Theme = applyStylePack(THEMES.cinematic, stylePack);
   const beats = shot.beats as CinematicBeat[];
 
   const idx = beats.findIndex((b, i) => frame >= b.at && (i === beats.length - 1 || frame < beats[i + 1].at));
@@ -76,6 +78,12 @@ export const Cinematic: React.FC<{ shot: ShotScript }> = ({ shot }) => {
   const mark = staticFile(shot.brand?.mark ?? 'brand/logo-mark.png');
   const fade = interpolate(f, [0, CROSSFADE], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const fadeOut = interpolate(f, [len - CROSSFADE, len], [1, 0.3], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // figure pilotée par le contenu : explicite > auto > opt-out (figure:false) ;
+  // les beats déjà chiffrés (stat/kinetic) ne se doublonnent pas eux-mêmes
+  const figAuto = figureDuBeat(beat) as FigureSpec | null;
+  const fig = figAuto && beat.kind === 'stat' && !beat.figure ? null : figAuto;
+  const figMode = fig ? fig.mode ?? modeParDefaut(fig) : null;
+
   const caption = 'caption' in beat ? (beat.caption as string | undefined) : undefined;
   const highlight = 'highlight' in beat ? (beat.highlight as string | undefined) : undefined;
 
@@ -216,6 +224,17 @@ export const Cinematic: React.FC<{ shot: ShotScript }> = ({ shot }) => {
       {/* poussière naturelle + flare : la signature « lumière réelle » */}
       <Particles count={20} tint="#FFE9C4" speed={0.35} rise={false} opacity={0.22} size={1.4} />
       <LightLeak tint="#FFD9A0" strength={0.4} x={0.7} />
+      {/* ————— FIGURE PILOTÉE PAR LE SCRIPT (mission 3) ————— */}
+      {fig && figMode === 'full' && (
+        <AbsoluteFill style={{ background: 'rgba(8,8,12,0.88)', alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
+          <FigureFull fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} w={L.col * 0.92} h={height * 0.62} />
+        </AbsoluteFill>
+      )}
+      {fig && figMode === 'overlay' && (
+        <div style={{ position: 'absolute', bottom: height * 0.2, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: `0 ${L.safe.x}px` }}>
+          <FigureOverlay fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} width={L.col * (isVerticalSafe(height, width) ? 0.9 : 0.66)} />
+        </div>
+      )}
       <FilmFinish intensity={0.85} />
     </AbsoluteFill>
   );
