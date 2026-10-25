@@ -5,7 +5,8 @@ import { fonts } from '../ds/tokens';
 import { THEMES, type Theme } from '../ds/themes';
 import { CamPreset, Parallax, World, camKeys } from '../library/Camera';
 import { LightLeak, Particles } from '../library/Atmosphere';
-import { CaptionWords } from '../library/Kinetic';
+import { CaptionWords, KineticTitle, MarkerStat } from '../library/Kinetic';
+import { DocCapture, PressCapture, YoutubeCapture, type DocSpec, type PressSpec, type YoutubeSpec } from '../library/Captures';
 import { KenBurns, type KenBurnsDirection } from '../library/KenBurns';
 import { BrandCard } from '../library/BrandCard';
 import { FilmFinish } from '../library/FilmFinish';
@@ -18,12 +19,41 @@ import type { CinematicBeat, ShotScript } from '../data/shots';
  * cartes de marque beige, sous-titres karaoke avec UN mot surligné,
  * fondu enchaîné lent entre les plans. Format natif 16:9.
  *
- * Beats : brand | footage | outro.
+ * Beats : brand | footage | stat | ui | title | outro.
+ * Niveau documentaire (référence C « Money Radar ») : footage réel voilé
+ * + chiffres géants surlignés jaune fluo + captures UI (YouTube, presse,
+ * document) + titres condensés blancs ; nappe tendue mixée par le studio.
  * Rendu muet : la voix off est mixée par le studio (lib/motion.js).
  */
 
+/** Radar balayant — signature du registre documentaire (réf. C). */
+const Radar: React.FC<{ frame: number; u: number; size: number }> = ({ frame, u, size }) => {
+  const rot = frame * 1.1;
+  return (
+    <svg width={size} height={size} viewBox="0 0 200 200" style={{ opacity: 0.5 }}>
+      {[92, 68, 44, 20].map((r) => (
+        <circle key={r} cx={100} cy={100} r={r} fill="none" stroke="rgba(51,214,232,0.35)" strokeWidth={1.2} />
+      ))}
+      <line x1={8} y1={100} x2={192} y2={100} stroke="rgba(51,214,232,0.18)" strokeWidth={1} />
+      <line x1={100} y1={8} x2={100} y2={192} stroke="rgba(51,214,232,0.18)" strokeWidth={1} />
+      <g transform={`rotate(${rot} 100 100)`}>
+        <path d="M100 100 L192 100 A92 92 0 0 0 165 35 Z" fill="rgba(51,214,232,0.16)" />
+        <line x1={100} y1={100} x2={192} y2={100} stroke="rgba(120,240,255,0.75)" strokeWidth={1.6} />
+      </g>
+      <circle cx={100} cy={100} r={3 + Math.sin(frame / 6) * 1.2} fill="#78F0FF" />
+      {Array.from({ length: 7 }, (_, i) => {
+        const a = (i * 137.5 * Math.PI) / 180;
+        const r = 24 + ((i * 53) % 66);
+        return <circle key={i} cx={100 + Math.cos(a) * r} cy={100 + Math.sin(a) * r} r={2} fill="rgba(120,240,255,0.7)" opacity={Math.sin((frame + i * 11) / 9) > 0 ? 0.9 : 0.25} />;
+      })}
+    </svg>
+  );
+};
+
 const KB_CYCLE: KenBurnsDirection[] = ['in', 'pan-left', 'out', 'pan-right'];
 const CROSSFADE = 10; // frames de fondu — le cinématographique ne snappe jamais
+
+const isVerticalSafe = (height: number, width: number) => height > width;
 
 export const Cinematic: React.FC<{ shot: ShotScript }> = ({ shot }) => {
   const frame = useCurrentFrame();
@@ -88,6 +118,52 @@ export const Cinematic: React.FC<{ shot: ShotScript }> = ({ shot }) => {
                       pointerEvents: 'none',
                     }}
                   />
+                </>
+              )}
+
+              {beat.kind === 'stat' && (
+                <>
+                  {beat.image && (
+                    <KenBurns src={staticFile(beat.image)} frame={frame} from={beatFrom} durationInFrames={len} direction="in" intensity={0.3} />
+                  )}
+                  <AbsoluteFill style={{ background: beat.image ? 'rgba(246,244,238,0.86)' : '#EFEAE2' }} />
+                  <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
+                    <MarkerStat frame={frame} from={beatFrom} u={u} lines={beat.lines} source={beat.source} align="center" />
+                  </AbsoluteFill>
+                </>
+              )}
+
+              {beat.kind === 'ui' && (
+                <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(80% 70% at 72% 60%, rgba(51,214,232,0.10), rgba(0,0,0,0) 60%)' }}>
+                  {beat.radar !== false && (
+                    <div style={{ position: 'absolute', right: -width * 0.06, bottom: -height * 0.1 }}>
+                      <Radar frame={frame} u={u} size={Math.min(width, height) * 0.9} />
+                    </div>
+                  )}
+                  {beat.capture.kind === 'youtube' && (
+                    <YoutubeCapture spec={beat.capture as YoutubeSpec} u={u} theme={theme} width={width * 0.66} frame={frame} from={beatFrom} />
+                  )}
+                  {beat.capture.kind === 'press' && (
+                    <PressCapture spec={beat.capture as PressSpec} u={u} theme={theme} width={width * 0.6} frame={frame} from={beatFrom} />
+                  )}
+                  {beat.capture.kind === 'doc' && (
+                    <DocCapture spec={beat.capture as DocSpec} u={u} theme={theme} width={width * 0.58} frame={frame} from={beatFrom} />
+                  )}
+                </AbsoluteFill>
+              )}
+
+              {beat.kind === 'title' && (
+                <>
+                  {beat.image && (
+                    <KenBurns src={staticFile(beat.image)} frame={frame} from={beatFrom} durationInFrames={len} direction={i % 2 ? 'pan-left' : 'in'} intensity={0.55} />
+                  )}
+                  <AbsoluteFill style={{ background: 'linear-gradient(180deg, rgba(8,8,12,0.34), rgba(8,8,12,0.55))' }} />
+                  <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
+                    <div style={{ textAlign: 'center', maxWidth: L.col * 1.15 }}>
+                      {beat.kicker && <CaptionWords u={u} theme={theme} frame={frame} from={beatFrom} until={beatFrom + 40} text={beat.kicker} />}
+                      <KineticTitle u={u} theme={theme} frame={frame} from={beatFrom + 4} text={beat.text} plain size={isVerticalSafe(height, width) ? 120 : 150} align="center" />
+                    </div>
+                  </AbsoluteFill>
                 </>
               )}
 

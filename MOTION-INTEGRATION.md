@@ -14,10 +14,19 @@ Les deux planches de référence sont atteintes par deux templates du moteur :
   imagerie réaliste (studio, conférence, rue, portrait), lumière naturelle,
   cartons de marque beige, sous-titres karaoke avec UN mot surligné,
   fondu enchaîné lent, filigrane de marque.
+- **Référence C — niveau documentaire du registre `cinematic`** (Money Radar,
+  documentaire financier faceless) : footage réel voilé + **chiffres géants
+  surlignés au surligneur jaune fluo** (`MarkerStat`), **captures UI réelles**
+  (chaîne YouTube avec barre like/s'abonner/cloche, communiqué de presse,
+  couverture de document institutionnel), titres condensés blancs sur plan
+  réel (`HUAWEIGATE`-style), radar balayant signature, et **nappe sonore
+  tendue procédurale** (drone ffmpeg lavfi, zéro crédit) mixée sous la VO.
 
 Preuves rendues en local (scale 0.5, zéro crédit payant) :
-`afrospeak-poc/renders/proof-explainer-php2shell-9x16.mp4` (15 s, 540×960) et
-`proof-cinematic-afrospeak-16x9.mp4` (11 s, 960×540).
+`afrospeak-poc/renders/proof-explainer-php2shell-9x16.mp4` (15 s, 540×960),
+`proof-cinematic-afrospeak-16x9.mp4` (11 s, 960×540) et
+`proof-doc-php2shell-16x9-voix.mp4` (15 s, 960×540, **VO + musique tendue
+mixées**, SRT sidecar) — le niveau documentaire de la référence C.
 
 ---
 
@@ -31,8 +40,8 @@ motion/                          ← moteur Remotion self-hosted (sous-projet au
 │   └── Cinematic.tsx            ← registre B : brand|footage|outro (Ken Burns + karaoke)
 ├── src/library/                 ← briques réutilisables des deux registres
 │   ├── Camera.tsx               ← World/Parallax/useCamera + presets camKeys (zéro plan fixe)
-│   ├── Kinetic.tsx              ← KineticTitle/KineticNumber/Kicker/CaptionWords (karaoke)
-│   ├── Captures.tsx             ← Browser/Table/Article/Term captures (+ ellipse rouge)
+│   ├── Kinetic.tsx              ← KineticTitle/KineticNumber/Kicker/CaptionWords (karaoke) + MarkerStat (surligneur jaune, réf. C)
+│   ├── Captures.tsx             ← Browser/Table/Article/Term (+ ellipse rouge), YouTube/Press/Doc (réf. C)
 │   ├── Metaphor.tsx             ← PlugConnect (prise branchée), WallGrid (parc exposé)
 │   ├── KenBurns.tsx             ← zoom/dérive lente sur image fixe (registre B)
 │   ├── BrandCard.tsx            ← carton de marque beige + balayage lumineux
@@ -71,11 +80,17 @@ Onglet **Motion** :
 API ajoutées (lib/webapp.js) : `GET /api/motion/capacite`, `GET /api/motion/shots`,
 `GET|POST /api/motion/renders`, `GET /api/motion/job/:id` (worker), `GET /api/motion/fichier/:id` (worker).
 
+`shot.music: "tension"` déclare la nappe sonore procédurale (drone bas
+désaccordé + souffle filtré, générée au ffmpeg lavfi puis mixée à -11 dB sous
+la VO par `mixerVoix`) — le registre documentaire de la réf. C, sans aucun
+fichier audio ni crédit payant. Preuve hors serveur :
+`node scripts/proof-motion-audio.js <shotId> <video-muette.mp4> <sortie.mp4>`.
+
 Ajouter un plan = déposer un JSON dans `motion/shots/`. Le validateur v2 exige :
 `template` déclaré, ≥ 2 beats horodatés croissants avec VO non vide, kinds conformes au
 registre, `highlight` ⊂ `caption`, sources présentes ; explainer : au moins un beat
 `screens|kinetic|metaphor|wall` ; cinematic : ≥ 2 beats `footage` dont les images existent
-dans `motion/public/`. Les compositions apparaissent automatiquement dans le moteur et l'UI.
+dans `motion/public/`, `stat` avec `lines[]`, `ui` avec capture `youtube|press|doc`. Les compositions apparaissent automatiquement dans le moteur et l'UI.
 
 ## 3. Où ça rend — matrice de capacité (honnête)
 

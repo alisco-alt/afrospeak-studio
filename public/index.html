@@ -2158,7 +2158,8 @@ function renderMotion(){
       return '<div class="card mshot">' +
         '<h4>' + esc(shot.title || s.id) +
           ' <span class="mtpl mtpl-' + esc(String(shot.template || '?')) + '" title="Registre du plan">' + esc(String(shot.template || '?').toUpperCase()) + '</span></h4>' +
-        '<div style="font-size:11px;color:var(--txt-3)">' + ((shot.durationInFrames || 0) / (shot.fps || 30)).toFixed(1) + ' s · ' + (shot.beats || []).length + ' beats · ' + (shot.sources || []).length + ' sources vérifiables</div>' +
+        '<div style="font-size:11px;color:var(--txt-3)">' + ((shot.durationInFrames || 0) / (shot.fps || 30)).toFixed(1) + ' s · ' + (shot.beats || []).length + ' beats · ' + (shot.sources || []).length + ' sources vérifiables' +
+          (shot.music === 'tension' ? ' · <span style="color:#78f0ff">musique tendue (procédurale)</span>' : '') + '</div>' +
         '<div class="beats">' + beats + '</div>' +
         '<div class="mfmts" data-shot="' + esc(s.id) + '">' +
           '<span class="mfmt on" data-f="16x9">Horizontal 16:9</span>' +

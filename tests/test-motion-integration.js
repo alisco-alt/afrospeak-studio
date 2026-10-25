@@ -32,8 +32,8 @@ function vrai(v, msg) { if (!v) throw new Error(msg || 'attendu vrai'); }
 
 test('deux plans embarqués au minimum', () => vrai(shots.length >= 2, 'shots=' + shots.length));
 test('les deux registres sont couverts (explainer + cinematic)', () => {
-  const tpl = shots.map((s) => s.shot && s.shot.template).sort().join(',');
-  eq(tpl, 'cinematic,explainer', 'templates couverts');
+  const tpl = new Set(shots.map((s) => s.shot && s.shot.template));
+  vrai(tpl.has('explainer') && tpl.has('cinematic'), 'templates couverts : ' + [...tpl].join(','));
 });
 
 for (const s of shots) {
@@ -45,7 +45,7 @@ for (const s of shots) {
   test(`plan ${s.id} : kinds conformes au registre`, () => {
     const autorises = s.shot.template === 'explainer'
       ? ['hook', 'screens', 'kinetic', 'metaphor', 'mascot', 'wall', 'outro']
-      : ['brand', 'footage', 'outro'];
+      : ['brand', 'footage', 'stat', 'ui', 'title', 'outro'];
     for (const b of s.shot.beats) vrai(autorises.includes(b.kind), `kind ${b.kind}`);
   });
   test(`plan ${s.id} : beats dans la durée`, () => {
@@ -90,6 +90,31 @@ test('plan cinematic : 2 footages + images présentes obligatoires', () => {
 test('validateur : template manquant refusé', () => {
   const e = motion.validerShotScript({ id: 'x-test', title: 't', fps: 30, durationInFrames: 30, beats: [], sources: [{ label: 'l', value: 'v' }] });
   vrai(e.some((x) => /template manquant/.test(x)), 'template non exigé');
+});
+
+test('validateur : stat sans lines et ui sans capture refusés', () => {
+  const e = motion.validerShotScript({
+    id: 'x-test', title: 't', template: 'cinematic', fps: 30, durationInFrames: 90,
+    sources: [{ label: 'l', value: 'v' }],
+    beats: [
+      { at: 0, name: 'a', kind: 'stat', vo: 'vo', lines: [] },
+      { at: 30, name: 'b', kind: 'ui', vo: 'vo', capture: { kind: 'nope' } },
+      { at: 60, name: 'c', kind: 'footage', vo: 'vo', image: 'img/cine-rue.png', caption: 'C' },
+    ],
+  });
+  vrai(e.some((x) => /stat exige lines/.test(x)), 'stat vide non détecté');
+  vrai(e.some((x) => /capture youtube\|press\|doc/.test(x)), 'ui sans capture non détecté');
+});
+
+test('pont motion : nappe sonore procédurale exposée', () => {
+  vrai(typeof motion.genererMusique === 'function', 'genererMusique absente');
+});
+
+test('plan documentaire : registre cinematic + musique déclarée', () => {
+  const doc = shots.find((s) => s.id === 'php2shell-doc');
+  vrai(doc, 'plan php2shell-doc absent');
+  eq(doc.shot.music, 'tension', 'musique');
+  vrai(doc.shot.beats.some((b) => b.kind === 'stat') && doc.shot.beats.some((b) => b.kind === 'ui') && doc.shot.beats.some((b) => b.kind === 'title'), 'kinds doc absents');
 });
 
 test('validateur : highlight hors caption refusé', () => {
@@ -175,6 +200,7 @@ test('UI : onglet + page + pilote motion présents', () => {
   vrai(html.includes('data-p="motion"'), 'onglet absent');
   vrai(html.includes('function renderMotion('), 'pilote absent');
   vrai(html.includes('mtpl-explainer') && html.includes('mtpl-cinematic'), 'badge template absent');
+  vrai(html.includes('musique tendue'), 'mention musique tendue absente');
 });
 
 test('API : routes motion montées', () => {

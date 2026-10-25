@@ -5,6 +5,7 @@ import { Cinematic } from './templates/Cinematic';
 import type { ShotScript } from './data/shots';
 import php2shell from '../shots/php2shell-hook.json';
 import afrospeak from '../shots/afrospeak-voice.json';
+import doc from '../shots/php2shell-doc.json';
 
 /**
  * RACINE REMOTION — une composition par plan × format, nommée
@@ -17,6 +18,7 @@ import afrospeak from '../shots/afrospeak-voice.json';
 const SHOTS: ShotScript[] = [
   php2shell as unknown as ShotScript,
   afrospeak as unknown as ShotScript,
+  doc as unknown as ShotScript,
 ];
 
 const FORMATS = [

@@ -21,6 +21,8 @@ const CHECKS = [
   { id: 'php2shell-hook-9x16', frames: [10, 60, 120, 210, 300, 380] },
   { id: 'afrospeak-voice-16x9', frames: [10, 60, 120, 210, 300] },
   { id: 'afrospeak-voice-9x16', frames: [10, 60, 120, 210, 300] },
+  { id: 'php2shell-doc-16x9', frames: [20, 95, 160, 230, 300, 350, 420] },
+  { id: 'php2shell-doc-9x16', frames: [20, 95, 160, 230, 300, 350, 420] },
 ];
 
 fs.mkdirSync(path.join(process.cwd(), 'out'), { recursive: true });
