@@ -1,5 +1,41 @@
 # AfroSpeak Studio — PRD & Journal
 
+## Itération — Octobre 2026 (moteur 3D + mascotte Kanu)
+Demande : le propriétaire a fixé une CIBLE QUALITÉ (vidéo de référence tech
+française ~1:50, animation 3D, mascotte éléphant). Écart à combler : le studio
+sait faire photo réelle + cartes ffmpeg, pas une scène animée.
+
+**LIVRÉ — `lib/motion3d/` (13 modules) :** rastériseur logiciel en JS pur
+(z-buffer, découpe au plan proche, Gouraud, brouillard, textures bilinéaires),
+génération procédurale des volumes, mascotte **Kanu** (rig : regard, oreilles,
+trompe, clignement ; 5 posages), décor commun, post-traitement (bloom, courbe
+ACES tabulée, grain, vignette), design system 2D (terminal, jauges, cartes,
+graphes) posé **dans** la 3D, habillage 2D par-dessus (titre, chiffre géant,
+karaoké, pastille, carton), et bande son (lit + SFX existants).
+**POC rendu** : plan d'ouverture 12,6 s sur les data centers africains
+(80 % des données hébergées hors du continent) en 9:16 **et** 16:9 depuis la
+même scène (`composition(W,H)`). CLI `scripts/motion3d.js`, suite
+`tests/test-motion3d.js` (51 assertions, 0 échec). Doc : `MOTEUR-3D.md`.
+
+Décisions et mesures (2 vCPU, sans GPU) : **1,50 s/image** en 1080p avec
+suréchantillonnage 2×, 270 Mo RSS (≤ 435 Mo en pointe avec x264) → `ss=1`
+imposé dans le Dockerfile. Trois optimisations issues de mesures : courbe
+filmique tabulée (−180 ms/image), balayage par *spans*, brouillard tabulé ;
+et un **cache de panneaux borné en octets** — sans cela le cache (120 entrées
+de 1,4 Mo) atteignait 170 Mo et la cadence s'effondrait en cours de plan.
+
+Choix d'architecture : **ni Blender headless** (binaire + contexte GPU
+incompatibles avec le conteneur 512 Mo, et un `.blend` par sujet n'est pas
+automatisable), **ni Remotion/2D** (pas de scène 3D avec personnage, +300 Mo
+de Chromium), mais une **3D procédurale** : un plan est du code, donc
+déterministe (cache de plans fiable), rééditable, et piloté par le contenu
+(chiffres/textes) comme le reste du studio.
+
+Prochains chantiers (détaillés dans MOTEUR-3D.md §5) : intégration
+`shot.motion3d` au pipeline + API + onglet interface ; scènes `chantier`
+(versions du langage = ouvriers), `intrusion` (faille = hacker encapuchonné),
+`correctif` (correctif = feux verts) ; voix off `tts.js` + timings.
+
 ## Itération — Juin 2026 (réédition post-rendu + karaoke pastille)
 Trois demandes utilisateur :
 - **Réédition Après Rendu (LIVRÉ)** : `pipeline.reopenForReedit(id)` rouvre

@@ -27,6 +27,9 @@ RUN npm pkg delete dependencies.ffmpeg-static dependencies.ffprobe-static \
 # ─────────────── Étape 2 : image finale ───────────────
 FROM node:20-bookworm-slim
 
+# NB : MOTION3D_SS=1 ci-dessous = 1 échantillon/pixel pour le moteur 3D. En
+# 1080p, ss=2 réclame ~300 Mo de tampons (mesuré) sur un conteneur qui en a
+# 460 d'utiles ; sur un poste de bureau, MOTION3D_SS=2 double l'anticrénelage.
 ENV DEBIAN_FRONTEND=noninteractive \
     NODE_ENV=production \
     PORT=7860 \
@@ -41,6 +44,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     MEM_LIMIT_MB=460 \
     LOW_MEMORY=1 \
     MAX_MEDIA_EDGE=2400 \
+    MOTION3D_SS=1 \
     # Chromium fourni par l'image, pas de téléchargement Puppeteer
     PUPPETEER_SKIP_DOWNLOAD=1 \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \

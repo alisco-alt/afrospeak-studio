@@ -12,7 +12,9 @@
     "doctor": "node index.js --doctor",
     "auto": "node index.js --auto",
     "watch": "node index.js --watch",
-    "cles": "node scripts/configurer-cles.js"
+    "cles": "node scripts/configurer-cles.js",
+    "motion3d": "node scripts/motion3d.js",
+    "test:motion3d": "node tests/test-motion3d.js"
   },
   "keywords": [
     "video",
@@ -23,7 +25,10 @@
     "tts",
     "ollama",
     "deepseek",
-    "automation"
+    "automation",
+    "3d",
+    "motion-design",
+    "renderer"
   ],
   "license": "MIT",
   "engines": {
@@ -33,6 +38,7 @@
     "@aws-sdk/client-s3": "^3.1097.0",
     "@aws-sdk/lib-storage": "^3.1100.0",
     "@aws-sdk/s3-request-presigner": "^3.1097.0",
+    "@napi-rs/canvas": "^1.0.13",
     "@neondatabase/serverless": "^1.1.0",
     "bcryptjs": "^2.4.3",
     "express": "^4.21.2",
