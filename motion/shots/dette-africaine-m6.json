@@ -1,0 +1,96 @@
+{
+  "id": "dette-africaine-m6",
+  "title": "Dette africaine — preuve mission 6 (sourcing réel filtré)",
+  "template": "cinematic",
+  "fps": 30,
+  "durationInFrames": 360,
+  "music": "tension",
+  "brand": {
+    "logo": "brand/logo.png",
+    "mark": "brand/logo-mark.png"
+  },
+  "sources": [
+    {
+      "label": "Beat 1",
+      "value": "cnbcafrica.com — Kenya plans to borrow $1 billion using debt for food swap, finance ministry document shows ..."
+    },
+    {
+      "label": "Beat 2",
+      "value": "dpworld.com — DP WORLD AND SENEGAL SIGN AGREEMENT TO DEVELOP NDAYANE PORT"
+    },
+    {
+      "label": "Beat 3",
+      "value": "Wikimedia Commons — Plateau 2010, Abidjan.jpg"
+    },
+    {
+      "label": "Beat 4",
+      "value": "llpzambia.blogspot.com — Lubuto Library Project, Lusaka, Zambia: Outdoor Market and Indoor Malls"
+    },
+    {
+      "label": "Beat 5",
+      "value": "linkedin.com — AFC delegates participated in the recently concluded 2023 African Union Summit in Addis Ababa ..."
+    },
+    {
+      "label": "Beat 6",
+      "value": "hotels.ng — Nigeria Stock Exchange, Lagos - Hotels.ng Places"
+    }
+  ],
+  "beats": [
+    {
+      "at": 0,
+      "kind": "title",
+      "vo": "La dette publique africaine a dépassé les six cent trente milliards de dollars.",
+      "cam": "dolly-in",
+      "image": "img/m6-0.jpg",
+      "kb": "in",
+      "kicker": "DETTE AFRICAINE · CONSTAT",
+      "text": "LE POIDS DE LA DETTE"
+    },
+    {
+      "at": 60,
+      "kind": "footage",
+      "vo": "Le Port de Dakar et ses containers : le commerce qui rembourse.",
+      "cam": "drift",
+      "image": "img/m6-1.jpg",
+      "kb": "pan-left"
+    },
+    {
+      "at": 120,
+      "kind": "footage",
+      "vo": "Un milliard huit cents millions de dollars : le service de la dette a doublé en dix ans.",
+      "cam": "dolly-in",
+      "image": "img/m6-2.jpg",
+      "kb": "out",
+      "caption": "Le service de la dette a doublé en dix ans",
+      "highlight": ""
+    },
+    {
+      "at": 180,
+      "kind": "footage",
+      "vo": "Zambie, Ghana, Éthiopie : trois pays déjà passés par la restructuration.",
+      "cam": "drift",
+      "image": "img/m6-3.jpg",
+      "kb": "in"
+    },
+    {
+      "at": 240,
+      "kind": "footage",
+      "vo": "Soixante pour cent des créanciers sont désormais privés, hors club de Paris.",
+      "cam": "dolly-in",
+      "image": "img/m6-4.jpg",
+      "kb": "pan-right",
+      "caption": "Créanciers privés : 60 % des encours",
+      "highlight": ""
+    },
+    {
+      "at": 300,
+      "kind": "outro",
+      "vo": "Et pendant ce temps, Lagos invente la finance qui financera le continent.",
+      "cam": "static",
+      "image": "img/m6-5.jpg",
+      "kb": "out",
+      "caption": "AFROSPEAK — L’ÉCO, DANS TA LANGUE",
+      "highlight": "ÉCO"
+    }
+  ]
+}

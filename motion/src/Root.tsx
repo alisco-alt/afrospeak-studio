@@ -8,6 +8,7 @@ import php2shell from '../shots/php2shell-hook.json';
 import afrospeak from '../shots/afrospeak-voice.json';
 import doc from '../shots/php2shell-doc.json';
 import demo from '../shots/infographies-demo.json';
+import detteM6 from '../shots/dette-africaine-m6.json';
 
 /**
  * RACINE REMOTION — une composition par plan × format, nommée
@@ -22,6 +23,7 @@ const SHOTS: ShotScript[] = [
   afrospeak as unknown as ShotScript,
   doc as unknown as ShotScript,
   demo as unknown as ShotScript,
+  detteM6 as unknown as ShotScript,
 ];
 
 const FORMATS = [

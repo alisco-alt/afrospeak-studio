@@ -234,21 +234,50 @@ footage qui défile, sous-titres calibrés -30 % en position basse) et
 `proof-m5-horizontal-moneyradar-16x9.mp4` (Money Radar-like, même grammaire
 déclinée en horizontal).
 
-## 7. Restes connus (roadmap)
+## 6c. Mission 6 — qualité du registre documentaire (retour CEO sur le run « dette africaine »)
 
-- M10 : iframe Remotion Studio derrière l'UI pour éditer les beats en scrub live ;
-- M15 : lip-sync de la mascotte sur l'amplitude de la VO (aujourd'hui : enveloppe procédurale) ;
-- M17 : SFX/musique procédurale dans le moteur (aujourd'hui : le montage visuel porte le rythme ;
-  les intents `sfx` textuels du POC ont été retirés du schéma v2) ;
-- M21 : captures d'écran réelles scrapées par le studio (aujourd'hui : captures vectorielles
-  reconstruites + champ `image` prêt à brancher un PNG par capture) ;
-- M22 : banque de plans cinématographiques élargie (4 plans générés livrés ; ajouter des
-  PNG dans `motion/public/img/` suffit, le validateur vérifie leur présence).
+Constat frame par frame sur l'horizontal Money Radar « dette africaine »
+(6:41) : colonnes GRECQUES, TAJ MAHAL, capture d'un débat budgétaire
+INDIEN (chaîne « Djaank »), doublon « femmes en bureau occidental ×2 »,
+podium UE ; le filtre géo de la mission 5 n'avait rejeté que 2 visuels ;
+41 % de beats sombres/abstraits. Cinq corrections, vérifiées par
+`tests/test-mission6.js` (10 assertions dont le test CEO « dette africaine
+→ zéro visuel non-africain ») :
 
-## 8. Vérifications
+1. **Filtre géo STRICT sur TOUTES les sources** : le garde-fou lit
+   désormais le CONTENU du candidat (titre, légende, alt, URL, chaîne), pas
+   la requête. Nouveau lexique `LIEUX_EMBLEMATIQUES` (~120 entrées, 19
+   pays) : « Parthénon », « Taj Mahal », « Big Ben », « parlement
+   européen »… valent mention de leur pays. Câblé aux quatre étages :
+   `media.js acquire` (tous providers banques/vidéo/web), `cascadeSource`
+   (mediaFetcher), archives presse (filtrage de la liste AVANT
+   téléchargement), verrou agent-monteur 6a. Un sujet Afrique rejette tout
+   candidat non africain sans signal africain compensatoire.
+2. **Pertinence sémantique** : match littéral ≠ bon contenu — le monument
+   ou l'institution visible dans les métadonnées confronte le candidat au
+   SUJET (pays/continent) avant tout téléchargement.
+3. **Anti-doublons strict** : `SEUILS.reuseMax` 3 → **1** et réemploi
+   pipeline DÉSACTIVÉ (`REEMPLOI_MAX = 0`) : un visuel ne passe qu'une
+   fois ; le garde-fou sourcing refuse un run qui recopie.
+4. **Cartes-articles = presse crédible** : `sourceAcceptable()` dans
+   `pressePhotos.js` — liste blanche (Jeune Afrique, RFI, BBC Afrique,
+   Financial Afrik, Agence Ecofin, Reuters/AP, AfricaNews, Le Monde
+   Afrique…), douteuses JAMAIS (Sputnik, RT, Infowars… ; correspondance
+   exacte de domaine : « theafricareport.com » ne doit pas matcher
+   « rt.com », bug mesuré et corrigé) ; sur sujet Afrique, une source hors
+   liste blanche n'entre que si son titre porte un signal africain.
+   Câblé dans `pressePhotos.chercher` et sur les candidats `web` de
+   `media.js`.
+5. **Plafond des beats non informatifs** : génération IA plafonnée à
+   30 % des plans (`iaSousPlafond`, 3 gates dans la boucle documentaire)
+   et garde-fou sourcing `SOURCING_TROP_ABSTRAIT` : au-delà de 40 % de
+   plans sans média réel (constaté 41 %), le run est STOPPÉ bruyamment
+   avec metrics — jamais livré sombre.
 
-```bash
-npm test                      # 18 suites dont test-mission5, test-motion-integration v2, test-figures, test-sourcing, test-ui-syntax
-cd motion && npx tsc --noEmit # typage du moteur
-cd motion && npm run qa       # assertions frames clés (anti plan fixe / frame vide)
-```
+Preuve : `scripts/proof-m6-dette.js` source SIX beats en direct (banques
+libres + presse), applique les filtres, puis rend
+`afrospeak-poc/renders/proof-m6-horizontal-dette-africaine-16x9.mp4`
+(cible Money Radar). Sourcing du run de preuve : cnbcafrica.com (Kenya),
+dpworld.com (Sénégal), Wikimedia (Abidjan), Lusaka (Zambie), délégués AFC,
+Lagos NSE — 100 % africain, zéro doublon, zéro rejet post-hoc.
+

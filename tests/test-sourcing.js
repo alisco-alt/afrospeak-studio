@@ -57,14 +57,16 @@ test('doublons massifs (même visuel > 3 plans) → SOURCING_DEGRADE', () => {
     shots: [shotReel('a'), shotReel('a'), shotReel('a'), shotReel('a'), shotReel('b'), shotReel('c')],
   });
   vrai(!v.ok, 'doit refuser');
-  vrai(/réemployé 4×/.test(v.message), 'message doublons : ' + v.message);
+  vrai(/passé 4×/.test(v.message), 'message doublons : ' + v.message);
 });
 
 test('aucun média réel (secours/IA nus) → SOURCING_DEGRADE', () => {
   const v = evaluerSourcingMedia({
     banquesOk: 9,
     banquesTotal: 9,
-    shots: [shotSecours, shotIA, shotNu, shotSecours, shotIA],
+    /* 3 plans : sous le seuil du garde-fou « beats abstraits » (≥ 4),
+     * on teste bien la raison « aucun média réel ». */
+    shots: [shotSecours, shotIA, shotNu],
   });
   vrai(!v.ok, 'doit refuser');
   vrai(/aucun média réel/.test(v.message), 'message fonds unis : ' + v.message);
@@ -80,7 +82,8 @@ test('média réel : secours, IA et plans nus exclus', () => {
 test('seuils documentés et stables', () => {
   eq(SEUILS.banquesMin, 0.5);
   eq(SEUILS.mediaReelMin, 0.5);
-  eq(SEUILS.reuseMax, 3);
+  eq(SEUILS.reuseMax, 1);          // mission 6 : anti-doublons strict
+  eq(SEUILS.abstraitMax, 0.4);      // mission 6 : plafond beats non informatifs
 });
 
 test('le pipeline câble bien le garde-fou avant le montage', () => {

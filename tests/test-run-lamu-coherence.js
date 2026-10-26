@@ -158,7 +158,10 @@ const choixSature = pipeline.choisirAssetReemploi(storyboardReemploi, 5, compte)
 check('un fichier déjà réemployé 2 fois n’est plus proposé',
   !choixSature || choixSature.shot.asset.file !== 'a.mp4');
 const choixLibre = pipeline.choisirAssetReemploi(storyboardReemploi, 2, new Map());
-check('un fichier jamais réemployé reste disponible', !!choixLibre);
+/* Mission 6 (CEO) : ANTI-DOUBLONS STRICT — un visuel ne passe qu'UNE
+ * fois, le réemploi est désactivé : même un fichier « libre » n'est plus
+ * proposé en recopie. */
+check('mission 6 : réemploi désactivé, aucun fichier recopié', !choixLibre && !choixSature);
 
 /* ── 4. Agent monteur : il arbitre, il ne note plus dans le vide ───── */
 console.log('— agent monteur : du verdict à l’action —');
