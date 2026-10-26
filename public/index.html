@@ -770,7 +770,7 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
               <label class="check on"><input type="checkbox" id="oKen" checked> Ken Burns</label>
               <label class="check on"><input type="checkbox" id="oBroll" checked> B-roll vidéo</label>
               <label class="check on"><input type="checkbox" id="oMusic" checked> Musique</label>
-              <label class="check on"><input type="checkbox" id="oMark" checked> Watermark</label>
+              <label class="check"><input type="checkbox" id="oMark"> Watermark (off par défaut — CEO 26/10)</label>
               <label class="check"><input type="checkbox" id="oProg"> Barre de rétention</label>
             </div>
           </div></div>
@@ -2173,6 +2173,7 @@ function renderMotion(){
           '<span class="mfmt on" data-f="16x9">Horizontal 16:9</span>' +
           '<span class="mfmt on" data-f="9x16">Vertical 9:16</span>' +
           '<span class="mfmt on" data-f="voix">Voix off (TTS gratuit)</span>' +
+          '<span class="mfmt" data-f="logo" title="OFF par défaut (CEO 26/10) : aucun logo ni filigrane incrusté">Logo & watermark</span>' +
         '</div>' +
         '<div class="mfmts mstyles" data-shot="' + esc(s.id) + '">' +
           '<span class="mfmt mstyle on" data-s="">Style du registre</span>' + styles +
@@ -2202,14 +2203,18 @@ function motionChoix(shotId){
   var f = [];
   if(box.querySelector('.mfmt[data-f="16x9"]').classList.contains('on')) f.push('16x9');
   if(box.querySelector('.mfmt[data-f="9x16"]').classList.contains('on')) f.push('9x16');
-  return { formats: f.length ? f : ['16x9'], voix: box.querySelector('.mfmt[data-f="voix"]').classList.contains('on') };
+  return {
+    formats: f.length ? f : ['16x9'],
+    voix: box.querySelector('.mfmt[data-f="voix"]').classList.contains('on'),
+    logo: !!box.querySelector('.mfmt[data-f="logo"]') && box.querySelector('.mfmt[data-f="logo"]').classList.contains('on'),
+  };
 }
 
 function motionLancer(shotId){
   var choix = motionChoix(shotId);
   var sel = document.querySelector('.mstyles[data-shot="' + shotId + '"] .mstyle.on');
   var style = sel && sel.getAttribute('data-s') ? sel.getAttribute('data-s') : null;
-  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix, style: style }) };
+  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix, style: style, logo: choix.logo }) };
   if (BACKEND_URL) o.credentials = 'include';
   if (TOKEN) o.headers.authorization = 'Bearer ' + TOKEN;
   fetch(apiUrl('/api/motion/renders'), o)

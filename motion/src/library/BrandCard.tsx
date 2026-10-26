@@ -12,12 +12,14 @@ export const BrandCard: React.FC<{
   from: number;
   u: number;
   theme: Theme;
-  logo: string;
+  logo?: string;
   logoMark?: string;
+  /** CEO 26/10 : carton sans logo par défaut (opt-in showLogo) */
+  showLogo?: boolean;
   name?: string;
   tagline?: string;
   width?: number;
-}> = ({ frame, from, u, theme, logo, logoMark, name = 'AfroSpeak', tagline, width = 1500 }) => {
+}> = ({ frame, from, u, theme, logo, logoMark, showLogo, name = 'AfroSpeak', tagline, width = 1500 }) => {
   const f = frame - from;
   const p = interpolate(f, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const sweep = interpolate(f, [12, 60], [-1.2, 1.4], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
@@ -40,10 +42,12 @@ export const BrandCard: React.FC<{
         boxShadow: '0 40px 90px rgba(0,0,0,0.75)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 22 * u }}>
-        {logoMark && <Img src={logoMark} style={{ width: 96 * u, height: 96 * u, objectFit: 'contain' }} />}
-        <Img src={logo} style={{ height: 110 * u, objectFit: 'contain' }} />
-      </div>
+      {showLogo && logo && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 22 * u }}>
+          {logoMark && <Img src={logoMark} style={{ width: 96 * u, height: 96 * u, objectFit: 'contain' }} />}
+          <Img src={logo} style={{ height: 110 * u, objectFit: 'contain' }} />
+        </div>
+      )}
       <div style={{ fontFamily: fonts.display, fontSize: 40 * u, fontWeight: 700, color: '#2A2118', letterSpacing: 0.5 * u }}>
         {name}
       </div>

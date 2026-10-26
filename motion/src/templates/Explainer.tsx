@@ -57,7 +57,7 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
   const cam: CamPreset = beat.cam ?? CAM_CYCLE[i % CAM_CYCLE.length];
   const pop = interpolate(f, [0, 8], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
-  const brandMark = shot.brand?.mark ? staticFile(shot.brand.mark) : undefined;
+  const brandMark = shot.brand?.mark && shot.brand?.showLogo === true ? staticFile(shot.brand.mark) : undefined;
 
   const renderScreen = (s: ScreenSpec, w: number, delay: number) => {
     const from = beatFrom + delay;
@@ -234,7 +234,9 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       )}
 
       {/* ————— HUD (espace écran) ————— */}
-      {caption && (
+      {/* CEO 26/10 : zéro sous-titre incrusté en vertical (le SRT reste
+          généré par le studio) ; l'horizontal conserve ses captions. */}
+      {caption && !isVertical && (
         <div
           style={{
             position: 'absolute',
@@ -252,7 +254,8 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       <Particles count={isVertical ? 46 : 34} tint={theme.accent} speed={0.8} rise opacity={0.3} />
       <LightLeak tint={theme.accent} strength={0.28} x={0.78} />
       {beat.flash && <FlashCut at={beatFrom} color={theme.accent} dur={5} strength={0.45} />}
-      {brandMark && (
+      {/* filigrane : OPT-IN strict (CEO 26/10 : OFF par défaut) */}
+      {brandMark && shot.brand?.watermark === true && (
         <div style={{ position: 'absolute', top: L.safe.y * 0.55, left: L.safe.x * 0.7, opacity: 0.9 }}>
           <img src={brandMark} style={{ width: 44 * u, height: 44 * u, objectFit: 'contain' }} />
         </div>

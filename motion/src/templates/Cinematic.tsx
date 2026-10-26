@@ -74,7 +74,8 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
   const f = frame - beatFrom;
   const cam: CamPreset = beat.cam ?? (beat.kind === 'footage' ? (i % 2 === 0 ? 'dolly-in' : 'drift') : 'static');
 
-  const logo = staticFile(shot.brand?.logo ?? 'brand/logo.png');
+  const showLogo = shot.brand?.showLogo === true;
+  const logo = showLogo ? staticFile(shot.brand?.logo ?? 'brand/logo.png') : undefined;
   const mark = staticFile(shot.brand?.mark ?? 'brand/logo-mark.png');
   const fade = interpolate(f, [0, CROSSFADE], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const fadeOut = interpolate(f, [len - CROSSFADE, len], [1, 0.3], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
@@ -103,7 +104,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
                       background: 'radial-gradient(90% 70% at 50% 42%, rgba(255,224,168,0.10), rgba(0,0,0,0) 62%)',
                     }}
                   >
-                    <BrandCard frame={frame} from={beatFrom} u={u} theme={theme} logo={logo} logoMark={mark} tagline={beat.tagline} width={width * 0.62} />
+                    <BrandCard frame={frame} from={beatFrom} u={u} theme={theme} logo={logo} logoMark={showLogo ? mark : undefined} showLogo={showLogo} tagline={beat.tagline} width={width * 0.62} />
                   </AbsoluteFill>
                 </Parallax>
               )}
@@ -189,7 +190,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
                       justifyContent: 'center',
                     }}
                   >
-                    <BrandCard frame={frame} from={beatFrom} u={u} theme={theme} logo={logo} logoMark={mark} name={shot.title} tagline={beat.tagline} width={width * 0.46} />
+                    <BrandCard frame={frame} from={beatFrom} u={u} theme={theme} logo={logo} logoMark={showLogo ? mark : undefined} showLogo={showLogo} name={shot.title} tagline={beat.tagline} width={width * 0.46} />
                   </AbsoluteFill>
                 </>
               )}
@@ -200,7 +201,9 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       </World>
 
       {/* ————— HUD (espace écran) ————— */}
-      {caption && (
+      {/* CEO 26/10 : zéro sous-titre incrusté en vertical (le SRT reste
+          généré par le studio) ; l'horizontal conserve son karaoke. */}
+      {caption && !isVerticalSafe(height, width) && (
         <div
           style={{
             position: 'absolute',
@@ -215,8 +218,8 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
           <CaptionWords u={u} theme={theme} frame={frame} from={beatFrom + CROSSFADE} until={beatTo - CROSSFADE} text={caption} highlight={highlight} />
         </div>
       )}
-      {/* filigrane marque (comme la référence B) */}
-      {shot.brand?.watermark !== false && (
+      {/* filigrane marque : OPT-IN strict (CEO 26/10 : OFF par défaut) */}
+      {shot.brand?.watermark === true && (
         <div style={{ position: 'absolute', top: L.safe.y * 0.6, left: L.safe.x * 0.7, opacity: 0.92 }}>
           <img src={mark} style={{ width: 52 * u, height: 52 * u, objectFit: 'contain', filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.6))' }} />
         </div>
