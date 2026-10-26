@@ -156,7 +156,33 @@ le même schéma (détection contenue, pas de niche).
 vérifie `window.go` / `renderMotion` / `motionLancer` + chasse l'apostrophe
 droite dans un segment single-quote — le bug du 25/10 qui tuait tout le JS).
 
-## 6. Restes connus (roadmap)
+## 6. Mission 4 — fiabilité & sobriété des incrustations (retour CEO 26/10)
+
+1. **Sonde visuelle** : `retries: 2` (correctif befe3d1 intégré à la base) —
+   une seule tentative sur 9 TLS parallèles produisait de faux « banques
+   mortes » sur liaison lente, donc recherche coupée, donc fonds unis.
+2. **Logos & watermarks OFF partout par défaut** : `config.DEFAULTS.defaults.watermark
+   = false`, case UI décochée, chip Motion « Logo & watermark » OFF (opt-in
+   envoyé au bridge qui patche `brand.watermark/showLogo` au rendu) ; côté
+   moteur, filigranes et cartons logo ne s'affichent que si
+   `shot.brand.watermark === true` / `showLogo === true` (aucun plan embarqué
+   ne les force). Le CEO pose son propre logo manuellement.
+3. **Zéro sous-titre incrusté dans les VERTICALES** : `captionsOn` du pipeline
+   classique et couche caption des deux templates sont coupées si le format
+   est 9:16 ; l'horizontal reste inchangé et le **SRT sidecar est toujours
+   écrit** (`buildSRT` ne dépend pas de `captionsOn`).
+4. **Garde-fou anti-production-dégradée** (`lib/sourcing.js`, testé) : avant le
+   montage, `evaluerSourcingMedia()` mesure banques joignables, part de médias
+   réels, réemploi maximal ; sous les seuils (50 % / 50 % / 3×) le run lève
+   `SOURCING_DEGRADE` avec message actionnable + metrics — jamais de vidéo de
+   fonds unis silencieusement produite.
+
+Preuves : `afrospeak-poc/renders/proof-m4-vertical-sans-sous-titres-9x16.mp4`
+(aucun sous-titre ni logo, captures réelles) et
+`proof-m4-horizontal-sous-titres-16x9.mp4` (karaoke conservé, image réelle,
+sans filigrane).
+
+## 7. Restes connus (roadmap)
 
 - M10 : iframe Remotion Studio derrière l'UI pour éditer les beats en scrub live ;
 - M15 : lip-sync de la mascotte sur l'amplitude de la VO (aujourd'hui : enveloppe procédurale) ;
@@ -167,10 +193,10 @@ droite dans un segment single-quote — le bug du 25/10 qui tuait tout le JS).
 - M22 : banque de plans cinématographiques élargie (4 plans générés livrés ; ajouter des
   PNG dans `motion/public/img/` suffit, le validateur vérifie leur présence).
 
-## 7. Vérifications
+## 8. Vérifications
 
 ```bash
-npm test                      # 16 suites dont test-motion-integration v2, test-figures, test-ui-syntax
+npm test                      # 17 suites dont test-motion-integration v2, test-figures, test-sourcing, test-ui-syntax
 cd motion && npx tsc --noEmit # typage du moteur
 cd motion && npm run qa       # assertions frames clés (anti plan fixe / frame vide)
 ```

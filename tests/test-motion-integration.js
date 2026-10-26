@@ -213,6 +213,41 @@ test('moteur : aucune dépendance remotion morte (paths/shapes/transitions)', ()
   }
 });
 
+/* ── mission 4 : logos OFF, verticales sans sous-titres, garde-fou ───── */
+
+test('mission 4 : aucun logo/filigrane opt-in dans les plans embarqués', () => {
+  for (const s of shots) {
+    vrai(!(s.shot.brand && s.shot.brand.watermark === true), s.id + ' : watermark forcé');
+    vrai(!(s.shot.brand && s.shot.brand.showLogo === true), s.id + ' : carton logo forcé');
+  }
+});
+
+test('mission 4 : templates — zéro sous-titre incrusté en vertical', () => {
+  const fsx = require('fs');
+  const exp = fsx.readFileSync(path.join(MOTION, 'src', 'templates', 'Explainer.tsx'), 'utf8');
+  const cin = fsx.readFileSync(path.join(MOTION, 'src', 'templates', 'Cinematic.tsx'), 'utf8');
+  vrai(exp.includes('{caption && !isVertical && ('), 'gate vertical Explainer absent');
+  vrai(cin.includes('{caption && !isVerticalSafe(height, width) && ('), 'gate vertical Cinematic absent');
+});
+
+test('mission 4 : watermark classique OFF par défaut (config)', () => {
+  const cfg = require('../lib/config.js');
+  eq(cfg.DEFAULTS.defaults.watermark, false, 'DEFAULTS.defaults.watermark');
+});
+
+test('mission 4 : pipeline — verticales sans incrustation, SRT conservé', () => {
+  const fsx = require('fs');
+  const src = fsx.readFileSync(path.join(RACINE, 'lib', 'pipeline.js'), 'utf8');
+  vrai(src.includes("captionsOn: style.captionMode !== 'none' && b.format !== 'vertical'"), 'gate captionsOn vertical');
+  vrai(/if \(allWords\.length\) fs\.writeFileSync\(srtFile/.test(src), 'SRT doit rester inconditionnel');
+});
+
+test('mission 4 : UI — chip logo présente et OFF par défaut', () => {
+  const html = require('fs').readFileSync(path.join(RACINE, 'public', 'index.html'), 'utf8');
+  vrai(html.includes('<span class="mfmt" data-f="logo"'), 'chip logo absente ou ON par défaut');
+  vrai(!html.includes('id="oMark" checked'), 'case watermark classique encore cochée');
+});
+
 /* ── UI + API + SRT ──────────────────────────────────────────────────── */
 
 test('UI : onglet + page + pilote motion présents', () => {
