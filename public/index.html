@@ -2159,9 +2159,8 @@ function renderMotion(){
           (f ? '<i class="mfig" title="Figure animée ' + (f.auto ? 'détectée dans la narration' : 'forcée par le plan') + '">◔ ' + esc(f.type) + (f.auto ? ' auto' : '') + '</i>' : '') +
           '</span></div>';
       }).join('');
-      var styles = (MOTION.styles || []).map(function(st){
-        return '<span class="mfmt mstyle" data-s="' + esc(st.id) + '" title="' + esc(st.label || st.id) + '">' + esc(st.id) + '</span>';
-      }).join('');
+      /* Mission 5 (CEO) : sélecteur de styles SUPPRIMÉ — cibles uniques,
+       * VERTICAL = Bankable, HORIZONTAL = Money Radar (choix côté moteur). */
       var invalide = (s.erreurs || []).length;
       return '<div class="card mshot">' +
         '<h4>' + esc(shot.title || s.id) +
@@ -2175,9 +2174,6 @@ function renderMotion(){
           '<span class="mfmt on" data-f="voix">Voix off (TTS gratuit)</span>' +
           '<span class="mfmt" data-f="logo" title="OFF par défaut (CEO 26/10) : aucun logo ni filigrane incrusté">Logo & watermark</span>' +
         '</div>' +
-        '<div class="mfmts mstyles" data-shot="' + esc(s.id) + '">' +
-          '<span class="mfmt mstyle on" data-s="">Style du registre</span>' + styles +
-        '</div>' +
         (invalide
           ? '<div style="color:#ff9ba3;font-size:11px">Plan invalide : ' + esc(s.erreurs.join(' ; ')) + '</div>'
           : '<button class="btn pri sm blk" ' + (c.ok ? '' : 'disabled') + ' onclick="motionLancer(\'' + esc(s.id) + '\')">◆ Lancer le rendu</button>') +
@@ -2185,11 +2181,6 @@ function renderMotion(){
     }).join('');
     $$('#motionShots .mfmt').forEach(function(el){
       el.addEventListener('click', function(){
-        if (el.classList.contains('mstyle')) {
-          $$('.mstyles[data-shot="' + el.parentElement.getAttribute('data-shot') + '"] .mstyle').forEach(function(x){ x.classList.remove('on'); });
-          el.classList.add('on');
-          return;
-        }
         el.classList.toggle('on');
       });
     });
@@ -2212,9 +2203,7 @@ function motionChoix(shotId){
 
 function motionLancer(shotId){
   var choix = motionChoix(shotId);
-  var sel = document.querySelector('.mstyles[data-shot="' + shotId + '"] .mstyle.on');
-  var style = sel && sel.getAttribute('data-s') ? sel.getAttribute('data-s') : null;
-  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix, style: style, logo: choix.logo }) };
+  var o = { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ shotId: shotId, formats: choix.formats, voix: choix.voix, logo: choix.logo }) };
   if (BACKEND_URL) o.credentials = 'include';
   if (TOKEN) o.headers.authorization = 'Bearer ' + TOKEN;
   fetch(apiUrl('/api/motion/renders'), o)

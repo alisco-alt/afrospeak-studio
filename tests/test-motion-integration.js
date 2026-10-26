@@ -222,12 +222,14 @@ test('mission 4 : aucun logo/filigrane opt-in dans les plans embarqués', () => 
   }
 });
 
-test('mission 4 : templates — zéro sous-titre incrusté en vertical', () => {
+test('mission 5 : templates — sous-titres en vertical AUSSI (gate supprimé)', () => {
   const fsx = require('fs');
   const exp = fsx.readFileSync(path.join(MOTION, 'src', 'templates', 'Explainer.tsx'), 'utf8');
   const cin = fsx.readFileSync(path.join(MOTION, 'src', 'templates', 'Cinematic.tsx'), 'utf8');
-  vrai(exp.includes('{caption && !isVertical && ('), 'gate vertical Explainer absent');
-  vrai(cin.includes('{caption && !isVerticalSafe(height, width) && ('), 'gate vertical Cinematic absent');
+  vrai(exp.includes('{caption && ('), 'gate vertical Explainer encore présent');
+  vrai(cin.includes('{caption && ('), 'gate vertical Cinematic encore présent');
+  const kin = fsx.readFileSync(path.join(MOTION, 'src', 'library', 'Kinetic.tsx'), 'utf8');
+  vrai(kin.includes('fontSize: 19 * u'), 'calibration -30 % (27u → 19u) absente');
 });
 
 test('mission 4 : watermark classique OFF par défaut (config)', () => {
@@ -235,10 +237,11 @@ test('mission 4 : watermark classique OFF par défaut (config)', () => {
   eq(cfg.DEFAULTS.defaults.watermark, false, 'DEFAULTS.defaults.watermark');
 });
 
-test('mission 4 : pipeline — verticales sans incrustation, SRT conservé', () => {
+test('mission 5 : pipeline — captionsOn ne dépend plus du format, SRT conservé', () => {
   const fsx = require('fs');
   const src = fsx.readFileSync(path.join(RACINE, 'lib', 'pipeline.js'), 'utf8');
-  vrai(src.includes("captionsOn: style.captionMode !== 'none' && b.format !== 'vertical'"), 'gate captionsOn vertical');
+  vrai(src.includes("captionsOn: style.captionMode !== 'none',"), 'gate captionsOn par format encore présent');
+  vrai(!src.includes("&& b.format !== 'vertical'"), 'résidu du gate mission 4');
   vrai(/if \(allWords\.length\) fs\.writeFileSync\(srtFile/.test(src), 'SRT doit rester inconditionnel');
 });
 
@@ -256,7 +259,10 @@ test('UI : onglet + page + pilote motion présents', () => {
   vrai(html.includes('function renderMotion('), 'pilote absent');
   vrai(html.includes('mtpl-explainer') && html.includes('mtpl-cinematic'), 'badge template absent');
   vrai(html.includes('musique tendue'), 'mention musique tendue absente');
-  vrai(html.includes('mstyles') && html.includes('mfig'), 'sélecteur de style / chips figures absents');
+  vrai(html.includes('mfig'), 'chips figures absentes');
+  /* Mission 5 (CEO) : le sélecteur de styles est SUPPRIMÉ — cibles uniques
+   * vertical=Bankable, horizontal=Money Radar, imposées par le moteur. */
+  vrai(!html.includes('mstyles') && !html.includes('mstyle'), 'sélecteur de styles encore présent');
 });
 
 test('API : routes motion montées', () => {

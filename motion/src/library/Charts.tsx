@@ -10,8 +10,9 @@ import { KineticNumber } from './Kinetic';
  * Composants purs : ils reçoivent une FigureSpec (détectée dans la
  * narration par motion/src/data/figures.js, ou écrite dans le JSON)
  * et la dessinent image par image. Deux mises en scène :
- *   · FigureOverlay — surimpression compacte, l'image reste visible ;
- *   · FigureFull    — slide de données plein écran (explication profonde).
+ *   · FigureOverlay — surimpression compacte, l'image reste visible.
+ * Mission 5 (CEO) : FigureFull (slide plein écran opaque) SUPPRIMÉE — les
+ * chiffres se posent TOUJOURS en transparent par-dessus l'image qui défile.
  * Le KPI réutilise KineticNumber (compteur géant) : pas de doublon.
  */
 
@@ -349,50 +350,6 @@ export const FigureOverlay: React.FC<{ fig: FigureSpec; frame: number; from: num
           </div>
         )}
       </div>
-    </div>
-  );
-};
-
-/* ————— MODE (b) : slide de données plein écran ————— */
-export const FigureFull: React.FC<{ fig: FigureSpec; frame: number; from: number; u: number; theme: Theme; w: number; h: number }> = ({
-  fig,
-  frame,
-  from,
-  u,
-  theme,
-  w,
-  h,
-}) => {
-  const f = frame - from;
-  const p = ease(f, 0, 10);
-  return (
-    <div
-      style={{
-        width: w,
-        opacity: p,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 22 * u,
-        padding: `${26 * u}px ${30 * u}px`,
-        borderRadius: 22 * u,
-        background: 'rgba(10,10,14,0.88)',
-        border: `1.5px solid ${theme.accent}33`,
-        boxShadow: `0 40px 100px rgba(0,0,0,0.7)`,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 * u }}>
-        <span style={{ width: 10 * u, height: 10 * u, borderRadius: 99, background: theme.accent, boxShadow: `0 0 12px ${theme.accent}` }} />
-        <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 17 * u, letterSpacing: 2.6 * u, textTransform: 'uppercase', color: theme.accent }}>
-          {fig.type === 'line' ? 'tendance' : fig.type === 'pie' ? 'répartition' : fig.type === 'map' ? 'géographie' : fig.type === 'compare' ? 'avant / après' : fig.type === 'bars' ? 'séries' : 'donnée'}
-          {fig.auto ? ' · détection auto' : ''}
-        </span>
-      </div>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0 }}>
-        <FigureBody fig={fig} frame={frame} from={from} u={u} theme={theme} w={w * 0.9} h={h * 0.62} />
-      </div>
-      {fig.label && (
-        <div style={{ fontFamily: fonts.body, fontSize: 19 * u, color: theme.dim, lineHeight: 1.4 }}>{fig.label}</div>
-      )}
     </div>
   );
 };

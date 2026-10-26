@@ -21,7 +21,7 @@ import { Mascot } from '../library/Mascot';
 import { FilmFinish } from '../library/FilmFinish';
 import type { ExplainerBeat, ScreenSpec, ShotScript } from '../data/shots';
 import { figureDuBeat, modeParDefaut } from '../data/figures.js';
-import { FigureFull, FigureOverlay, type FigureSpec } from '../library/Charts';
+import { FigureOverlay, type FigureSpec } from '../library/Charts';
 
 /**
  * TEMPLATE « EXPLAINER » — référence A (php2shell-hook).
@@ -72,8 +72,7 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
   // les beats déjà chiffrés (stat/kinetic) ne se doublonnent pas eux-mêmes
   const figAuto = figureDuBeat(beat) as FigureSpec | null;
   const fig = figAuto && (beat as { kind?: string }).kind === 'stat' && !beat.figure ? null : figAuto;
-  const figMode = fig ? fig.mode ?? modeParDefaut(fig) : null;
-
+  
   const caption = 'caption' in beat ? (beat.caption as string | undefined) : undefined;
   const highlight = 'highlight' in beat ? (beat.highlight as string | undefined) : undefined;
   const ctaIn = interpolate(f, [26, 34], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
@@ -204,11 +203,6 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
                         {beat.cta}
                       </div>
                     )}
-                    {beat.sources && (
-                      <div style={{ fontFamily: theme.fontMono, fontSize: typeScale.monoSm.size * u, color: theme.dim, marginTop: 40 * u, maxWidth: L.col }}>
-                        {beat.sources}
-                      </div>
-                    )}
                   </div>
                 )}
               </AbsoluteFill>
@@ -236,7 +230,7 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       {/* ————— HUD (espace écran) ————— */}
       {/* CEO 26/10 : zéro sous-titre incrusté en vertical (le SRT reste
           généré par le studio) ; l'horizontal conserve ses captions. */}
-      {caption && !isVertical && (
+      {caption && (
         <div
           style={{
             position: 'absolute',
@@ -261,12 +255,7 @@ export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
         </div>
       )}
       {/* ————— FIGURE PILOTÉE PAR LE SCRIPT (mission 3) ————— */}
-      {fig && figMode === 'full' && (
-        <AbsoluteFill style={{ background: 'rgba(8,8,12,0.88)', alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
-          <FigureFull fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} w={L.col * 0.92} h={height * 0.62} />
-        </AbsoluteFill>
-      )}
-      {fig && figMode === 'overlay' && (
+      {fig && (
         <div style={{ position: 'absolute', bottom: height * 0.13, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: `0 ${L.safe.x}px` }}>
           <FigureOverlay fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} width={L.col * (isVertical ? 0.9 : 0.66)} />
         </div>
