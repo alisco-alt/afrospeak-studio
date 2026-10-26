@@ -78,4 +78,31 @@ export const FORMAT_PREF: Record<ThemeId, '16x9' | '9x16'> = {
   cinematic: '16x9',
 };
 
+/**
+ * PACK VISUEL INJECTÉ (mission 3, adaptabilité) : le studio choisit un
+ * style UI (Bankable, Money Radar, Écofin, Documentaire, Brut, Viral…),
+ * le pont le résout depuis lib/presets.js (source unique) et l'injecte
+ * au rendu via --props. Le moteur applique le pack sur le thème du
+ * registre — aucun style codé en dur ici.
+ */
+export interface StylePack {
+  id?: string;
+  accent?: string | null;
+  pill?: string | null;
+  upper?: boolean;
+  vignette?: number | null;
+  saturation?: number | null;
+  grade?: string | null;
+  dataCards?: boolean;
+}
+
+export function applyStylePack(theme: Theme, pack?: StylePack | null): Theme {
+  if (!pack || !pack.id) return theme;
+  return {
+    ...theme,
+    accent: pack.accent || theme.accent,
+    accent2: pack.pill || pack.accent || theme.accent2,
+  };
+}
+
 export const baseColors = colors;

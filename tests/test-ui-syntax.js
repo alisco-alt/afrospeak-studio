@@ -1,42 +1,62 @@
-#!/usr/bin/env node
+/**
+ * Non-régression UI — le JS inline de public/index.html doit COMPILER.
+ * ---------------------------------------------------------------------
+ * Le 25/10, une apostrophe non échappée (« pour l'instant » dans une
+ * chaîne entre guillemets simples, ligne ~2218) tuait TOUT le script
+ * inline : onglets inertes, rendus Motion invisibles. Ce test compile
+ * chaque <script> inline (vm.Script = parse sans exécution) et vérifie
+ * la présence des points d'entrée du pilote (window.go, renderMotion,
+ * motionLancer). Toute livraison UI doit passer ici.
+ */
 'use strict';
-/* Tests de santé de l'interface web.
- *   - Le JavaScript inline de public/index.html doit COMPILER (une apostrophe
- *     non échappée dans une chaîne a déjà tué toute l'UI : boutons inertes,
- *     listes vides — les greps de présence ne l'attrapent pas).
- *   - Les fonctions globales clés doivent être exportées sur window.
- * Sans réseau : pure analyse du fichier. */
-
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-let ok = 0, ko = 0;
-const check = (nom, cond) => { if (cond) { ok++; console.log('  ✓ ' + nom); } else { ko++; console.log('  ✗ ' + nom); } };
+const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
 
-const RACINE = path.resolve(__dirname, '..');
-const html = fs.readFileSync(path.join(RACINE, 'public', 'index.html'), 'utf8');
-
-/* ── extraction du script inline ─────────────────────────────────────── */
-const m = html.match(/<script>([\s\S]*)<\/script>/);
-check('index.html contient un bloc <script> inline', !!m);
-const src = m ? m[1] : '';
-
-/* ── compilation (même moteur V8 que le navigateur) ──────────────────── */
-let erreur = null;
-try { new vm.Script(src, { filename: 'index.html#inline' }); } catch (e) { erreur = e; }
-check('le JavaScript inline compile sans erreur de syntaxe', !erreur);
-if (erreur) console.log('      → ' + String(erreur.message).slice(0, 160));
-
-/* ── exports globaux attendus (window.X = X) ─────────────────────────── */
-for (const fn of ['go', 'renderMotion', 'motionLancer']) {
-  check('window.' + fn + ' est exporté', new RegExp('window\\.' + fn + '\\s*=').test(src));
+let ok = 0;
+let ko = 0;
+function test(nom, fn) {
+  try {
+    fn();
+    ok++;
+    console.log('  ok  ' + nom);
+  } catch (e) {
+    ko++;
+    console.log('  KO  ' + nom + ' — ' + e.message);
+  }
 }
+function vrai(v, msg) { if (!v) throw new Error(msg || 'attendu vrai'); }
 
-/* ── pas d'apostrophe non échappée (garde supplémentaire lisible) ────── */
-const apostrophe = src.match(/=\s*'[^'\\\n]*[a-zàâçéèêëîïôûùüÿœ]'[a-zàâçéèêëîïôûùüÿœ]/);
-check('aucune chaîne simple-quote avortée par une apostrophe', !apostrophe);
+const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 
-console.log('');
-console.log('Résultat : ' + ok + ' ok, ' + ko + ' ko');
-process.exit(ko > 0 ? 1 : 0);
+test('au moins un script inline présent', () => vrai(scripts.length >= 1, 'aucun script inline'));
+
+scripts.forEach((code, i) => {
+  test(`script inline #${i} compile (parse strict)`, () => {
+    new vm.Script(code, { filename: `inline-${i}.js` });
+  });
+});
+
+const code = scripts.join('\n');
+test('points d' + ' entrée du routeur et du pilote motion exposés', () => {
+  vrai(/window\.go\s*=/.test(code), 'window.go absent');
+  vrai(/function renderMotion\s*\(/.test(code) && /window\.renderMotion\s*=/.test(code), 'renderMotion non exposé');
+  vrai(/function motionLancer\s*\(/.test(code) && /window\.motionLancer\s*=/.test(code), 'motionLancer non exposé');
+});
+
+test('aucune apostrophe typographique cassée dans une chaîne single-quote du pilote motion', () => {
+  // motif du bug du 25/10 : ' … l'instant … ' (apostrophe droite inside single quotes)
+  const motion = code.slice(code.indexOf('var MOTION = {'));
+  vrai(motion.length > 0, 'bloc MOTION introuvable');
+  // une élision française (lettre + apostrophe droite + lettre) à l'intérieur
+  // d'un segment single-quote = le bug du 25/10 ; le code légitime
+  // (getAttribute('data-s')) n'a jamais lettre'lettre dans un segment
+  const segments = [...motion.matchAll(/'[^'\n]*'/g)].map((m) => m[0]);
+  const casses = segments.filter((seg) => /[a-zà-ÿ]'[a-zà-ÿ]/.test(seg));
+  vrai(casses.length === 0, 'apostrophes droites suspectes : ' + casses.join(' | '));
+});
+
+console.log(`\nRésultat : ${ok} ok, ${ko} ko`);
+process.exit(ko ? 1 : 0);

@@ -23,6 +23,8 @@ const CHECKS = [
   { id: 'afrospeak-voice-9x16', frames: [10, 60, 120, 210, 300] },
   { id: 'php2shell-doc-16x9', frames: [20, 95, 160, 230, 300, 350, 420] },
   { id: 'php2shell-doc-9x16', frames: [20, 95, 160, 230, 300, 350, 420] },
+  { id: 'infographies-demo-16x9', frames: [20, 80, 140, 200, 260, 315, 370] },
+  { id: 'infographies-demo-9x16', frames: [20, 80, 140, 200, 260, 315, 370] },
 ];
 
 fs.mkdirSync(path.join(process.cwd(), 'out'), { recursive: true });

@@ -127,7 +127,36 @@ shots/x.json → validerShotScript v2 (registre, kinds, highlight, images)
 Le moteur rend **muet par conception** : l'audio (VO) est mixé par le studio, ce qui garde
 le rendu Remotion déterministe et léger ; le SRT reste calé sur les `at` des beats.
 
-## 5. Restes connus (roadmap)
+## 5. Mission 3 — infographies animées pilotées par le script
+
+Le CONTENU du plan déclenche la visualisation : `motion/src/data/figures.js`
+(source unique CJS, consommée par moteur, pont et tests) analyse chaque `vo`
+et dérive une FigureSpec — **chiffre → KPI compteur, tendance/« +x % » →
+courbe, part (« un tiers », « 3 sur 4 ») → camembert, géographie + chiffre →
+carte à pins, « passé de A à B » → comparaison, série de valeurs → barres**.
+Deux mises en scène dans les DEUX templates :
+
+- **surimpression** (`FigureOverlay`) : bandeau compact, l'image reste visible — mode par défaut du KPI ;
+- **slide plein écran** (`FigureFull`) : fond voilé + carte de données — mode par défaut des graphes riches.
+
+Chaque beat peut forcer (`figure: {…}`) ou refuser (`figure: false`) la figure ;
+l'UI affiche une chip `◔ type auto` par beat détecté. Preuve :
+`shots/infographies-demo.json` (sujet éco, aucune figure écrite à la main) →
+`afrospeak-poc/renders/proof-infographies-demo-16x9-voix.mp4`.
+
+**Adaptabilité totale** : le style choisi dans l'UI (Bankable, Money Radar,
+Écofin, Documentaire, Brut, Viral, Impact, Cinéma) est résolu depuis
+`lib/presets.js` (source unique) en `packStyle()` puis injecté au rendu via
+`--props { shot, stylePack }` ; le moteur l'applique par `applyStylePack()`
+sur le thème du registre — aucun style codé en dur, tout sujet/type passe par
+le même schéma (détection contenue, pas de niche).
+
+**Règle de livraison UI** : tout changement de `public/index.html` passe
+`tests/test-ui-syntax.js` (compile chaque `<script>` inline via `vm.Script` +
+vérifie `window.go` / `renderMotion` / `motionLancer` + chasse l'apostrophe
+droite dans un segment single-quote — le bug du 25/10 qui tuait tout le JS).
+
+## 6. Restes connus (roadmap)
 
 - M10 : iframe Remotion Studio derrière l'UI pour éditer les beats en scrub live ;
 - M15 : lip-sync de la mascotte sur l'amplitude de la VO (aujourd'hui : enveloppe procédurale) ;
@@ -138,10 +167,10 @@ le rendu Remotion déterministe et léger ; le SRT reste calé sur les `at` des 
 - M22 : banque de plans cinématographiques élargie (4 plans générés livrés ; ajouter des
   PNG dans `motion/public/img/` suffit, le validateur vérifie leur présence).
 
-## 6. Vérifications
+## 7. Vérifications
 
 ```bash
-npm test                      # 14 suites dont test-motion-integration v2 (343 ok au commit)
+npm test                      # 16 suites dont test-motion-integration v2, test-figures, test-ui-syntax
 cd motion && npx tsc --noEmit # typage du moteur
 cd motion && npm run qa       # assertions frames clés (anti plan fixe / frame vide)
 ```

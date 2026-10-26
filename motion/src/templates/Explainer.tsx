@@ -2,7 +2,7 @@ import React from 'react';
 import { AbsoluteFill, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { useLayout } from '../ds/layout';
 import { fonts, type as typeScale } from '../ds/tokens';
-import { THEMES, type Theme } from '../ds/themes';
+import { THEMES, applyStylePack, type StylePack, type Theme } from '../ds/themes';
 import { CamPreset, Parallax, World, camKeys } from '../library/Camera';
 import { FlashCut, LightLeak, Particles } from '../library/Atmosphere';
 import { CaptionWords, Kicker, KineticNumber, KineticTitle } from '../library/Kinetic';
@@ -20,6 +20,8 @@ import { PlugConnect, WallGrid } from '../library/Metaphor';
 import { Mascot } from '../library/Mascot';
 import { FilmFinish } from '../library/FilmFinish';
 import type { ExplainerBeat, ScreenSpec, ShotScript } from '../data/shots';
+import { figureDuBeat, modeParDefaut } from '../data/figures.js';
+import { FigureFull, FigureOverlay, type FigureSpec } from '../library/Charts';
 
 /**
  * TEMPLATE « EXPLAINER » — référence A (php2shell-hook).
@@ -38,12 +40,12 @@ import type { ExplainerBeat, ScreenSpec, ShotScript } from '../data/shots';
 
 const CAM_CYCLE: CamPreset[] = ['dolly-in', 'pan-right', 'tilt-up', 'pan-left', 'dolly-out'];
 
-export const Explainer: React.FC<{ shot: ShotScript }> = ({ shot }) => {
+export const Explainer: React.FC<{ shot: ShotScript; stylePack?: StylePack | null }> = ({ shot, stylePack }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const L = useLayout();
   const { u, width, height, isVertical } = L;
-  const theme: Theme = THEMES.explainer;
+  const theme: Theme = applyStylePack(THEMES.explainer, stylePack);
   const beats = shot.beats as ExplainerBeat[];
 
   const idx = beats.findIndex((b, i) => frame >= b.at && (i === beats.length - 1 || frame < beats[i + 1].at));
@@ -65,6 +67,12 @@ export const Explainer: React.FC<{ shot: ShotScript }> = ({ shot }) => {
     if (s.kind === 'term') return <TermCapture key={s.title} spec={s as TermSpec} u={u} theme={theme} width={w} frame={frame} from={from} />;
     return null;
   };
+
+  // figure pilotée par le contenu : explicite > auto > opt-out (figure:false) ;
+  // les beats déjà chiffrés (stat/kinetic) ne se doublonnent pas eux-mêmes
+  const figAuto = figureDuBeat(beat) as FigureSpec | null;
+  const fig = figAuto && (beat as { kind?: string }).kind === 'stat' && !beat.figure ? null : figAuto;
+  const figMode = fig ? fig.mode ?? modeParDefaut(fig) : null;
 
   const caption = 'caption' in beat ? (beat.caption as string | undefined) : undefined;
   const highlight = 'highlight' in beat ? (beat.highlight as string | undefined) : undefined;
@@ -247,6 +255,17 @@ export const Explainer: React.FC<{ shot: ShotScript }> = ({ shot }) => {
       {brandMark && (
         <div style={{ position: 'absolute', top: L.safe.y * 0.55, left: L.safe.x * 0.7, opacity: 0.9 }}>
           <img src={brandMark} style={{ width: 44 * u, height: 44 * u, objectFit: 'contain' }} />
+        </div>
+      )}
+      {/* ————— FIGURE PILOTÉE PAR LE SCRIPT (mission 3) ————— */}
+      {fig && figMode === 'full' && (
+        <AbsoluteFill style={{ background: 'rgba(8,8,12,0.88)', alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
+          <FigureFull fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} w={L.col * 0.92} h={height * 0.62} />
+        </AbsoluteFill>
+      )}
+      {fig && figMode === 'overlay' && (
+        <div style={{ position: 'absolute', bottom: height * 0.13, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: `0 ${L.safe.x}px` }}>
+          <FigureOverlay fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} width={L.col * (isVertical ? 0.9 : 0.66)} />
         </div>
       )}
       <FilmFinish intensity={1.15} />

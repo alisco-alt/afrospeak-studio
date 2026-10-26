@@ -3,9 +3,11 @@ import { Composition } from 'remotion';
 import { Explainer } from './templates/Explainer';
 import { Cinematic } from './templates/Cinematic';
 import type { ShotScript } from './data/shots';
+import type { StylePack } from './ds/themes';
 import php2shell from '../shots/php2shell-hook.json';
 import afrospeak from '../shots/afrospeak-voice.json';
 import doc from '../shots/php2shell-doc.json';
+import demo from '../shots/infographies-demo.json';
 
 /**
  * RACINE REMOTION — une composition par plan × format, nommée
@@ -19,6 +21,7 @@ const SHOTS: ShotScript[] = [
   php2shell as unknown as ShotScript,
   afrospeak as unknown as ShotScript,
   doc as unknown as ShotScript,
+  demo as unknown as ShotScript,
 ];
 
 const FORMATS = [
@@ -26,8 +29,8 @@ const FORMATS = [
   { suffix: '9x16', width: 1080, height: 1920 },
 ];
 
-const ShotComp: React.FC<{ shot: ShotScript }> = ({ shot }) =>
-  shot.template === 'cinematic' ? <Cinematic shot={shot} /> : <Explainer shot={shot} />;
+const ShotComp: React.FC<{ shot: ShotScript; stylePack?: StylePack | null }> = ({ shot, stylePack }) =>
+  shot.template === 'cinematic' ? <Cinematic shot={shot} stylePack={stylePack ?? null} /> : <Explainer shot={shot} stylePack={stylePack ?? null} />;
 
 export const RemotionRoot: React.FC = () => (
   <>
@@ -41,7 +44,7 @@ export const RemotionRoot: React.FC = () => (
           fps={shot.fps}
           width={fmt.width}
           height={fmt.height}
-          defaultProps={{ shot }}
+          defaultProps={{ shot, stylePack: null }}
         />
       )),
     )}

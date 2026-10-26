@@ -106,6 +106,26 @@ test('validateur : stat sans lines et ui sans capture refusés', () => {
   vrai(e.some((x) => /capture youtube\|press\|doc/.test(x)), 'ui sans capture non détecté');
 });
 
+test('pont motion : figures détectées exposées par beat (mission 3)', () => {
+  const demo = shots.find((s) => s.id === 'infographies-demo');
+  vrai(demo, 'plan démo absent');
+  const types = demo.figures.filter(Boolean).map((f) => f.type);
+  for (const t of ['line', 'kpi', 'pie', 'compare', 'map']) vrai(types.includes(t), 'figure ' + t + ' non détectée');
+  vrai(demo.figures.filter(Boolean).every((f) => f.auto), 'les figures du démo doivent être auto');
+  const hook = shots.find((s) => s.id === 'php2shell-hook');
+  vrai(hook.figures.every((f) => !f), 'plan validé : aucune figure auto attendue');
+});
+
+test('pont motion : pack de style résolu depuis presets.js (adaptabilité)', () => {
+  const styles = motion.listStyles();
+  for (const id of ['bankable', 'moneyradar', 'ecofin', 'doc', 'brut', 'viral']) {
+    vrai(styles.some((s) => s.id === id), 'style UI manquant : ' + id);
+  }
+  const mr = motion.packStyle('moneyradar');
+  vrai(mr && mr.accent, 'pack moneyradar sans accent');
+  eq(motion.packStyle('style-inexistant'), null, 'style inconnu doit donner null');
+});
+
 test('pont motion : nappe sonore procédurale exposée', () => {
   vrai(typeof motion.genererMusique === 'function', 'genererMusique absente');
 });
@@ -201,6 +221,7 @@ test('UI : onglet + page + pilote motion présents', () => {
   vrai(html.includes('function renderMotion('), 'pilote absent');
   vrai(html.includes('mtpl-explainer') && html.includes('mtpl-cinematic'), 'badge template absent');
   vrai(html.includes('musique tendue'), 'mention musique tendue absente');
+  vrai(html.includes('mstyles') && html.includes('mfig'), 'sélecteur de style / chips figures absents');
 });
 
 test('API : routes motion montées', () => {
