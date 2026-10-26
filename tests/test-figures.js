@@ -30,7 +30,7 @@ test('tendance + pourcentage → courbe (le PIB a bondi de 80 %)', () => {
   eq(f.unit, '%');
   eq(f.trend, 'up');
   vrai(Array.isArray(f.series) && f.series.length >= 4, 'série synthétique');
-  eq(modeParDefaut(f), 'full', 'courbe = slide plein écran');
+  eq(modeParDefaut(f), 'overlay', 'mission 5 : courbe = surimpression (plus de slide opaque)');
 });
 
 test('signe portant la tendance → courbe (+12 % en un an)', () => {
@@ -112,7 +112,7 @@ test('figureDuBeat : explicite > auto > opt-out', () => {
   eq(expl.value, 7);
   const auto = figureDuBeat({ vo: 'a bondi de 80 %' });
   vrai(auto.auto === true, 'marqueur auto');
-  eq(auto.mode, 'full');
+  eq(auto.mode, 'overlay');
 });
 
 console.log('\nRésultat : ' + ok + ' ok, ' + ko + ' ko');

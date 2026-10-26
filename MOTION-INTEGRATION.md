@@ -167,10 +167,10 @@ droite dans un segment single-quote — le bug du 25/10 qui tuait tout le JS).
    moteur, filigranes et cartons logo ne s'affichent que si
    `shot.brand.watermark === true` / `showLogo === true` (aucun plan embarqué
    ne les force). Le CEO pose son propre logo manuellement.
-3. **Zéro sous-titre incrusté dans les VERTICALES** : `captionsOn` du pipeline
-   classique et couche caption des deux templates sont coupées si le format
-   est 9:16 ; l'horizontal reste inchangé et le **SRT sidecar est toujours
-   écrit** (`buildSRT` ne dépend pas de `captionsOn`).
+3. **Zéro sous-titre incrusté dans les VERTICALES** — ⚠️ **RENVERSÉ PAR LA
+   MISSION 5** (décision CEO : sous-titres réactivés en vertical, calibrés
+   -30 % sur la référence Bankable, position basse conservée). Le **SRT
+   sidecar reste toujours écrit** (`buildSRT` ne dépend pas de `captionsOn`).
 4. **Garde-fou anti-production-dégradée** (`lib/sourcing.js`, testé) : avant le
    montage, `evaluerSourcingMedia()` mesure banques joignables, part de médias
    réels, réemploi maximal ; sous les seuils (50 % / 50 % / 3×) le run lève
@@ -181,6 +181,58 @@ Preuves : `afrospeak-poc/renders/proof-m4-vertical-sans-sous-titres-9x16.mp4`
 (aucun sous-titre ni logo, captures réelles) et
 `proof-m4-horizontal-sous-titres-16x9.mp4` (karaoke conservé, image réelle,
 sans filigrane).
+
+## 6b. Mission 5 — plein cadre, chiffres transparents, cibles uniques (retour CEO sur run réel)
+
+Constat CEO sur une production réelle (verticale + 3 captures) : pièces d'or et
+cargo « flottant » sur fond flouté, « 400 tonnes » en ×4 empilé sur slide
+opaque, un visuel du Kazakhstan sur un sujet Afrique. Six corrections,
+vérifiées par `tests/test-mission5.js` (15 assertions) :
+
+1. **Images plein cadre** : `pickFitMode()` renvoie `'crop'` quoi qu'il
+   arrive — le mode « blur » (image entière sur fond flouté) est supprimé,
+   tout visuel de fond est recadré cover, zéro marge/coin visible.
+2. **Chiffres transparents, instance unique, compteur animé** :
+   - classique : les types `dataSlide/counter/barChart/line/statTile` ne
+     produisent plus de clip ASS opaque (`renderMotionShot` → `null`) ; le
+     chiffre passe par `addFigureCard` = calque ASS **transparent** posé sur
+     l'image réelle qui continue son Ken Burns. Le style « Ghost » (écho
+     géant ×4) a disparu du chemin de rendu ; `ajoutCompteur()` émet une
+     rampe 0→cible en événements ASS **consécutifs** (jamais superposés :
+     zéro ghosting), testée au chevauchement près ;
+   - moteur Motion : `FigureFull` (slide plein écran) **supprimée** de
+     `Charts.tsx` et des deux templates ; `modeParDefaut()` renvoie
+     `'overlay'` pour toutes les figures — la couche surimpression seule
+     reste, sur l'image qui défile.
+3. **Sous-titres -30 %** : `captionSize` Bankable 0.058→**0.041**, Money
+   Radar 0.044→**0.031** ; moteur : `CaptionWords` 27u→**19u**. Position
+   basse conservée ; verticales **avec** sous-titres (voir §6.3 renversé).
+4. **Cibles uniques, plus de sélecteur** : chips `.mstyles` retirées de
+   l'UI ; `styleCible(format)` = `landscape→moneyradar`, sinon `bankable` ;
+   le bridge Motion impose `packStyle('9x16'→bankable, '16x9'→moneyradar)`
+   — l'agent-monteur adapte le montage **au sujet** dans la même grammaire.
+5. **Zéro méta-incrustation** : crédits, sources, `dataSource` et bandeau
+   « ILLUSTRATION IA » ne passent plus à l'écran ; tout est écrit dans un
+   sidecar `<basename>.credits.txt` (par plan : crédit, citation,
+   fournisseur, URL, mention IA, donnée). Côté moteur, le bloc de sources
+   mono de l'outro Explainer (`beat.sources`) est supprimé du template, du
+   type `ShotScript` et des plans embarqués — les métadonnées vivent dans
+   le JSON/sidecar, jamais à l'image.
+6. **Filtre géo (pays ET continent)** : lexique `PAYS_MONDE` tagué par
+   continent (119 pays, 52 africains) ; `sujetGeo()` ancre un sujet sur ses
+   pays nommés ou son continent (« Afrique », « panafricain »…) ;
+   `filtrerGeoCandidat()` rejette tout candidat nommant un pays étranger au
+   sujet sans en nommer aucun du sujet (`GEO_MISMATCH`). Câblé **deux**
+   fois : dans la cascade de sourcing (`mediaFetcher`) et en dernier verrou
+   de l'agent-monteur avant arbitrage (`pipeline` stage 6a, visuel écarté +
+   finding au rapport). Sans ancrage du sujet, rien n'est filtré.
+
+Preuves (plan `infographies-demo`, images réelles + figures auto + caption) :
+`afrospeak-poc/renders/proof-m5-vertical-bankable-9x16.mp4` (Bankable-like :
+plein cadre cover, chiffres en surimpression transparente animée sur le
+footage qui défile, sous-titres calibrés -30 % en position basse) et
+`proof-m5-horizontal-moneyradar-16x9.mp4` (Money Radar-like, même grammaire
+déclinée en horizontal).
 
 ## 7. Restes connus (roadmap)
 
@@ -196,7 +248,7 @@ sans filigrane).
 ## 8. Vérifications
 
 ```bash
-npm test                      # 17 suites dont test-motion-integration v2, test-figures, test-sourcing, test-ui-syntax
+npm test                      # 18 suites dont test-mission5, test-motion-integration v2, test-figures, test-sourcing, test-ui-syntax
 cd motion && npx tsc --noEmit # typage du moteur
 cd motion && npm run qa       # assertions frames clés (anti plan fixe / frame vide)
 ```

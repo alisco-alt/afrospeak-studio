@@ -212,7 +212,9 @@ export const CaptionWords: React.FC<{
         justifyContent: 'center',
         gap: `0 ${9 * u}px`,
         fontFamily: fonts.body,
-        fontSize: 27 * u,
+        /* Mission 5 (CEO) : sous-titres calibrés sur la référence Bankable,
+         * -30 % (27u → 19u) — position basse conservée. */
+        fontSize: 19 * u,
         fontWeight: 800,
         letterSpacing: 0.6 * u,
         textTransform: 'uppercase',

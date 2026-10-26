@@ -12,7 +12,7 @@ import { BrandCard } from '../library/BrandCard';
 import { FilmFinish } from '../library/FilmFinish';
 import type { CinematicBeat, ShotScript } from '../data/shots';
 import { figureDuBeat, modeParDefaut } from '../data/figures.js';
-import { FigureFull, FigureOverlay, type FigureSpec } from '../library/Charts';
+import { FigureOverlay, type FigureSpec } from '../library/Charts';
 
 /**
  * TEMPLATE « CINEMATIC » — référence B (afrospeak-voice).
@@ -83,8 +83,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
   // les beats déjà chiffrés (stat/kinetic) ne se doublonnent pas eux-mêmes
   const figAuto = figureDuBeat(beat) as FigureSpec | null;
   const fig = figAuto && beat.kind === 'stat' && !beat.figure ? null : figAuto;
-  const figMode = fig ? fig.mode ?? modeParDefaut(fig) : null;
-
+  
   const caption = 'caption' in beat ? (beat.caption as string | undefined) : undefined;
   const highlight = 'highlight' in beat ? (beat.highlight as string | undefined) : undefined;
 
@@ -203,7 +202,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       {/* ————— HUD (espace écran) ————— */}
       {/* CEO 26/10 : zéro sous-titre incrusté en vertical (le SRT reste
           généré par le studio) ; l'horizontal conserve son karaoke. */}
-      {caption && !isVerticalSafe(height, width) && (
+      {caption && (
         <div
           style={{
             position: 'absolute',
@@ -228,12 +227,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       <Particles count={20} tint="#FFE9C4" speed={0.35} rise={false} opacity={0.22} size={1.4} />
       <LightLeak tint="#FFD9A0" strength={0.4} x={0.7} />
       {/* ————— FIGURE PILOTÉE PAR LE SCRIPT (mission 3) ————— */}
-      {fig && figMode === 'full' && (
-        <AbsoluteFill style={{ background: 'rgba(8,8,12,0.88)', alignItems: 'center', justifyContent: 'center', padding: `${L.safe.y}px ${L.safe.x}px` }}>
-          <FigureFull fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} w={L.col * 0.92} h={height * 0.62} />
-        </AbsoluteFill>
-      )}
-      {fig && figMode === 'overlay' && (
+      {fig && (
         <div style={{ position: 'absolute', bottom: height * 0.2, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: `0 ${L.safe.x}px` }}>
           <FigureOverlay fig={fig} frame={frame} from={beatFrom} u={u} theme={theme} width={L.col * (isVerticalSafe(height, width) ? 0.9 : 0.66)} />
         </div>
