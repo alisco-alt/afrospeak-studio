@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "status": "pass",
+  "score": 100,
+  "threshold": 90,
+  "checks": [
+    {
+      "id": "decode",
+      "status": "pass",
+      "value": true,
+      "detail": "Décodage complet audio/vidéo sans erreur",
+      "critical": true
+    },
+    {
+      "id": "format",
+      "status": "pass",
+      "value": {
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "audio": "aac"
+      },
+      "detail": "H.264 yuv420p + AAC, dimensions demandées",
+      "critical": true
+    },
+    {
+      "id": "fps",
+      "status": "pass",
+      "value": 30,
+      "detail": "Cadence mesurée au conteneur",
+      "critical": true
+    },
+    {
+      "id": "duration",
+      "status": "pass",
+      "value": 25.133984,
+      "detail": "Durée attendue ±1 % ; désynchronisation A/V <350 ms",
+      "critical": true
+    },
+    {
+      "id": "evidence_binding",
+      "status": "pass",
+      "value": true,
+      "detail": "Empreintes des médias et du master ; couverture de timeline",
+      "critical": true
+    },
+    {
+      "id": "dark_ratio",
+      "status": "pass",
+      "value": 0,
+      "detail": "Échantillons sombres ≤15 %",
+      "critical": true
+    },
+    {
+      "id": "full_frame",
+      "status": "pass",
+      "value": 0,
+      "detail": "Bandes noires opposées ; heuristique luminance des bords",
+      "critical": true
+    },
+    {
+      "id": "relevance",
+      "status": "pass",
+      "value": [
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        }
+      ],
+      "detail": "Géo stricte + recoupement lexical métadonnées ; pas de reconnaissance visuelle",
+      "critical": true
+    },
+    {
+      "id": "cut_rate",
+      "status": "pass",
+      "value": {
+        "plannedCutsPerMinute": 16.710442721695056,
+        "measuredCutsPerMinute": 16.710442721695056,
+        "longestShot": 4.233333333333333
+      },
+      "detail": "Timeline + changements d’image FFmpeg (seuils scène 0,12/0,05)",
+      "critical": true
+    },
+    {
+      "id": "captions",
+      "status": "pass",
+      "value": [],
+      "detail": "Durée, CPS, lignes, taille et marges ; contraste attesté par outline",
+      "critical": true
+    },
+    {
+      "id": "watermark",
+      "status": "pass",
+      "value": {
+        "samples": 8,
+        "stockHits": []
+      },
+      "detail": "OCR local sur chaque plan (mots de banques connus). Filigranes graphiques inconnus non garantis.",
+      "critical": true
+    },
+    {
+      "id": "caption_pixels",
+      "status": "pass",
+      "value": {
+        "matches": 8,
+        "samples": 8
+      },
+      "detail": "Au moins 50 % des sondes OCR retrouvent un mot du sous-titre incrusté",
+      "critical": true
+    },
+    {
+      "id": "unique_assets",
+      "status": "pass",
+      "value": {
+        "shots": 8,
+        "unique": 8
+      },
+      "detail": "Un fichier réel unique par plan (SHA-256)",
+      "critical": true
+    },
+    {
+      "id": "visual_grade",
+      "status": "pass",
+      "value": {
+        "enabled": false,
+        "look": "disabled",
+        "shots": 0,
+        "meanDeltaE76": null,
+        "meanLumaShift": null,
+        "meanHistogramDistance": null
+      },
+      "detail": "Étalonnage désactivé explicitement",
+      "critical": true
+    }
+  ],
+  "limits": [
+    "QC échantillonné : défauts entre sondes possibles.",
+    "Pertinence lexicale ≠ compréhension visuelle.",
+    "OCR ≠ preuve universelle d’absence de watermark.",
+    "La provenance repose sur un manifeste produit par le moteur ; les hashes ne prouvent pas la vérité des métadonnées.",
+    "Ce score ne certifie pas une équivalence artistique aux références."
+  ],
+  "measurements": {
+    "frameSamples": 50,
+    "sampleSeconds": 0.5,
+    "sceneTimes": [
+      3.033333,
+      4.566667,
+      6.733333,
+      10.533333,
+      14.3,
+      17.966667,
+      22.2
+    ],
+    "ocr": {
+      "available": true,
+      "complete": true,
+      "samples": 8,
+      "stockHits": [],
+      "captionSamples": 8,
+      "captionMatches": 8
+    }
+  },
+  "file": "/home/user/afrospeak-studio/proofs/mission9/abidjan-before.mp4",
+  "createdAt": "2026-10-27T15:31:34.257Z",
+  "masterSha256": "6ebd621206369bc26a28db51b549c50c806da7fffbb55b5dee45e6b37e95d582"
+}
