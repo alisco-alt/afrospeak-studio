@@ -315,3 +315,23 @@ output/
 - *Optionnel* : Ollama (scripts IA), `pip install yt-dlp gallery-dl` (réseaux sociaux)
 
 Licence : usage personnel et éditorial. Respectez les droits des médias tiers.
+
+## Mission 8 — production locale avec livraison bloquée par le QC
+
+```bash
+# Une fois : dépendances système + modèle Piper (voir MISSION8-QUALITE.md)
+bash scripts/setup-local-production.sh
+PATH="$PWD/.venv/bin:$PATH" npm run produce -- \
+  --script examples/mission8-abidjan.json \
+  --piper-model data/models/fr_FR-siwis-medium.onnx \
+  --output output/abidjan.mp4 --strict
+```
+
+Cette voie isolée ne charge aucun fournisseur cloud. Elle livre le MP4 seulement
+après le PASS du gate local ; elle refuse plutôt que de livrer un fond de secours
+hors sujet. TXT/JSON, sourcing Commons libre ou `--offline`, reprises bornées,
+rapports JSON + texte, crédits et manifeste d'empreintes.
+
+**Portée et limites du QC, installation, scripts et preuve :
+[MISSION8-QUALITE.md](MISSION8-QUALITE.md).** Le score n'est pas une certification
+artistique ; la géographie est contrôlée via les métadonnées, le watermark par OCR.

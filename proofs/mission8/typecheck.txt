@@ -1,0 +1,4 @@
+Commande : cd motion && ./node_modules/.bin/tsc --noEmit
+Code de sortie : 0
+Rendu smoke : npx remotion render src/index.ts infographies-demo-16x9 /home/user/remotion-smoke.mp4 --frames=50-79 --scale=0.5 --concurrency=1
+Code de sortie : 0 ; 30/30 frames encodées

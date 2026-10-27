@@ -1,0 +1,18 @@
+{
+  "title": "Abidjan : capacité portuaire n'est pas trafic réel",
+  "topic": "Le port d'Abidjan en Côte d'Ivoire",
+  "editorialNote": "Nouvelle production du 27 octobre 2026, pas une actualité datée du jour. Les photos Commons sont des archives de contexte, pas des vues certifiées du terminal TC2. Aucun trafic actuel inventé.",
+  "sources": [
+    {"url": "https://www.portabidjan.ci/fr/le-port-dabidjan/installations-et-activites", "claim": "TC2 : capacité 1,5 million EVP/an ; quai 1 100 m"},
+    {"url": "https://www.transports.gouv.ci/actualites/port-dabidjan-le-nouveau-terminal-a-conteneurs-inaugure", "claim": "Inauguration du deuxième terminal en décembre 2022"}
+  ],
+  "scenes": [
+    {"narration": "À Abidjan, le port raconte une autre économie.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": false},
+    {"narration": "Des quais aux navires, les marchandises doivent circuler.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": false},
+    {"narration": "En 2022, le deuxième terminal change l'échelle du port.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": false},
+    {"narration": "Sa capacité nominale atteint 1,5 million de conteneurs par an.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": {"type": "kpi", "value": 1.5, "unit": "M EVP / an", "label": "TC2 · capacité nominale"}},
+    {"narration": "Le quai mesure 1100 mètres, selon l'autorité portuaire.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": {"type": "kpi", "value": 1100, "unit": "m", "label": "TC2 · longueur de quai"}},
+    {"narration": "Mais capacité annoncée ne signifie pas trafic réellement observé.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": false},
+    {"narration": "La différence se joue dans les routes et les délais.", "subject": "port", "queries": ["Abidjan port", "Abidjan harbour"], "figure": false}
+  ]
+}

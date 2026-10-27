@@ -1,0 +1,29 @@
+
+> afrospeak-studio@1.0.0 test
+> node tests/run-tests.js
+
+✓ test-contrat-modules.js              7 ok   0.1s
+✓ test-agent-monteur-realisation.js   38 ok   0.1s
+✓ test-c1-sous-titres.js              11 ok   0.1s
+✓ test-c456-matiere-boussole.js       17 ok   0.1s
+✗ test-figures.js                      0 ok, 1 ko   0.0s
+      Error: Cannot find module '/home/user/afrospeak-studio/motion/src/data/figures.js'
+✓ test-media-filtres.js               27 ok   0.3s
+✗ test-mission5.js                     0 ok, 1 ko   0.1s
+      Error: Cannot find module '/home/user/afrospeak-studio/motion/src/data/figures.js'
+✓ test-mission6.js                    10 ok   0.1s
+✗ test-motion-integration.js           0 ok, 1 ko   0.0s
+      Error: Cannot find module '/home/user/afrospeak-studio/motion/src/data/figures.js'
+✓ test-round3-qualite.js              21 ok   0.1s
+✓ test-round4-editorial.js            25 ok   0.1s
+✓ test-run-lamu-2-demarrage.js        36 ok   0.4s
+✓ test-run-lamu-3-moteur.js           19 ok   0.1s
+✓ test-run-lamu-coherence.js          32 ok   0.2s
+✓ test-script-faille-generale.js      20 ok   0.2s
+✓ test-script-import.js               32 ok   0.1s
+✓ test-sourcing.js                     8 ok   0.0s
+✓ test-ui-syntax.js                    4 ok   0.0s
+✓ test-v2-retour-run2.js              34 ok   0.1s
+
+✗ TOTAL : 341 ok, 3 ko — 19 suite(s)
+Suites en échec : test-figures.js, test-mission5.js, test-motion-integration.js

@@ -1,0 +1,58 @@
+Bundling 6%
+Bundling 21%
+Bundling 32%
+Bundling 43%
+Bundling 54%
+Bundling 65%
+Bundling 70%
+Bundling 75%
+Bundling 80%
+Bundling 85%
+Bundling 91%
+Bundling 98%
+Bundling 100%
+Getting composition
+⚡️ Cached bundle. Subsequent renders will be faster.
+Composition          infographies-demo-16x9
+Codec                h264
+Output               /home/user/remotion-smoke.mp4
+Concurrency          1x
+Rendered 0/30
+Rendered 1/30, time remaining: 11s
+Rendered 2/30, time remaining: 6s
+Rendered 3/30, time remaining: 5s
+Rendered 4/30, time remaining: 4s
+Rendered 5/30, time remaining: 3s
+Rendered 6/30, time remaining: 3s
+Rendered 7/30, time remaining: 2s
+Rendered 7/30, time remaining: 2s
+Rendered 8/30, time remaining: 2s
+Rendered 9/30, time remaining: 2s
+Rendered 10/30, time remaining: 2s
+Rendered 11/30, time remaining: 2s
+Rendered 12/30, time remaining: 1s
+Rendered 13/30, time remaining: 1s
+Rendered 13/30, time remaining: 1s
+Rendered 14/30, time remaining: 1s
+Rendered 15/30, time remaining: 1s
+Rendered 16/30, time remaining: 1s
+Rendered 17/30, time remaining: 1s
+Rendered 18/30, time remaining: 1s
+Rendered 19/30, time remaining: 1s
+Rendered 20/30, time remaining: 0s
+Rendered 20/30, time remaining: 0s
+Rendered 21/30, time remaining: 0s
+Rendered 22/30, time remaining: 0s
+Rendered 23/30, time remaining: 0s
+Rendered 24/30, time remaining: 0s
+Rendered 25/30, time remaining: 0s
+Rendered 26/30, time remaining: 0s
+Rendered 26/30, time remaining: 0s
+Rendered 27/30, time remaining: 0s
+Rendered 28/30, time remaining: 0s
+Rendered 29/30, time remaining: 0s
+Rendered 30/30
+Encoded 7/30
+Encoded 24/30
+Encoded 30/30
++                    /home/user/remotion-smoke.mp4 235.4 kB

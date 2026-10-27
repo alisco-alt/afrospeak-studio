@@ -14,7 +14,10 @@
     "watch": "node index.js --watch",
     "cles": "node scripts/configurer-cles.js",
     "test": "node tests/run-tests.js",
-    "test:moteur": "node tests/run-tests.js"
+    "test:moteur": "node tests/run-tests.js",
+    "produce": "node scripts/produce-local.js",
+    "qc": "node scripts/quality-check.js",
+    "test:qc": "node tests/test-mission8-qc.js"
   },
   "keywords": [
     "video",

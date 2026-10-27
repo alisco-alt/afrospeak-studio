@@ -45,6 +45,12 @@ process.on('unhandledRejection', (reason) => {
 const fs = require('fs');
 const path = require('path');
 
+// Voie locale isolée AVANT le chargement des moteurs cloud historiques.
+if (require.main === module && process.argv.includes('--script')) {
+  require('./scripts/produce-local').main().catch(e => { console.error(e.message); process.exitCode = 1; });
+  return;
+}
+
 const util = require('./lib/util');
 const { DIRS, ensureDirs } = util;
 ensureDirs();
@@ -121,6 +127,12 @@ ${c.b}PRODUCTION${c.r}
   --quality <q>            draft | high | max                 (défaut: high)
   --voice <p>              auto | elevenlabs | openai | google
   --captions <m>           karaoke | word | phrase | none
+  --script <fichier>       Production 100 % locale TXT/JSON → master QC-passé
+  --output <fichier.mp4>   Sortie (ne doit pas exister)
+  --piper-model <fichier>  Modèle Piper français local
+  --strict                 Bloque aussi le pipeline historique si QC en échec
+  --offline                Médias locaux uniquement (mode --script)
+  --retries <0-3>          Reprises bornées (défaut : 1)
   --review                 Pause de validation des médias avant montage
                            (désactivée en CLI : pilote automatique)
 
@@ -257,6 +269,7 @@ function briefFromArgs(a, topic) {
   }
   return {
     topic,
+    qcStrict: !!a.strict,
     angle: typeof a.angle === 'string' ? a.angle : '',
     format: a.format || 'landscape',
     style: a.style || 'ecofin',
@@ -396,6 +409,16 @@ async function main() {
 
   if (a.help || a.h) { console.log(HELP); return; }
   if (a.doctor) return doctor();
+  if (a.script) {
+    if (typeof a.script !== 'string') throw new Error('--script attend un fichier');
+    const local = require('./lib/localProduction');
+    const result = await local.produce(local.loadScript(path.resolve(a.script)), {
+      output: a.output, format: a.format, piperModel: a['piper-model'], offline: !!a.offline,
+      retries: a.retries === undefined ? 1 : Number(a.retries), allowDegradedVoice: !!a['allow-degraded-voice'],
+    });
+    console.log(`Livraison QC PASS : ${result.video}\nRapport : ${result.report.reportPath}`);
+    return;
+  }
 
   if (a.list) {
     const files = fs.existsSync(DIRS.output) ? fs.readdirSync(DIRS.output).filter(f => f.endsWith('.mp4')) : [];
@@ -470,6 +493,7 @@ async function main() {
       if (r) okCount++;
     }
     say.ok(`${okCount}/${topics.length} vidéo(s) produite(s) — ${DIRS.output}`);
+    if (a.strict && okCount < topics.length) throw new Error('Au moins une production refusée en mode strict.');
     return;
   }
 
@@ -483,7 +507,8 @@ async function main() {
   }
   const brief = briefFromArgs(a, topic);
   if (a.__srcItems) brief.sourceItems = a.__srcItems;
-  await produce(brief);
+  const result = await produce(brief);
+  if (!result && a.strict) throw new Error('Production refusée en mode strict.');
 }
 
 if (require.main === module) {

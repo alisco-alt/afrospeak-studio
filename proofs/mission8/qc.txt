@@ -1,0 +1,21 @@
+QC PASS — 100/90 (score/seuil)
+mission8-abidjan.mp4
+PASS    decode : Décodage complet audio/vidéo sans erreur
+PASS    format : H.264 yuv420p + AAC, dimensions demandées
+PASS    fps : Cadence mesurée au conteneur
+PASS    duration : Durée attendue ±1 % ; désynchronisation A/V <350 ms
+PASS    evidence_binding : Empreintes des médias et du master ; couverture de timeline
+PASS    dark_ratio : Échantillons sombres ≤15 %
+PASS    full_frame : Bandes noires opposées ; heuristique luminance des bords
+PASS    relevance : Géo stricte + recoupement lexical métadonnées ; pas de reconnaissance visuelle
+PASS    cut_rate : Timeline + changements d’image FFmpeg (seuil scène 0,12)
+PASS    captions : Durée, CPS, lignes, taille et marges ; contraste attesté par outline
+PASS    watermark : OCR local sur chaque plan (mots de banques connus). Filigranes graphiques inconnus non garantis.
+PASS    caption_pixels : Au moins 50 % des sondes OCR retrouvent un mot du sous-titre incrusté
+PASS    unique_assets : Un fichier réel unique par plan (SHA-256)
+
+QC échantillonné : défauts entre sondes possibles.
+Pertinence lexicale ≠ compréhension visuelle.
+OCR ≠ preuve universelle d’absence de watermark.
+La provenance repose sur un manifeste produit par le moteur ; les hashes ne prouvent pas la vérité des métadonnées.
+Ce score ne certifie pas une équivalence artistique aux références.

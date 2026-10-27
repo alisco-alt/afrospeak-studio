@@ -33,7 +33,7 @@ for (const suite of suites) {
   const sortie = String(r.stdout || '') + String(r.stderr || '');
   const m = sortie.match(/Résultat\s*:\s*(\d+)\s*ok,\s*(\d+)\s*ko/);
   const suiteOk = m ? Number(m[1]) : 0;
-  const suiteKo = m ? Number(m[2]) : 1;
+  const suiteKo = Math.max(m ? Number(m[2]) : 1, r.status === 0 && !r.error ? 0 : 1);
   totalOk += suiteOk;
   totalKo += suiteKo;
   const duree = ((Date.now() - t0) / 1000).toFixed(1);

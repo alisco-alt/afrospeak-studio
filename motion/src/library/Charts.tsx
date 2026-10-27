@@ -17,7 +17,7 @@ import { KineticNumber } from './Kinetic';
  */
 
 export interface FigureSpec {
-  type: 'kpi' | 'line' | 'bars' | 'pie' | 'map' | 'compare';
+  type: 'kpi' | 'line' | 'bars' | 'pie' | 'map' | 'compare' | 'timeline';
   value?: number;
   unit?: string;
   label?: string;
@@ -29,6 +29,10 @@ export interface FigureSpec {
   after?: number;
   mode?: 'overlay' | 'full';
   auto?: boolean;
+  schematic?: boolean;
+  places?: { label: string; lat: number; lon: number }[];
+  events?: { year: number; label: string }[];
+  connect?: boolean;
 }
 
 const ease = (f: number, a: number, b: number) =>
@@ -199,10 +203,13 @@ const MapChart: React.FC<{ fig: FigureSpec; frame: number; from: number; u: numb
   h,
 }) => {
   const f = frame - from;
-  const labels = fig.labels && fig.labels.length ? fig.labels : ['zone 1'];
+  const labels = fig.places?.map(p => p.label) || (fig.labels?.length ? fig.labels : ['Lieu non spécifié']);
   const pins = labels.map((lb, i) => {
-    const gx = 0.2 + ((i * 0.61) % 0.6);
-    const gy = 0.24 + ((i * 0.37) % 0.5);
+    const place = fig.places?.[i];
+    // Coordonnées réelles si fournies ; sinon le label du panneau signale
+    // explicitement un schéma, jamais une carte géographique certifiée.
+    const gx = place ? (place.lon + 180) / 360 : 0.2 + ((i * 0.61) % 0.6);
+    const gy = place ? (90 - place.lat) / 180 : 0.24 + ((i * 0.37) % 0.5);
     return { lb, x: gx * w, y: gy * h };
   });
   const dots: React.ReactNode[] = [];
@@ -221,7 +228,7 @@ const MapChart: React.FC<{ fig: FigureSpec; frame: number; from: number; u: numb
         const pulse = 1 + Math.sin((f - i * 7) / 6) * 0.25;
         return (
           <g key={i} opacity={app}>
-            {i > 0 && (
+            {i > 0 && fig.connect && (
               <path
                 d={`M${pins[0].x} ${pins[0].y} Q ${(pins[0].x + p.x) / 2} ${Math.min(pins[0].y, p.y) - 50 * u} ${p.x} ${p.y}`}
                 fill="none"
@@ -276,6 +283,24 @@ const CompareChart: React.FC<{ fig: FigureSpec; frame: number; from: number; u: 
   );
 };
 
+/** Dates explicites seulement, position proportionnelle à l'année réelle. */
+const TimelineChart: React.FC<{ fig: FigureSpec; frame: number; from: number; u: number; theme: Theme; w: number }> = ({ fig, frame, from, u, theme, w }) => {
+  const events = [...(fig.events || [])].sort((a,b) => a.year - b.year);
+  if (events.length < 2) return null;
+  const first = events[0].year, span = Math.max(1, events[events.length-1].year-first);
+  return <svg width={w} height={110*u} viewBox={`0 0 ${w} ${110*u}`} style={{overflow:'visible'}}>
+    <line x1={20*u} x2={w-20*u} y1={40*u} y2={40*u} stroke={theme.dim} strokeWidth={2*u}/>
+    {events.map((event,i) => {
+      const x=20*u+(event.year-first)/span*(w-40*u), p=ease(frame-from,6+i*5,16+i*5);
+      return <g key={i} opacity={p}>
+        <circle cx={x} cy={40*u} r={6*u*p} fill={theme.accent}/>
+        <text x={x} y={24*u} textAnchor="middle" fill={theme.text} fontSize={22*u} fontWeight={800}>{event.year}</text>
+        <text x={x} y={(70+i%2*24)*u} textAnchor="middle" fill={theme.text} fontSize={16*u}>{event.label.slice(0,25)}</text>
+      </g>;
+    })}
+  </svg>;
+};
+
 /* ————— le corps commun : dispatch par type ————— */
 export const FigureBody: React.FC<{ fig: FigureSpec; frame: number; from: number; u: number; theme: Theme; w: number; h: number }> = ({
   fig,
@@ -286,6 +311,7 @@ export const FigureBody: React.FC<{ fig: FigureSpec; frame: number; from: number
   w,
   h,
 }) => {
+  if (fig.type === 'timeline') return <TimelineChart fig={fig} frame={frame} from={from} u={u} theme={theme} w={w} />;
   if (fig.type === 'line') return <LineChart fig={fig} frame={frame} from={from} u={u} theme={theme} w={w} h={h} />;
   if (fig.type === 'bars') return <BarChart fig={fig} frame={frame} from={from} u={u} theme={theme} w={w} h={h} />;
   if (fig.type === 'pie') return <PieChart fig={fig} frame={frame} from={from} u={u} theme={theme} size={Math.min(h * 0.9, w * 0.42)} />;
@@ -346,7 +372,7 @@ export const FigureOverlay: React.FC<{ fig: FigureSpec; frame: number; from: num
         {fig.label && (
           <div style={{ fontFamily: fonts.body, fontSize: 15 * u, color: theme.dim, marginTop: 6 * u, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {fig.label}
-            {fig.auto ? ' · fig. auto' : ''}
+            {fig.schematic && !fig.label?.includes('schéma') && !fig.label?.includes('Schéma') ? ' · schéma illustratif, non mesuré' : ''}
           </div>
         )}
       </div>

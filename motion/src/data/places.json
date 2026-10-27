@@ -1,0 +1,12 @@
+[
+  {"label":"Abidjan","lat":5.36,"lon":-4.01},
+  {"label":"Dakar","lat":14.69,"lon":-17.45},
+  {"label":"Lagos","lat":6.45,"lon":3.39},
+  {"label":"Accra","lat":5.56,"lon":-0.2},
+  {"label":"Nairobi","lat":-1.29,"lon":36.82},
+  {"label":"Lusaka","lat":-15.42,"lon":28.28},
+  {"label":"Douala","lat":4.05,"lon":9.7},
+  {"label":"Lomé","lat":6.13,"lon":1.23},
+  {"label":"Cotonou","lat":6.37,"lon":2.43},
+  {"label":"Addis-Abeba","lat":9.03,"lon":38.74}
+]

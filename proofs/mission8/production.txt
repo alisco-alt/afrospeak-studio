@@ -1,0 +1,9 @@
+[1/2] Plan 1/7 — À Abidjan, le port raconte une autre économie.
+[1/2] Plan 2/7 — Des quais aux navires, les marchandises doivent circuler.
+[1/2] Plan 3/7 — En 2022, le deuxième terminal change l'échelle du port.
+[1/2] Plan 4/7 — Sa capacité nominale atteint 1,5 million de conteneurs par an.
+[1/2] Plan 5/7 — Le quai mesure 1100 mètres, selon l'autorité portuaire.
+[1/2] Plan 6/7 — Mais capacité annoncée ne signifie pas trafic réellement observé.
+[1/2] Plan 7/7 — La différence se joue dans les routes et les délais.
+Livraison QC PASS : /home/user/afrospeak-studio/output/mission8-abidjan-livraison.mp4
+Rapport : /home/user/afrospeak-studio/output/mission8-abidjan-livraison.mp4.qc.json

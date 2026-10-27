@@ -53,7 +53,7 @@ const Radar: React.FC<{ frame: number; u: number; size: number }> = ({ frame, u,
 };
 
 const KB_CYCLE: KenBurnsDirection[] = ['in', 'pan-left', 'out', 'pan-right'];
-const CROSSFADE = 10; // frames de fondu — le cinématographique ne snappe jamais
+const CROSSFADE = 6; // fondu motivé seulement ; les plans ordinaires coupent franchement
 
 const isVerticalSafe = (height: number, width: number) => height > width;
 
@@ -77,8 +77,10 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
   const showLogo = shot.brand?.showLogo === true;
   const logo = showLogo ? staticFile(shot.brand?.logo ?? 'brand/logo.png') : undefined;
   const mark = staticFile(shot.brand?.mark ?? 'brand/logo-mark.png');
-  const fade = interpolate(f, [0, CROSSFADE], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const fadeOut = interpolate(f, [len - CROSSFADE, len], [1, 0.3], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const previous = i > 0 ? beats[i - 1] : null;
+  const transition = beat.transition ?? (beat.kind === 'title' ? 'dissolve' : 'cut');
+  const fade = previous?.image && transition !== 'cut'
+    ? interpolate(f, [0, CROSSFADE], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) : 1;
   // figure pilotée par le contenu : explicite > auto > opt-out (figure:false) ;
   // les beats déjà chiffrés (stat/kinetic) ne se doublonnent pas eux-mêmes
   const figAuto = figureDuBeat(beat) as FigureSpec | null;
@@ -92,7 +94,12 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       <World keys={camKeys(cam, beatFrom, beatTo)} width={width} height={height}>
         {(camState) => (
           <>
-            <div style={{ position: 'absolute', inset: 0, opacity: fade * fadeOut }}>
+            {/* Fond précédent sous le fondu : jamais de trou noir entre plans. */}
+            {fade < 1 && previous?.image && (
+              <KenBurns src={staticFile(previous.image)} frame={previous.at + 1} from={previous.at}
+                durationInFrames={Math.max(1, beatFrom - previous.at)} direction={previous.kb ?? 'in'} intensity={0.3} />
+            )}
+            <div style={{ position: 'absolute', inset: 0, opacity: fade }}>
               {/* ————— BEAT ————— */}
               {beat.kind === 'brand' && (
                 <Parallax cam={camState} depth={0.85}>
@@ -200,8 +207,7 @@ export const Cinematic: React.FC<{ shot: ShotScript; stylePack?: StylePack | nul
       </World>
 
       {/* ————— HUD (espace écran) ————— */}
-      {/* CEO 26/10 : zéro sous-titre incrusté en vertical (le SRT reste
-          généré par le studio) ; l'horizontal conserve son karaoke. */}
+      {/* Sous-titres incrustés sur les deux formats ; sidecar conservé. */}
       {caption && (
         <div
           style={{

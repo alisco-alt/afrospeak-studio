@@ -27,3 +27,7 @@ cookies/*.txt
 credentials.json
 .credentials
 afrospeak-studio/
+
+# « data/ » vise les données de production, pas le schéma source Remotion.
+!motion/src/data/
+!motion/src/data/**
