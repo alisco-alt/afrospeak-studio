@@ -5,6 +5,16 @@ gratuitement.** Script panafricain, voix off synchronisée mot à mot, images
 sourcées et créditées, montage FFmpeg complet — de bout en bout, sans
 intervention.
 
+## Miniatures PNG locales
+
+Activez `--thumbnail` pour générer, en plus de la vidéo, deux miniatures
+Remotion (1280×720 et 1080×1920). La photo réelle provient du storyboard ;
+le titre peut être fourni avec `--thumbnail-title` (3 à 6 mots). Une option
+d'interface et l'API sont disponibles, avec fichiers d'attribution séparés.
+Installation, droits, conditions de licence Remotion et exemples :
+[MINIATURES.md](MINIATURES.md).
+
+
 > 🚀 **Déploiement gratuit en 25 min** → voir **[DEPLOIEMENT.md](DEPLOIEMENT.md)**
 > Render (conteneur) + Neon (base) + Cloudflare R2 (vidéos) + Groq (IA) = **0 €/mois**
 

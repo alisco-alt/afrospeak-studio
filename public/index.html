@@ -707,6 +707,14 @@ input,select,textarea{transition:border-color .2s,box-shadow .28s,background .2s
           </div>
         </div>
 
+        <!-- Miniatures : opt-in, disponibles dans les deux formats. -->
+        <div class="field" style="margin-top:20px">
+          <label class="check"><input type="checkbox" id="oThumbnail"> Générer deux miniatures PNG</label>
+          <div class="hint" style="margin:8px 0">YouTube 1280×720 + Shorts/Reels 1080×1920 · photo réelle libre du storyboard · rendu local</div>
+          <input type="text" id="fThumbnailTitle" maxlength="65" placeholder="Titre miniature facultatif — 3 à 6 mots">
+          <div class="hint" style="margin-top:5px">Sans titre, l’accroche du script est raccourcie automatiquement. Attribution fournie à part.</div>
+        </div>
+
         <!-- Options avancées -->
         <div class="acc" id="advAcc" style="margin-top:20px">
           <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
@@ -1478,8 +1486,18 @@ function submitVideo(){
     broll: $('#oBroll').checked,
     music: $('#oMusic').checked,
     watermark: $('#oMark').checked,
-    progressBar: $('#oProg').checked
+    progressBar: $('#oProg').checked,
+    thumbnail: $('#oThumbnail').checked,
+    thumbnailTitle: $('#oThumbnail').checked ? $('#fThumbnailTitle').value.trim() : ''
   };
+  if(body.thumbnail && body.thumbnailTitle){
+    var motsMiniature = body.thumbnailTitle.trim().split(/\s+/).filter(function(m){ return /[\p{L}\p{N}]/u.test(m); });
+    if(motsMiniature.length < 3 || motsMiniature.length > 6){
+      toast('Le titre de miniature doit contenir 3 à 6 mots.', 'err');
+      $('#fThumbnailTitle').focus();
+      return;
+    }
+  }
   var btn = (MODE === 'script' && $('#btnGoScript')) ? $('#btnGoScript') : $('#btnGo');
   var libelle = btn.innerHTML;
   btn.disabled = true;
@@ -1641,6 +1659,13 @@ function renderDash(){
     '<div class="kv"><span>Rendus simultanés</span><b>1</b></div>';
 }
 
+function liensMiniatures(v){
+  var urls = v.thumbnailUrls || {};
+  return (urls['16x9'] ? '<a class="btn xs ghost" href="'+esc(urls['16x9'])+'" download>⬇ PNG 16:9</a>' : '')+
+    (urls['9x16'] ? '<a class="btn xs ghost" href="'+esc(urls['9x16'])+'" download>⬇ PNG 9:16</a>' : '')+
+    (v.thumbnailSourcesUrl ? '<a class="btn xs ghost" href="'+esc(v.thumbnailSourcesUrl)+'" download>Sources photo</a>' : '');
+}
+
 function videoRow(v){
   var map = {
     done:['g','Terminée'], running:['o','En cours'], queued:['n','En file'],
@@ -1675,6 +1700,7 @@ function videoRow(v){
             '<b id="vn-'+v.id+'" style="font-variant-numeric:tabular-nums">'+pct+'%</b></div>'
         : '')+
       (v.error ? '<div style="color:#ff9ba3;font-size:11.5px;margin-top:7px">'+esc(v.error)+'</div>' : '')+
+      (v.thumbnailError ? '<div style="color:#ffd083;font-size:11.5px;margin-top:7px">Miniatures non produites : '+esc(v.thumbnailError)+'</div>' : '')+
       '<div class="btns" style="margin-top:10px">'+
         (v.status==='done' && v.videoUrl
           ? '<button class="btn xs ok" onclick="playVideo(\''+v.id+'\')">▶ Voir</button>'+
@@ -1682,6 +1708,8 @@ function videoRow(v){
             '<a class="btn xs" href="'+esc(v.downloadUrl||v.videoUrl)+'" download="'+
               esc((v.title||v.topic||'afrospeak').replace(/[^\w\s-]/g,'').trim().slice(0,60))+'.mp4">⬇ MP4</a>'+
             (v.srtUrl?'<a class="btn xs ghost" href="'+esc(v.srtUrl)+'" download>SRT</a>':'')+
+            liensMiniatures(v)+
+            '<button class="btn xs ghost" id="thumb-action-'+v.id+'" onclick="regenerateThumbnails(\''+v.id+'\')">↻ Miniatures</button>'+
             '<button class="btn xs dan" onclick="deleteVideo(\''+v.id+'\')">🗑️ Supprimer</button>'
           : '')+
         (active ? '<button class="btn xs dan" onclick="cancelVideo(\''+v.id+'\')">Arrêter</button>' : '')+
@@ -1717,6 +1745,7 @@ window.playVideo = function(id){
     '<div class="btns" style="margin-top:16px">'+
       '<a class="btn pri" href="'+esc(v.downloadUrl||v.videoUrl)+'" download>⬇ Télécharger le MP4</a>'+
       (v.srtUrl?'<a class="btn" href="'+esc(v.srtUrl)+'" download>⬇ Sous-titres</a>':'')+
+      liensMiniatures(v)+
       (v.metaUrl?'<a class="btn ghost" href="'+esc(v.metaUrl)+'" target="_blank" rel="noopener">📄 Description</a>':'')+
       '<a class="btn ghost" href="'+esc(v.videoUrl)+'" target="_blank" rel="noopener">Ouvrir dans un onglet</a>'+
     '</div>'+
@@ -1736,6 +1765,18 @@ window.playVideo = function(id){
         '<span class="mono" style="font-size:11px">'+esc(v.videoUrl)+'</span></div>';
     });
   }
+};
+
+window.regenerateThumbnails = function(id){
+  var button = document.getElementById('thumb-action-'+id);
+  if(button){ button.disabled = true; button.textContent = 'Rendu en cours…'; }
+  var options = { method:'POST', headers:{'content-type':'application/json'}, body:'{}' };
+  if(BACKEND_URL) options.credentials = 'include';
+  if(TOKEN) options.headers.authorization = 'Bearer '+TOKEN;
+  fetch(apiUrl('/api/videos/'+encodeURIComponent(id)+'/thumbnails'), options)
+    .then(function(r){ return r.json().then(function(j){ if(!r.ok || !j.ok) throw new Error(j.error || 'Rendu impossible'); return j; }); })
+    .then(function(){ toast('Miniatures PNG prêtes.', 'ok'); return loadVideos().then(renderDash); })
+    .catch(function(e){ toast('Miniatures : '+e.message, 'err'); if(button){ button.disabled=false; button.textContent='↻ Miniatures'; } });
 };
 
 window.cancelVideo = function(id){

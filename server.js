@@ -179,7 +179,8 @@ app.use('/output', express.static(DIRS.output, {
     // La vitrine vit sur un autre domaine : sans cela, <video> reste muet
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('Cache-Control', /_thumb_(?:16x9|9x16|sources)\.(?:png|txt|json)$/i.test(path.basename(filePath))
+      ? 'no-cache' : 'public, max-age=31536000, immutable');
   },
 }));
 
@@ -190,7 +191,7 @@ const fail = (res, e, code = 500) => {
   log.error(e && e.message ? e.message : e);
   res.status(code).json({ ok: false, error: (e && e.message) || String(e) });
 };
-const wrap = fn => (req, res) => Promise.resolve(fn(req, res)).catch(e => fail(res, e));
+const wrap = fn => (req, res) => Promise.resolve(fn(req, res)).catch(e => fail(res, e, e.status || 500));
 
 /* ----------------------------- Config ----------------------------- */
 

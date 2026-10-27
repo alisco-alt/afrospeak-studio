@@ -133,6 +133,8 @@ ${c.b}PRODUCTION${c.r}
   --strict                 Bloque aussi le pipeline historique si QC en échec
   --offline                Médias locaux uniquement (mode --script)
   --retries <0-3>          Reprises bornées (défaut : 1)
+  --thumbnail              Crée aussi deux miniatures PNG Remotion (16:9 + 9:16)
+  --thumbnail-title "<t>"  Titre miniature facultatif, 3 à 6 mots
   --review                 Pause de validation des médias avant montage
                            (désactivée en CLI : pilote automatique)
 
@@ -144,6 +146,14 @@ ${c.b}MÉDIAS & RÉSEAUX SOCIAUX${c.r}
   --accounts <p:@h,…>      Comptes à scraper, ex. x:@AgenceEcofin,tiktok:@brut
   --credit-corner <coin>   bottom-right | bottom-left | top-right | top-left
   --credit-size <t>        tiny | small | medium | large
+
+${c.b}MINIATURE SEULE${c.r}
+  --thumbnail-only         Sans vidéo ; nécessite --image et --thumbnail-title
+  --image "<fichier>"      Photo locale PNG/JPEG/WebP
+  --thumbnail-output "<p>" Préfixe de sortie (sinon output/miniature)
+  --source-author "<nom>"  Auteur de la photo ; --source-license et --source-page
+  --source-license-url "<url>"  Lien de licence ; --source-news pour l'article
+  --source-image-url "<url>"   Image originale ; --source-date pour sa date
 
 ${c.b}MODES${c.r}
   --auto [--count N]       Choisit N sujets depuis la veille et les produit
@@ -288,6 +298,8 @@ function briefFromArgs(a, topic) {
     socialBrowser: typeof a.browser === 'string' ? a.browser : '',
     socialAccounts: accounts,
     music: a.music !== 'false' && a['no-music'] !== true,
+    thumbnail: a.thumbnail === true || a.thumbnail === 'true',
+    thumbnailTitle: typeof a['thumbnail-title'] === 'string' ? a['thumbnail-title'] : '',
     sourceUrls: typeof a.url === 'string' ? [a.url] : [],
     /* La validation des médias est un point d'arrêt d'INTERFACE. En CLI,
      * elle laissait le studio sans vidéo : le pipeline s'arrêtait en
@@ -365,6 +377,9 @@ async function produce(brief) {
     say.kv('Durée', `${pipeline.fmtDur(done.result.duration)}  ·  ${(done.result.size / 1e6).toFixed(1)} Mo  ·  ${done.result.width}×${done.result.height}`);
     if (done.result.srt) say.kv('Sous-titres', done.result.srt);
     if (done.result.thumbnail) say.kv('Miniature', done.result.thumbnail);
+    for (const [f, file] of Object.entries(done.result.thumbnails || {})) say.kv('Miniature PNG ' + f, file);
+    if (done.result.thumbnailSources) say.kv('Attribution miniature', done.result.thumbnailSources);
+    if (done.result.thumbnailError) { say.warn('Miniatures demandées non produites : ' + done.result.thumbnailError); process.exitCode = 1; }
     if (done.result.metadata) say.kv('Métadonnées', done.result.metadata);
     if (done.script.engine) say.kv('Moteur script', `${done.script.engine.model} (${done.script.engine.provider})`);
     const nSocial = (done.storyboard || []).filter(s => s.asset && s.asset.social).length;
@@ -419,6 +434,29 @@ async function main() {
     console.log(`Livraison QC PASS : ${result.video}\nRapport : ${result.report.reportPath}`);
     return;
   }
+  if (a['thumbnail-only']) {
+    const miniature = require('./lib/thumbnail');
+    const provenance = {
+      auteur: typeof a['source-author'] === 'string' ? a['source-author'] : '',
+      licence: typeof a['source-license'] === 'string' ? a['source-license'] : '',
+      licenceUrl: typeof a['source-license-url'] === 'string' ? a['source-license-url'] : '',
+      page: typeof a['source-page'] === 'string' ? a['source-page'] : '',
+      imageUrl: typeof a['source-image-url'] === 'string' ? a['source-image-url'] : '',
+      actualite: typeof a['source-news'] === 'string' ? a['source-news'] : '',
+      date: typeof a['source-date'] === 'string' ? a['source-date'] : '',
+    };
+    if (!a.image) throw new Error('Chemin de l’image manquant.');
+    const source = miniature.validerProvenance(provenance);
+    const r = await miniature.generer({
+      image: a.image, titre: a['thumbnail-title'],
+      base: typeof a['thumbnail-output'] === 'string' ? a['thumbnail-output'] : path.join(DIRS.output, 'miniature'),
+      provenance: source,
+    });
+    for (const [f, file] of Object.entries(r.fichiers)) say.kv('Miniature PNG ' + f, file);
+    say.kv('Attribution', r.sources);
+    say.kv('Contraste minimal', `blanc ${r.contraste.primary.toFixed(2)}:1 · ambre ${r.contraste.accent.toFixed(2)}:1`);
+    return;
+  }
 
   if (a.list) {
     const files = fs.existsSync(DIRS.output) ? fs.readdirSync(DIRS.output).filter(f => f.endsWith('.mp4')) : [];
@@ -466,6 +504,7 @@ async function main() {
         enabled: true, intervalMinutes: every, perRun: Number(a.count) || 1,
         format: a.format || 'landscape', style: a.style || 'ecofin',
         targetMinutes: Number(a.minutes) || 5,
+        thumbnail: a.thumbnail === true || a.thumbnail === 'true',
       },
     });
     say.step(1, 1, `Production en continu — un cycle toutes les ${every} min`);
