@@ -1,0 +1,80 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,Montserrat,33,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,-1,0,0,0,100,100,0,0,1,3,1,2,154,154,97,1
+Style: Data,Montserrat,40,&H00FFFFFF,&H00FFFFFF,&H00101010,&H90000000,-1,0,0,0,100,100,0,0,1,3,0,7,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 3,0:00:00.00,0:00:01.60,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}À Abidjan, le port relie
+Dialogue: 3,0:00:01.60,0:00:02.40,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}l’Afrique.
+Dialogue: 3,0:00:02.40,0:00:03.96,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}Ses quais accueillent navires et
+Dialogue: 3,0:00:03.96,0:00:04.70,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}marchandises.
+Dialogue: 3,0:00:04.70,0:00:07.47,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}TC2 ouvre en novembre 2022.
+Dialogue: 3,0:00:07.47,0:00:09.99,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}Capacité annoncée : 1,5 million
+Dialogue: 3,0:00:09.99,0:00:10.93,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}d’EVP/an.
+Dialogue: 3,0:00:10.93,0:00:13.33,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}TC1 : capacité annoncée
+Dialogue: 3,0:00:13.33,0:00:15.00,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}1 million d’EVP par an.
+Dialogue: 3,0:00:15.00,0:00:18.33,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}En 2025, le trafic conteneurisé
+Dialogue: 3,0:00:18.33,0:00:21.57,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}atteint 1,697 million d’EVP.
+Dialogue: 3,0:00:21.57,0:00:23.30,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}L’objectif officiel
+Dialogue: 3,0:00:23.30,0:00:25.42,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}vise 2 millions d’EVP d’ici
+Dialogue: 3,0:00:25.42,0:00:26.03,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}2027.
+Dialogue: 3,0:00:26.03,0:00:27.77,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}selon le Port Autonome.
+Dialogue: 3,0:00:27.77,0:00:30.17,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}La capacité décrit un potentiel,
+Dialogue: 3,0:00:30.17,0:00:32.43,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}pas le trafic réellement observé.
+Dialogue: 3,0:00:32.43,0:00:34.28,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}Archives de contexte, pas
+Dialogue: 3,0:00:34.28,0:00:35.30,Caption,,0,0,0,,{\fad(60,50)\move(960,989,960,983,0,100)}d’actualité.
+Dialogue: 2,0:00:07.57,0:00:07.63,Data,,0,0,0,,{\pos(173,162)\fs79.2}0 M EVP/an
+Dialogue: 2,0:00:07.63,0:00:07.70,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,2 M EVP/an
+Dialogue: 2,0:00:07.70,0:00:07.76,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,3 M EVP/an
+Dialogue: 2,0:00:07.76,0:00:07.83,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,5 M EVP/an
+Dialogue: 2,0:00:07.83,0:00:07.89,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,6 M EVP/an
+Dialogue: 2,0:00:07.89,0:00:07.96,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,8 M EVP/an
+Dialogue: 2,0:00:07.96,0:00:08.02,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,9 M EVP/an
+Dialogue: 2,0:00:08.02,0:00:08.09,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,1 M EVP/an
+Dialogue: 2,0:00:08.09,0:00:08.15,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,2 M EVP/an
+Dialogue: 2,0:00:08.15,0:00:08.22,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,4 M EVP/an
+Dialogue: 2,0:00:08.22,0:00:10.83,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,5 M EVP/an
+Dialogue: 2,0:00:07.57,0:00:10.83,Data,,0,0,0,,{\pos(173,264.3)\fad(100,100)}Capacité annoncée · TC2
+Dialogue: 2,0:00:13.43,0:00:13.50,Data,,0,0,0,,{\pos(173,162)\fs79.2}0 M EVP/an
+Dialogue: 2,0:00:13.50,0:00:13.56,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,1 M EVP/an
+Dialogue: 2,0:00:13.56,0:00:13.63,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,2 M EVP/an
+Dialogue: 2,0:00:13.63,0:00:13.69,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,3 M EVP/an
+Dialogue: 2,0:00:13.69,0:00:13.76,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,4 M EVP/an
+Dialogue: 2,0:00:13.76,0:00:13.82,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,5 M EVP/an
+Dialogue: 2,0:00:13.82,0:00:13.89,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,6 M EVP/an
+Dialogue: 2,0:00:13.89,0:00:13.95,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,7 M EVP/an
+Dialogue: 2,0:00:13.95,0:00:14.02,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,8 M EVP/an
+Dialogue: 2,0:00:14.02,0:00:14.08,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,9 M EVP/an
+Dialogue: 2,0:00:14.08,0:00:14.90,Data,,0,0,0,,{\pos(173,162)\fs79.2}1 M EVP/an
+Dialogue: 2,0:00:13.43,0:00:14.90,Data,,0,0,0,,{\pos(173,264.3)\fad(100,100)}Capacité annoncée · TC1
+Dialogue: 2,0:00:18.43,0:00:18.50,Data,,0,0,0,,{\pos(173,162)\fs79.2}0 M EVP
+Dialogue: 2,0:00:18.50,0:00:18.56,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,2 M EVP
+Dialogue: 2,0:00:18.56,0:00:18.63,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,3 M EVP
+Dialogue: 2,0:00:18.63,0:00:18.69,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,5 M EVP
+Dialogue: 2,0:00:18.69,0:00:18.76,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,7 M EVP
+Dialogue: 2,0:00:18.76,0:00:18.82,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,8 M EVP
+Dialogue: 2,0:00:18.82,0:00:18.89,Data,,0,0,0,,{\pos(173,162)\fs79.2}1 M EVP
+Dialogue: 2,0:00:18.89,0:00:18.95,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,2 M EVP
+Dialogue: 2,0:00:18.95,0:00:19.02,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,4 M EVP
+Dialogue: 2,0:00:19.02,0:00:19.08,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,5 M EVP
+Dialogue: 2,0:00:19.08,0:00:21.47,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,697 M EVP
+Dialogue: 2,0:00:18.43,0:00:21.47,Data,,0,0,0,,{\pos(173,264.3)\fad(100,100)}Trafic conteneurisé · 2025
+Dialogue: 2,0:00:23.40,0:00:23.47,Data,,0,0,0,,{\pos(173,162)\fs79.2}0 M EVP
+Dialogue: 2,0:00:23.47,0:00:23.53,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,2 M EVP
+Dialogue: 2,0:00:23.53,0:00:23.60,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,4 M EVP
+Dialogue: 2,0:00:23.60,0:00:23.66,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,6 M EVP
+Dialogue: 2,0:00:23.66,0:00:23.73,Data,,0,0,0,,{\pos(173,162)\fs79.2}0,8 M EVP
+Dialogue: 2,0:00:23.73,0:00:23.79,Data,,0,0,0,,{\pos(173,162)\fs79.2}1 M EVP
+Dialogue: 2,0:00:23.79,0:00:23.86,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,2 M EVP
+Dialogue: 2,0:00:23.86,0:00:23.92,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,4 M EVP
+Dialogue: 2,0:00:23.92,0:00:23.99,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,6 M EVP
+Dialogue: 2,0:00:23.99,0:00:24.05,Data,,0,0,0,,{\pos(173,162)\fs79.2}1,8 M EVP
+Dialogue: 2,0:00:24.05,0:00:25.93,Data,,0,0,0,,{\pos(173,162)\fs79.2}2 M EVP
+Dialogue: 2,0:00:23.40,0:00:25.93,Data,,0,0,0,,{\pos(173,264.3)\fad(100,100)}Objectif PAA · 2027

@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "topic": "Le port d'Abidjan en Côte d'Ivoire",
+  "automaticMapping": true,
+  "counts": {
+    "comparison": 1,
+    "barChart": 1,
+    "line": 1,
+    "quote": 1
+  },
+  "clips": [
+    {
+      "type": "barChart",
+      "clip": "bar-chart.mp4",
+      "capture": "bar-chart.png",
+      "duration": 4.2,
+      "narration": "TC1 : 1 million d’EVP par an; TC2 : 1,5 million d’EVP par an.",
+      "params": {
+        "data": [
+          {
+            "label": "TC1",
+            "value": 1,
+            "display": "1 M EVP/an"
+          },
+          {
+            "label": "TC2",
+            "value": 1.5,
+            "display": "1,5 M EVP/an"
+          }
+        ],
+        "title": "Capacité nominale annoncée",
+        "source": "Port Autonome d'Abidjan · Installations et activités",
+        "duration": 4.2
+      },
+      "sourceUrl": "https://www.portabidjan.ci/fr/le-port-dabidjan/installations-et-activites",
+      "renderer": "lib/motionGraphics.generateMotionClip",
+      "captureAtSeconds": 3
+    },
+    {
+      "type": "line",
+      "clip": "line-chart.mp4",
+      "capture": "line-chart.png",
+      "duration": 4.2,
+      "narration": "Trafic EVP : 840926 en 2022, 1238195 en 2023, 1646304 en 2024, 1697131 en 2025.",
+      "params": {
+        "points": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0.3333333333333333,
+            "y": 0.4639881804007218
+          },
+          {
+            "x": 0.6666666666666666,
+            "y": 0.940636880186404
+          },
+          {
+            "x": 1,
+            "y": 1
+          }
+        ],
+        "title": "EVP traités · 2022–2025",
+        "source": "Port Autonome d'Abidjan · statistiques publiées",
+        "duration": 4.2,
+        "schematic": false
+      },
+      "sourceUrl": "https://www.portabidjan.ci/en/news/second-container-terminal-abidjan-port-celebrated-its-millionth-teus",
+      "renderer": "lib/motionGraphics.generateMotionClip",
+      "captureAtSeconds": 3,
+      "supportingSourceUrls": [
+        "https://www.portabidjan.ci/fr/actualites/port-dabidjan-une-croissance-record-de-16-en-2025",
+        "https://www.portabidjan.ci/fr/le-port-dabidjan/statistiques-portuaires"
+      ]
+    },
+    {
+      "type": "comparison",
+      "clip": "comparison.mp4",
+      "capture": "comparison.png",
+      "duration": 4.2,
+      "narration": "Le port passe d’une capacité de 1 million à 2,5 millions d’EVP par an avec TC2.",
+      "params": {
+        "title": "Capacité totale annoncée",
+        "left": {
+          "value": "1 M EVP/an",
+          "label": "Avant"
+        },
+        "right": {
+          "value": "2,5 M EVP/an",
+          "label": "Après"
+        },
+        "source": "Port Autonome d'Abidjan · modernisation du port",
+        "duration": 4.2
+      },
+      "sourceUrl": "https://www.portabidjan.ci/fr/actualites/le-conseil-dadministration-du-paa-visite-les-chantiers-de-modernisation-du-port-dabidjan",
+      "renderer": "lib/motionGraphics.generateMotionClip",
+      "captureAtSeconds": 3
+    },
+    {
+      "type": "quote",
+      "clip": "quote-card.mp4",
+      "capture": "quote-card.png",
+      "duration": 4.2,
+      "narration": "« L’objectif est désormais clair : atteindre 2 millions d’EVP d’ici 2027. »",
+      "params": {
+        "quote": "L’objectif est désormais clair : atteindre 2 millions d’EVP d’ici 2027.",
+        "author": null,
+        "duration": 4.2
+      },
+      "sourceUrl": "https://www.portabidjan.ci/fr/actualites/port-dabidjan-une-croissance-record-de-16-en-2025",
+      "renderer": "lib/motionGraphics.generateMotionClip",
+      "captureAtSeconds": 3
+    }
+  ]
+}

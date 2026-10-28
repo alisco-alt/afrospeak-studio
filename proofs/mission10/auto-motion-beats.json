@@ -1,0 +1,63 @@
+{
+  "topic": "Le port d'Abidjan en Côte d'Ivoire",
+  "beats": [
+    {
+      "narration": "TC1 : 1 million d’EVP par an; TC2 : 1,5 million d’EVP par an.",
+      "figure": {
+        "type": "barChart",
+        "label": "Capacité nominale annoncée",
+        "source": "Port Autonome d'Abidjan · Installations et activités",
+        "data": [
+          {
+            "label": "TC1",
+            "value": 1,
+            "display": "1 M EVP/an"
+          },
+          {
+            "label": "TC2",
+            "value": 1.5,
+            "display": "1,5 M EVP/an"
+          }
+        ]
+      },
+      "sourceUrl": "https://www.portabidjan.ci/fr/le-port-dabidjan/installations-et-activites"
+    },
+    {
+      "narration": "Trafic EVP : 840926 en 2022, 1238195 en 2023, 1646304 en 2024, 1697131 en 2025.",
+      "figure": {
+        "type": "line",
+        "label": "EVP traités · 2022–2025",
+        "source": "Port Autonome d'Abidjan · statistiques publiées",
+        "series": [
+          840926,
+          1238195,
+          1646304,
+          1697131
+        ],
+        "schematic": false
+      },
+      "sourceUrl": "https://www.portabidjan.ci/en/news/second-container-terminal-abidjan-port-celebrated-its-millionth-teus",
+      "supportingSourceUrls": [
+        "https://www.portabidjan.ci/fr/actualites/port-dabidjan-une-croissance-record-de-16-en-2025",
+        "https://www.portabidjan.ci/fr/le-port-dabidjan/statistiques-portuaires"
+      ]
+    },
+    {
+      "narration": "Le port passe d’une capacité de 1 million à 2,5 millions d’EVP par an avec TC2.",
+      "figure": {
+        "type": "compare",
+        "label": "Capacité totale annoncée",
+        "before": 1,
+        "after": 2.5,
+        "unit": "M EVP/an",
+        "source": "Port Autonome d'Abidjan · modernisation du port"
+      },
+      "sourceUrl": "https://www.portabidjan.ci/fr/actualites/le-conseil-dadministration-du-paa-visite-les-chantiers-de-modernisation-du-port-dabidjan"
+    },
+    {
+      "narration": "« L’objectif est désormais clair : atteindre 2 millions d’EVP d’ici 2027. »",
+      "figure": false,
+      "sourceUrl": "https://www.portabidjan.ci/fr/actualites/port-dabidjan-une-croissance-record-de-16-en-2025"
+    }
+  ]
+}
