@@ -1,0 +1,434 @@
+{
+  "schemaVersion": 1,
+  "topic": "Le port d'Abidjan en Côte d'Ivoire",
+  "script": {
+    "title": "Abidjan : grade visuel — capacité portuaire et trafic réel",
+    "topic": "Le port d'Abidjan en Côte d'Ivoire",
+    "editorialNote": "Nouvelle production du 27 octobre 2026, pas une actualité datée du jour. Les photos Commons sont des archives de contexte, pas des vues certifiées du terminal TC2. Aucun trafic actuel inventé. Plan dynamique explicitement balisé en rafale pour la mission 9.",
+    "sources": [
+      {
+        "url": "https://www.portabidjan.ci/fr/le-port-dabidjan/installations-et-activites",
+        "claim": "TC2 : capacité 1,5 million EVP/an ; quai 1 100 m"
+      },
+      {
+        "url": "https://www.transports.gouv.ci/actualites/port-dabidjan-le-nouveau-terminal-a-conteneurs-inaugure",
+        "claim": "Inauguration du deuxième terminal en décembre 2022"
+      }
+    ],
+    "scenes": [
+      {
+        "narration": "À Abidjan, le port raconte une autre économie.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": false
+      },
+      {
+        "narration": "Des quais aux navires, les marchandises doivent circuler.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": false,
+        "burst": true
+      },
+      {
+        "narration": "En 2022, le deuxième terminal change l'échelle du port.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": false
+      },
+      {
+        "narration": "Sa capacité nominale atteint 1,5 million de conteneurs par an.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": {
+          "type": "kpi",
+          "value": 1.5,
+          "unit": "M EVP / an",
+          "label": "TC2 · capacité nominale"
+        }
+      },
+      {
+        "narration": "Le quai mesure 1100 mètres, selon l'autorité portuaire.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": {
+          "type": "kpi",
+          "value": 1100,
+          "unit": "m",
+          "label": "TC2 · longueur de quai"
+        }
+      },
+      {
+        "narration": "Mais capacité annoncée ne signifie pas trafic réellement observé.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": false
+      },
+      {
+        "narration": "La différence se joue dans les routes et les délais.",
+        "subject": "port",
+        "queries": [
+          "Abidjan port",
+          "Abidjan harbour"
+        ],
+        "figure": false
+      }
+    ]
+  },
+  "shots": [
+    {
+      "narration": "À Abidjan, le port raconte une autre économie.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "À Abidjan, le port raconte une autre économie.",
+      "transition": "cut",
+      "motion": "in",
+      "start": 0,
+      "duration": 3,
+      "asset": {
+        "title": "File:Abidjan port warehouses Cote d'Ivoire.jpg",
+        "description": "Warehouses and transport trucks at the port of Abidjan in Cote d'Ivoire",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:Abidjan_port_warehouses_Cote_d%27Ivoire.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Abidjan_port_warehouses_Cote_d%27Ivoire.jpg/1920px-Abidjan_port_warehouses_Cote_d%27Ivoire.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "Romain Seaf",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-60949f24f2cbd92c.jpg",
+        "sha256": "7a0c92e6319e7e3f5c544d67801bbd2ff4157c84f5b5859a8aeeac4fc588c57f"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "Des quais aux navires,",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "Des quais aux navires, les marchandises doivent circuler.",
+      "transition": "cut",
+      "motion": "pan-left",
+      "start": 3,
+      "duration": 1.5333333333333334,
+      "asset": {
+        "title": "File:2009 Abidjan port 3841939455.jpeg",
+        "description": "Chenalage en sortant du port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841939455.jpeg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/2009_Abidjan_port_3841939455.jpeg/1920px-2009_Abidjan_port_3841939455.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-dbb6eb81477a6ae8.jpg",
+        "sha256": "fdea8bf5c2c69713a3de47ef1d92bc30895dde3c5dd867ce9140489303cb6f0f"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "les marchandises doivent circuler.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "Des quais aux navires, les marchandises doivent circuler.",
+      "transition": "cut",
+      "motion": "out",
+      "start": 4.533333333333333,
+      "duration": 2.1333333333333333,
+      "asset": {
+        "title": "File:2012 Abidjan port 8696740211.jpg",
+        "description": "Près du port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2012_Abidjan_port_8696740211.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/2012_Abidjan_port_8696740211.jpg/1920px-2012_Abidjan_port_8696740211.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+        "author": "abdallahh from Montréal, Canada",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-ebb16c6f4ab74cc7.jpg",
+        "sha256": "dac1b24b2882a75b976037c2b574cdf5cd352d4acbd3d87f6e96d503229222bc"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "En 2022, le deuxième terminal change l'échelle du port.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "En 2022, le deuxième terminal change l'échelle du port.",
+      "transition": "dissolve",
+      "motion": "pan-right",
+      "start": 6.666666666666666,
+      "duration": 3.8333333333333335,
+      "asset": {
+        "title": "File:2009 Abidjan port 3841899765.jpg",
+        "description": "Dans le port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841899765.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/2009_Abidjan_port_3841899765.jpg/1920px-2009_Abidjan_port_3841899765.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-5bfab5e07e753899.jpg",
+        "sha256": "994935a81b306e318a3204bd9fdb2987887ccebf7eab258f9be29be2bee83dc3"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "Sa capacité nominale atteint 1,5 million de conteneurs par an.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": {
+        "type": "kpi",
+        "value": 1.5,
+        "unit": "M EVP / an",
+        "label": "TC2 · capacité nominale"
+      },
+      "burst": false,
+      "sourceNarration": "Sa capacité nominale atteint 1,5 million de conteneurs par an.",
+      "transition": "cut",
+      "motion": "in",
+      "start": 10.5,
+      "duration": 3.7666666666666666,
+      "asset": {
+        "title": "File:2009 Abidjan port 3841906423.jpg",
+        "description": "Dans le port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841906423.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/2009_Abidjan_port_3841906423.jpg/1920px-2009_Abidjan_port_3841906423.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-f9184cfaec8511d2.jpg",
+        "sha256": "b3d375ff78fa15db1afd7b68b6a92bc009b7d3190ea05aeaca9dbfeded99bcae"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "Le quai mesure 1100 mètres, selon l'autorité portuaire.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": {
+        "type": "kpi",
+        "value": 1100,
+        "unit": "m",
+        "label": "TC2 · longueur de quai"
+      },
+      "burst": false,
+      "sourceNarration": "Le quai mesure 1100 mètres, selon l'autorité portuaire.",
+      "transition": "cut",
+      "motion": "pan-left",
+      "start": 14.266666666666666,
+      "duration": 3.6333333333333333,
+      "asset": {
+        "title": "File:2009 Abidjan port 3842716900.jpg",
+        "description": "Quand l'eau du fleuve rencontre l'océan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3842716900.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/2009_Abidjan_port_3842716900.jpg/1920px-2009_Abidjan_port_3842716900.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-bb2d1323ab6d389f.jpg",
+        "sha256": "a187771bc98d9640a89df29033ad1fa5de1301d653df0537dadde6367e6918ed"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "Mais capacité annoncée ne signifie pas trafic réellement observé.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "Mais capacité annoncée ne signifie pas trafic réellement observé.",
+      "transition": "wipeleft",
+      "motion": "out",
+      "start": 17.9,
+      "duration": 4.233333333333333,
+      "asset": {
+        "title": "File:2009 Abidjan port 3841908253.jpg",
+        "description": "Dans le port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841908253.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/2009_Abidjan_port_3841908253.jpg/1920px-2009_Abidjan_port_3841908253.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-4c580cfca4219b81.jpg",
+        "sha256": "6a125cce5b88ce11158ec476df3d44a5c87b074dbf01af99bd540d40a349e514"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    },
+    {
+      "narration": "La différence se joue dans les routes et les délais.",
+      "subject": "port",
+      "queries": [
+        "Abidjan port",
+        "Abidjan harbour"
+      ],
+      "figure": null,
+      "burst": false,
+      "sourceNarration": "La différence se joue dans les routes et les délais.",
+      "transition": "dissolve",
+      "motion": "pan-right",
+      "start": 22.133333333333333,
+      "duration": 2.966666666666667,
+      "asset": {
+        "title": "File:2009 Abidjan boat 3842702960.jpg",
+        "description": "Dans le port d'Abidjan",
+        "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_boat_3842702960.jpg",
+        "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/2009_Abidjan_boat_3842702960.jpg/1920px-2009_Abidjan_boat_3842702960.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "license": "CC BY-SA 2.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+        "author": "RomainSeaf from Madrid, Espagne",
+        "provider": "Wikimedia Commons",
+        "file": "proofs/mission9/assets/source-802e713d99557f0d.jpg",
+        "sha256": "0c4da5a5f2f97ba86e50525e9e987dd8eb7b496643157cf6f4131f4a248c9322"
+      },
+      "voice": "piper-local (audio omitted from portable QC bundle)"
+    }
+  ],
+  "cues": [
+    {
+      "start": 0,
+      "end": 1.698,
+      "text": "À Abidjan, le port raconte"
+    },
+    {
+      "start": 1.698,
+      "end": 3,
+      "text": "une autre économie."
+    },
+    {
+      "start": 3,
+      "end": 4.533,
+      "text": "Des quais aux navires,"
+    },
+    {
+      "start": 4.533,
+      "end": 6.667,
+      "text": "les marchandises doivent circuler."
+    },
+    {
+      "start": 6.667,
+      "end": 8.707,
+      "text": "En 2022, le deuxième terminal"
+    },
+    {
+      "start": 8.707,
+      "end": 10.5,
+      "text": "change l'échelle du port."
+    },
+    {
+      "start": 10.5,
+      "end": 12.465,
+      "text": "Sa capacité nominale atteint 1,5"
+    },
+    {
+      "start": 12.465,
+      "end": 14.267,
+      "text": "million de conteneurs par an."
+    },
+    {
+      "start": 14.267,
+      "end": 16.083,
+      "text": "Le quai mesure 1100 mètres,"
+    },
+    {
+      "start": 16.083,
+      "end": 17.9,
+      "text": "selon l'autorité portuaire."
+    },
+    {
+      "start": 17.9,
+      "end": 20.134,
+      "text": "Mais capacité annoncée ne signifie"
+    },
+    {
+      "start": 20.134,
+      "end": 22.133,
+      "text": "pas trafic réellement observé."
+    },
+    {
+      "start": 22.133,
+      "end": 23.642,
+      "text": "La différence se joue dans"
+    },
+    {
+      "start": 23.642,
+      "end": 25.1,
+      "text": "les routes et les délais."
+    }
+  ],
+  "visualGrade": {
+    "schemaVersion": 1,
+    "enabled": false,
+    "look": "disabled",
+    "method": "FFmpeg eq + colorbalance + vignette; image-derived exposure/WB; 32x18 RGB sample",
+    "shots": 0,
+    "meanDeltaE76": null,
+    "meanLumaShift": null,
+    "meanHistogramDistance": null,
+    "perShot": []
+  },
+  "voice": {
+    "provider": "piper-local",
+    "model": "fr_FR-siwis-medium.onnx",
+    "modelSha256": "641d1ab097da2b81128c076810edb052b385decc8be3381814802a64a73baf99",
+    "timing": "estimated-per-cue"
+  },
+  "captionFile": "proofs/mission10/abidjan-before.captions.ass",
+  "captionSha256": "184731e457957ddebe0736ffef7a488d51a0f2284803f1930ac4044d34ed323c",
+  "captionLayout": {
+    "fontRatio": 0.031,
+    "safeMargin": 0.08,
+    "outline": true
+  },
+  "expected": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "duration": 25.1
+  },
+  "masterSha256": "6ebd621206369bc26a28db51b549c50c806da7fffbb55b5dee45e6b37e95d582"
+}

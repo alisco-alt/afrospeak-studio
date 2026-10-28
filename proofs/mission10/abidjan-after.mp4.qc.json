@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "status": "pass",
+  "score": 100,
+  "threshold": 90,
+  "checks": [
+    {
+      "id": "decode",
+      "status": "pass",
+      "value": true,
+      "detail": "Décodage complet audio/vidéo sans erreur",
+      "critical": true
+    },
+    {
+      "id": "format",
+      "status": "pass",
+      "value": {
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264",
+        "audio": "aac"
+      },
+      "detail": "H.264 yuv420p + AAC, dimensions demandées",
+      "critical": true
+    },
+    {
+      "id": "fps",
+      "status": "pass",
+      "value": 30,
+      "detail": "Cadence mesurée au conteneur",
+      "critical": true
+    },
+    {
+      "id": "duration",
+      "status": "pass",
+      "value": 35.333984,
+      "detail": "Durée attendue ±1 % ; désynchronisation A/V <350 ms",
+      "critical": true
+    },
+    {
+      "id": "evidence_binding",
+      "status": "pass",
+      "value": true,
+      "detail": "Empreintes des médias et du master ; couverture de timeline",
+      "critical": true
+    },
+    {
+      "id": "dark_ratio",
+      "status": "pass",
+      "value": 0.07042253521126761,
+      "detail": "Échantillons sombres ≤15 %",
+      "critical": true
+    },
+    {
+      "id": "full_frame",
+      "status": "pass",
+      "value": 0,
+      "detail": "Bandes noires opposées ; heuristique luminance des bords",
+      "critical": true
+    },
+    {
+      "id": "relevance",
+      "status": "pass",
+      "value": [
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        },
+        {
+          "ok": true,
+          "hits": [
+            "port",
+            "abidjan"
+          ],
+          "reason": "Recoupement lexical candidat/sujet"
+        }
+      ],
+      "detail": "Géo stricte + recoupement lexical métadonnées ; pas de reconnaissance visuelle",
+      "critical": true
+    },
+    {
+      "id": "cut_rate",
+      "status": "pass",
+      "value": {
+        "plannedCutsPerMinute": 22.075065183705295,
+        "measuredCutsPerMinute": 20.376983246497197,
+        "longestShot": 3.466666666666667
+      },
+      "detail": "Timeline + changements d’image FFmpeg (seuils scène 0,12/0,05)",
+      "critical": true
+    },
+    {
+      "id": "captions",
+      "status": "pass",
+      "value": [],
+      "detail": "Durée, CPS, lignes, taille et marges ; contraste attesté par outline",
+      "critical": true
+    },
+    {
+      "id": "watermark",
+      "status": "pass",
+      "value": {
+        "samples": 14,
+        "stockHits": []
+      },
+      "detail": "OCR local sur chaque plan (mots de banques connus). Filigranes graphiques inconnus non garantis.",
+      "critical": true
+    },
+    {
+      "id": "caption_pixels",
+      "status": "pass",
+      "value": {
+        "matches": 14,
+        "samples": 14
+      },
+      "detail": "Au moins 50 % des sondes OCR retrouvent un mot du sous-titre incrusté",
+      "critical": true
+    },
+    {
+      "id": "unique_assets",
+      "status": "pass",
+      "value": {
+        "shots": 14,
+        "unique": 14
+      },
+      "detail": "Un fichier réel unique par plan (SHA-256)",
+      "critical": true
+    },
+    {
+      "id": "visual_grade",
+      "status": "pass",
+      "value": {
+        "enabled": true,
+        "look": "neutral",
+        "shots": 14,
+        "meanDeltaE76": 5.7098,
+        "meanLumaShift": 0.0011,
+        "meanHistogramDistance": 0.1873
+      },
+      "detail": "Grade local attesté par histogrammes 16 bins et ΔE76 mesurés avant/après",
+      "critical": true
+    }
+  ],
+  "limits": [
+    "QC échantillonné : défauts entre sondes possibles.",
+    "Pertinence lexicale ≠ compréhension visuelle.",
+    "OCR ≠ preuve universelle d’absence de watermark.",
+    "La provenance repose sur un manifeste produit par le moteur ; les hashes ne prouvent pas la vérité des métadonnées.",
+    "Ce score ne certifie pas une équivalence artistique aux références."
+  ],
+  "measurements": {
+    "frameSamples": 71,
+    "sampleSeconds": 0.5,
+    "sceneTimes": [
+      4.733333,
+      7.533333,
+      10.966667,
+      13.366667,
+      15.066667,
+      18.4,
+      21.6,
+      23.333333,
+      26.066667,
+      27.833333,
+      30.2,
+      32.5
+    ],
+    "ocr": {
+      "available": true,
+      "complete": true,
+      "samples": 14,
+      "stockHits": [],
+      "captionSamples": 14,
+      "captionMatches": 14
+    }
+  },
+  "file": "/home/user/afrospeak-m10/proofs/mission10/abidjan-after.mp4",
+  "createdAt": "2026-10-28T03:29:11.928Z",
+  "masterSha256": "63c89f8ac0953c8811bcd835c9d8b7352ae6735bfb31d87bf524e6a18e35ad93"
+}

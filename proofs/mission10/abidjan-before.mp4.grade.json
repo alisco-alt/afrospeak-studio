@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "look": "disabled",
+  "method": "FFmpeg eq + colorbalance + vignette; image-derived exposure/WB; 32x18 RGB sample",
+  "shots": 0,
+  "meanDeltaE76": null,
+  "meanLumaShift": null,
+  "meanHistogramDistance": null,
+  "perShot": []
+}

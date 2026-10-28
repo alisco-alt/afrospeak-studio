@@ -1,0 +1,337 @@
+{
+  "title": "Abidjan : capacité portuaire et trafic publié",
+  "topic": "Le port d'Abidjan en Côte d'Ivoire",
+  "editorialNote": "Preuve MoneyRadar. Trafic 2025 publié par le Port Autonome d’Abidjan en février 2026. Capacités et objectifs sont distingués du trafic réellement observé. Les images proviennent des mêmes huit photos d’archives que le comparatif Mission 9; six plans sont des recadrages éditoriaux de ces originaux, crédités à la même source. Le master montre les photos comme archives de contexte, pas comme vues certifiées de 2025.",
+  "sources": [
+    {
+      "url": "https://www.portabidjan.ci/fr/le-port-dabidjan/installations-et-activites",
+      "claim": "TC1 1M EVP/an; TC2 1,5M EVP/an; TC2 1100m quai"
+    },
+    {
+      "url": "https://www.portabidjan.ci/fr/actualites/port-dabidjan-une-croissance-record-de-16-en-2025",
+      "claim": "Trafic conteneurisé 2025: 1 697 131 EVP; objectif 2M en 2027"
+    },
+    {
+      "url": "https://www.portabidjan.ci/fr/actualites/le-deuxieme-terminal-conteneurs-du-port-dabidjan-est-operationnel",
+      "claim": "TC2 opérationnel depuis 2022; capacité 1,5M EVP/an"
+    },
+    {
+      "url": "https://www.portabidjan.ci/fr/actualites/port-dabidjan-le-deuxieme-terminal-conteneurs-continue-attirer-les-grands-navires",
+      "claim": "Capacité totale portée à 2,5M EVP selon actualité PAA"
+    }
+  ],
+  "scenes": [
+    {
+      "narration": "À Abidjan, le port relie l’Afrique.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:Abidjan port warehouses Cote d'Ivoire.jpg",
+          "description": "Warehouses and transport trucks at the port of Abidjan in Cote d'Ivoire",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:Abidjan_port_warehouses_Cote_d%27Ivoire.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Abidjan_port_warehouses_Cote_d%27Ivoire.jpg/1920px-Abidjan_port_warehouses_Cote_d%27Ivoire.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "Romain Seaf",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-60949f24f2cbd92c.jpg",
+          "sha256": "7a0c92e6319e7e3f5c544d67801bbd2ff4157c84f5b5859a8aeeac4fc588c57f"
+        }
+      ]
+    },
+    {
+      "narration": "Ses quais accueillent navires et marchandises.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841939455.jpeg",
+          "description": "Chenalage en sortant du port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841939455.jpeg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/2009_Abidjan_port_3841939455.jpeg/1920px-2009_Abidjan_port_3841939455.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-dbb6eb81477a6ae8.jpg",
+          "sha256": "fdea8bf5c2c69713a3de47ef1d92bc30895dde3c5dd867ce9140489303cb6f0f"
+        }
+      ]
+    },
+    {
+      "narration": "TC2 ouvre en novembre 2022.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2012 Abidjan port 8696740211.jpg",
+          "description": "Près du port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2012_Abidjan_port_8696740211.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/2012_Abidjan_port_8696740211.jpg/1920px-2012_Abidjan_port_8696740211.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+          "author": "abdallahh from Montréal, Canada",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-ebb16c6f4ab74cc7.jpg",
+          "sha256": "dac1b24b2882a75b976037c2b574cdf5cd352d4acbd3d87f6e96d503229222bc"
+        }
+      ]
+    },
+    {
+      "narration": "Capacité annoncée : 1,5 million d’EVP/an.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": {
+        "type": "kpi",
+        "value": 1.5,
+        "unit": "M EVP/an",
+        "label": "Capacité annoncée · TC2"
+      },
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841899765.jpg",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841899765.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/2009_Abidjan_port_3841899765.jpg/1920px-2009_Abidjan_port_3841899765.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-5bfab5e07e753899.jpg",
+          "sha256": "994935a81b306e318a3204bd9fdb2987887ccebf7eab258f9be29be2bee83dc3"
+        }
+      ]
+    },
+    {
+      "narration": "TC1 : capacité annoncée",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841906423.jpg",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841906423.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/2009_Abidjan_port_3841906423.jpg/1920px-2009_Abidjan_port_3841906423.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-f9184cfaec8511d2.jpg",
+          "sha256": "b3d375ff78fa15db1afd7b68b6a92bc009b7d3190ea05aeaca9dbfeded99bcae"
+        }
+      ]
+    },
+    {
+      "narration": "1 million d’EVP par an.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": {
+        "type": "kpi",
+        "value": 1,
+        "unit": "M EVP/an",
+        "label": "Capacité annoncée · TC1"
+      },
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841906423.jpg — recadrage éditorial",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841906423.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/2009_Abidjan_port_3841906423.jpg/1920px-2009_Abidjan_port_3841906423.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-tc1-b.jpg",
+          "sha256": "b3d375ff78fa15db1afd7b68b6a92bc009b7d3190ea05aeaca9dbfeded99bcae",
+          "derivedFrom": "File:2009 Abidjan port 3841906423.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    },
+    {
+      "narration": "En 2025, le trafic conteneurisé",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3842716900.jpg",
+          "description": "Quand l'eau du fleuve rencontre l'océan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3842716900.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/2009_Abidjan_port_3842716900.jpg/1920px-2009_Abidjan_port_3842716900.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-bb2d1323ab6d389f.jpg",
+          "sha256": "a187771bc98d9640a89df29033ad1fa5de1301d653df0537dadde6367e6918ed"
+        }
+      ]
+    },
+    {
+      "narration": "atteint 1,697 million d’EVP.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": {
+        "type": "kpi",
+        "value": 1.697,
+        "unit": "M EVP",
+        "label": "Trafic conteneurisé · 2025"
+      },
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841908253.jpg",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841908253.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/2009_Abidjan_port_3841908253.jpg/1920px-2009_Abidjan_port_3841908253.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-4c580cfca4219b81.jpg",
+          "sha256": "6a125cce5b88ce11158ec476df3d44a5c87b074dbf01af99bd540d40a349e514"
+        }
+      ]
+    },
+    {
+      "narration": "L’objectif officiel",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan boat 3842702960.jpg",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_boat_3842702960.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/2009_Abidjan_boat_3842702960.jpg/1920px-2009_Abidjan_boat_3842702960.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "../mission9/assets/source-802e713d99557f0d.jpg",
+          "sha256": "0c4da5a5f2f97ba86e50525e9e987dd8eb7b496643157cf6f4131f4a248c9322"
+        }
+      ]
+    },
+    {
+      "narration": "vise 2 millions d’EVP d’ici 2027.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": {
+        "type": "kpi",
+        "value": 2,
+        "unit": "M EVP",
+        "label": "Objectif PAA · 2027"
+      },
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841906423.jpg — recadrage éditorial",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841906423.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/2009_Abidjan_port_3841906423.jpg/1920px-2009_Abidjan_port_3841906423.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-tc2-a.jpg",
+          "sha256": "b3d375ff78fa15db1afd7b68b6a92bc009b7d3190ea05aeaca9dbfeded99bcae",
+          "derivedFrom": "File:2009 Abidjan port 3841906423.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    },
+    {
+      "narration": "selon le Port Autonome.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3841908253.jpg — recadrage éditorial",
+          "description": "Dans le port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3841908253.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/2009_Abidjan_port_3841908253.jpg/1920px-2009_Abidjan_port_3841908253.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-traffic-b.jpg",
+          "sha256": "6a125cce5b88ce11158ec476df3d44a5c87b074dbf01af99bd540d40a349e514",
+          "derivedFrom": "File:2009 Abidjan port 3841908253.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    },
+    {
+      "narration": "La capacité décrit un potentiel,",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:Abidjan port warehouses Cote d'Ivoire.jpg — recadrage éditorial",
+          "description": "Warehouses and transport trucks at the port of Abidjan in Cote d'Ivoire",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:Abidjan_port_warehouses_Cote_d%27Ivoire.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Abidjan_port_warehouses_Cote_d%27Ivoire.jpg/1920px-Abidjan_port_warehouses_Cote_d%27Ivoire.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "Romain Seaf",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-capacity-b.jpg",
+          "sha256": "7a0c92e6319e7e3f5c544d67801bbd2ff4157c84f5b5859a8aeeac4fc588c57f",
+          "derivedFrom": "File:Abidjan port warehouses Cote d'Ivoire.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    },
+    {
+      "narration": "pas le trafic réellement observé.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2012 Abidjan port 8696740211.jpg — recadrage éditorial",
+          "description": "Près du port d'Abidjan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2012_Abidjan_port_8696740211.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/2012_Abidjan_port_8696740211.jpg/1920px-2012_Abidjan_port_8696740211.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+          "author": "abdallahh from Montréal, Canada",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-archive-b.jpg",
+          "sha256": "dac1b24b2882a75b976037c2b574cdf5cd352d4acbd3d87f6e96d503229222bc",
+          "derivedFrom": "File:2012 Abidjan port 8696740211.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    },
+    {
+      "narration": "Archives de contexte, pas d’actualité.",
+      "subject": "port d’Abidjan",
+      "query": "Abidjan port",
+      "figure": false,
+      "assets": [
+        {
+          "title": "File:2009 Abidjan port 3842716900.jpg — recadrage éditorial",
+          "description": "Quand l'eau du fleuve rencontre l'océan",
+          "pageUrl": "https://commons.wikimedia.org/wiki/File:2009_Abidjan_port_3842716900.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/2009_Abidjan_port_3842716900.jpg/1920px-2009_Abidjan_port_3842716900.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "license": "CC BY-SA 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+          "author": "RomainSeaf from Madrid, Espagne",
+          "provider": "Wikimedia Commons",
+          "file": "assets/abidjan-crop-context-c.jpg",
+          "sha256": "a187771bc98d9640a89df29033ad1fa5de1301d653df0537dadde6367e6918ed",
+          "derivedFrom": "File:2009 Abidjan port 3842716900.jpg",
+          "editNote": "Recadrage rapproché dérivé de la photo Commons source; licence/auteur inchangés."
+        }
+      ]
+    }
+  ]
+}
