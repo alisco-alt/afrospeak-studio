@@ -90,7 +90,10 @@ test('seuils, comptage distinct et exception éditoriale bornée', () => {
   const fond = { asset: { file: 'fond.jpg', provider: 'AfroSpeak Studio', title: 'Fond éditorial', fondLocal: true } };
   const assezDeReels = evaluerSourcingMedia({ banquesOk: 9, banquesTotal: 9,
     shots: [shotReel('a'), shotReel('b'), shotReel('c'), shotReel('d'), shotReel('e'), fond,
-      shotIA, shotIA, shotIA, shotIA] });
+      { asset: { ...shotIA.asset, file: 'ia1.png' } },
+      { asset: { ...shotIA.asset, file: 'ia2.png' } },
+      { asset: { ...shotIA.asset, file: 'ia3.png' } },
+      { asset: { ...shotIA.asset, file: 'ia4.png' } }] });
   vrai(assezDeReels.ok, assezDeReels.message);
   eq(assezDeReels.metrics.fichiersReelsDistincts, 5);
   eq(assezDeReels.metrics.ratioMediaReel, 0.5);
@@ -104,13 +107,42 @@ test('seuils, comptage distinct et exception éditoriale bornée', () => {
   eq(pasAssezDeReels.metrics.fondsExceptions[0].autorise, false);
 });
 
+test('profil essai : IA premium et média réel séparés, mix distinct accepté', () => {
+  const premium = i => ({ asset: { file: `premium-${i}.jpg`, provider: 'Illustration IA',
+    genereParIA: true, qualiteIAPremium: true, width: 1344, height: 768,
+    info: { width: 1344, height: 768 } } });
+  const v = evaluerSourcingMedia({ profil: 'essai', banquesOk: 9, banquesTotal: 9,
+    shots: [shotReel('archive-1'), ...Array.from({ length: 8 }, (_, i) => premium(i)),
+      { asset: { file: 'fond.jpg', provider: 'AfroSpeak Studio', title: 'Fond éditorial', fondLocal: true } }] });
+  vrai(v.ok, v.message);
+  eq(v.metrics.profil, 'essai');
+  eq(v.metrics.fichiersReelsDistincts, 1);
+  eq(v.metrics.fichiersIAPremiumDistincts, 8);
+  eq(v.metrics.ratioVisuelsDistincts, 0.9);
+});
+
+test('doublon strict IA et image IA sous-définie restent bloquants', () => {
+  const ai = file => ({ asset: { file, provider: 'Illustration IA', genereParIA: true,
+    qualiteIAPremium: true, width: 1344, height: 768, info: { width: 1344, height: 768 } } });
+  const v = evaluerSourcingMedia({ profil: 'essai', banquesOk: 9, banquesTotal: 9,
+    shots: [shotReel('r1'), ai('same.jpg'), ai('same.jpg'),
+      { asset: { file: 'small.jpg', provider: 'Illustration IA', genereParIA: true,
+        qualiteIAPremium: true, width: 575, height: 1024, info: { width: 575, height: 1024 } } }] });
+  vrai(!v.ok, 'un doublon strict doit bloquer');
+  vrai(/doublon strict/.test(v.message), v.message);
+  eq(v.metrics.fichiersIAPremiumDistincts, 1, 'image sous-définie ne compte pas premium');
+});
+
 test('le pipeline câble bien le garde-fou avant le montage', () => {
   const fs = require('fs');
   const src = fs.readFileSync(path.join(__dirname, '..', 'lib', 'pipeline.js'), 'utf8');
   vrai(src.includes("require('./sourcing').evaluerSourcingMedia"), 'appel manquant');
   vrai(src.includes("code: verdict.code"), 'erreur typée manquante');
+  const iProfile = src.indexOf('const _profilSourcing = String(process.env.SOURCING_PROFILE');
   const iGate = src.indexOf("evaluerSourcingMedia");
   const iRender = src.indexOf('/* ---------- 7. Rendu ----------');
+  vrai(iProfile > 0 && iGate > iProfile, 'le profil QC doit vivre au niveau de run()');
+  vrai(src.includes('sourcingProfile: [\'documentaire\', \'essai\']'), 'le profil de la demande doit être conservé');
   vrai(iGate > 0 && iRender > 0 && iGate < iRender, 'le garde-fou doit précéder le stage rendu');
 });
 

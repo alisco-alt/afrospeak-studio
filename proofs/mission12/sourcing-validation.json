@@ -1,0 +1,472 @@
+{
+  "mission": "12",
+  "validationType": "sourcing-candidates-assets-and-strict-QC",
+  "validatedAt": "2026-10-28T22:26:19.389Z",
+  "projectId": "proj_mvsnsndj_2c90d3f3",
+  "process": {
+    "outcome": "pipeline error (not OOM)",
+    "error": "_profilSourcing is not defined",
+    "noOomObserved": true,
+    "note": "La phase sourcing a atteint le plan 177 et sauvegardé le storyboard; aucune production dégradée n’a été montée."
+  },
+  "input": {
+    "scriptBytes": 4918,
+    "timelinePlans": 177,
+    "sourcingQueriesLogged": 252,
+    "candidateRowsReported": 4399,
+    "candidatesRetainedBySearch": 1798,
+    "banksResponding": 8,
+    "banksProbed": 9
+  },
+  "assets": {
+    "assignedPlans": 176,
+    "distinctFiles": 135,
+    "strictDuplicateFiles": 8,
+    "providers": {
+      "Wikimedia Commons": 30,
+      "Internet Archive": 3,
+      "aihg.drugros-spb.org": 1,
+      "mitraveltips.com": 1,
+      "stockcake.com": 13,
+      "stock.adobe.com": 5,
+      "art-facts.com": 1,
+      "flickr.com": 1,
+      "pikbest.com": 1,
+      "pexels.com": 19,
+      "Illustration IA": 4,
+      "rawpixel.com": 3,
+      "wallpapers.com": 1,
+      "wallpapersafari.com": 2,
+      "ar.inspiredpencil.com": 4,
+      "creator.nightcafe.studio": 1,
+      "archival-footage.com": 1,
+      "arabsstock.com": 1,
+      "artelisted.com": 1,
+      "ipic.ai": 1,
+      "digitalcommonwealth.org": 1,
+      "southafricatoday.net": 1,
+      "bridgemanimages.com": 2,
+      "hetogrow.blogspot.com": 1,
+      "dvidshub.net": 1,
+      "leftovercurrency.com": 2,
+      "u.polizeimensch.de": 1,
+      "form.imisys.de": 1,
+      "bondcounsel.org": 1,
+      "AfroSpeak Studio": 49,
+      "africabusinessplus.com": 2,
+      "unpublished.beehiiv.com": 1,
+      "bank-of-africa.net": 1,
+      "paradavisual.com": 1,
+      "westend61.de": 1,
+      "memento.fr": 1,
+      "waynehutchinson.photodeck.com": 1,
+      "africagreenmagazine.com": 1,
+      "lalibre.be": 1,
+      "zhauns.co.za": 1,
+      "storage.googleapis.com": 1,
+      "mceafrica.org": 1,
+      "stablediffusionweb.com": 1,
+      "fstoppers.com": 1,
+      "wavesold.com": 1,
+      "kofisi.africa": 1,
+      "grammy.com": 1,
+      "news.cgtn.com": 1,
+      "relocationafrica.com": 1,
+      "africa.businessinsider.com": 1,
+      "earground.com": 1
+    },
+    "realMediaDistinct": 123,
+    "aiPremiumDistinct": 0,
+    "editorialBackgrounds": 49,
+    "nonInformativeBeats": 5
+  },
+  "strictQc": {
+    "ok": false,
+    "code": "SOURCING_FONDS_EDITORIAL_NON_AUTORISE",
+    "message": "Rendu STOPPÉ — sourcing média non conforme : illustrations IA premium distinctes 0/177 (< 45 %) ; visuels distincts (réels + IA premium) 123/177 (< 70 %) ; doublon strict : même fichier réutilisé 8× (> 1×) ; fonds éditoriaux exceptionnels non autorisés 49/177 : ratio de fonds 0.277 > borne 0.25. Le QC reste bloquant ; aucune dégradation silencieuse ne sera rendue. Metrics : {\"profil\":\"essai\",\"banquesOk\":8,\"banquesTotal\":9,\"ratioBanques\":0.889,\"plansTotal\":177,\"plansMediaReel\":123,\"ratioMediaReel\":0.695,\"ratioMediaReelOccurrences\":0.695,\"plansIAPremium\":0,\"fichiersIAPremiumDistincts\":0,\"ratioIAPremium\":0,\"fichiersVisuelsDistincts\":123,\"ratioVisuelsDistincts\":0.695,\"fichiersDistincts\":135,\"fichiersReelsDistincts\":123,\"reuseMax\":1,\"reuseMaxTous\":8,\"plansAbstraits\":5,\"ratioAbstrait\":0.028,\"plansFondsEditorial\":49,\"ratioFondsEditorial\":0.277,\"fondsEditorialAutorises\":false,\"fondsExceptions\":[{\"plan\":69,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":70,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":79,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":80,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":84,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":85,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":86,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":101,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":102,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":103,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":104,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":105,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":106,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":109,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":110,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":111,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":112,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":113,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":114,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":128,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":145,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":146,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":147,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":148,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":149,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":150,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":151,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":152,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":153,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":154,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":155,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":156,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":158,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":160,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":161,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":162,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":163,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":164,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":165,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":166,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":167,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":168,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":169,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":170,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":171,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":172,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":175,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":176,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"},{\"plan\":177,\"file\":\"/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg\",\"provider\":\"AfroSpeak Studio\",\"autorise\":false,\"motif\":\"ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25\"}],\"seuils\":{\"banquesMin\":0.5,\"mediaReelMin\":0.05,\"aiPremiumMin\":0.45,\"visuelsDistinctsMin\":0.7,\"reuseMax\":1,\"abstraitMax\":0.15,\"fondEditorialMax\":0.25,\"fondEditorialPlancherReel\":0.05}}",
+    "metrics": {
+      "profil": "essai",
+      "banquesOk": 8,
+      "banquesTotal": 9,
+      "ratioBanques": 0.889,
+      "plansTotal": 177,
+      "plansMediaReel": 123,
+      "ratioMediaReel": 0.695,
+      "ratioMediaReelOccurrences": 0.695,
+      "plansIAPremium": 0,
+      "fichiersIAPremiumDistincts": 0,
+      "ratioIAPremium": 0,
+      "fichiersVisuelsDistincts": 123,
+      "ratioVisuelsDistincts": 0.695,
+      "fichiersDistincts": 135,
+      "fichiersReelsDistincts": 123,
+      "reuseMax": 1,
+      "reuseMaxTous": 8,
+      "plansAbstraits": 5,
+      "ratioAbstrait": 0.028,
+      "plansFondsEditorial": 49,
+      "ratioFondsEditorial": 0.277,
+      "fondsEditorialAutorises": false,
+      "fondsExceptions": [
+        {
+          "plan": 69,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 70,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 79,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 80,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 84,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 85,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 86,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 101,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 102,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 103,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 104,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 105,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 106,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 109,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 110,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 111,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 112,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 113,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 114,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 128,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 145,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 146,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 147,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 148,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 149,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 150,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 151,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 152,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 153,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 154,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 155,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 156,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 158,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 160,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 161,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 162,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 163,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 164,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 165,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_462fd59829ac.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 166,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6a9d7e057b91.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 167,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 168,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 169,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 170,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2a83209615cf.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 171,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_840301d6c856.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 172,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_6fca225382b8.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 175,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_457177989b01.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 176,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_9029d1b0fe7a.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        },
+        {
+          "plan": 177,
+          "file": "/home/user/afrospeak-m12/data/cache/reserve/fond_2e1b75bed5aa.jpg",
+          "provider": "AfroSpeak Studio",
+          "autorise": false,
+          "motif": "ratio de fonds éditoriaux 0.277 au-dessus de la borne 0.25"
+        }
+      ],
+      "seuils": {
+        "banquesMin": 0.5,
+        "mediaReelMin": 0.05,
+        "aiPremiumMin": 0.45,
+        "visuelsDistinctsMin": 0.7,
+        "reuseMax": 1,
+        "abstraitMax": 0.15,
+        "fondEditorialMax": 0.25,
+        "fondEditorialPlancherReel": 0.05
+      }
+    }
+  },
+  "output": {
+    "mp4": null,
+    "frameGrid": null,
+    "disposition": "QC strict bloquant — aucun MP4 ni grille de frames généré"
+  }
+}

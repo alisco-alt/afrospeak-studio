@@ -1,0 +1,32 @@
+{
+  "mission": "12",
+  "run": "baseline à partir de l’audit Mission 11 (avant corrections M12)",
+  "date": "2026-10-28",
+  "script": {
+    "file": "data/script_gemini_valide.txt",
+    "bytes": 4918,
+    "words": 747,
+    "storyboardShots": 37,
+    "expandedTimelineShots": 177
+  },
+  "settings": {
+    "format": "landscape",
+    "style": "moneyradar",
+    "minutes": 6,
+    "quality": "high",
+    "music": true,
+    "thumbnail": true,
+    "qcStrict": true
+  },
+  "baseline": {
+    "distinctRealMediaFiles": 16,
+    "distinctRealMediaRatio": 0.0904,
+    "editorialBackgroundShots": 157,
+    "editorialBackgroundRatio": 0.887,
+    "aiIllustrations": 1,
+    "shotsWithoutAsset": 3,
+    "mediaStageSeconds": 815,
+    "outcome": "QC strict a bloqué le rendu; aucun MP4 dégradé livré"
+  },
+  "source": "proofs/mission11/before-sourcing.json (audit pré-M12). Cette référence est le dernier audit de référence disponible; ne pas l'interpréter comme un nouveau run contrôlé."
+}
