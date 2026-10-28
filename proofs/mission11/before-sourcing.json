@@ -1,0 +1,65 @@
+{
+  "mission": "11",
+  "run": "baseline b085962, index.js -> produce",
+  "date": "2026-10-28",
+  "script": {
+    "file": "data/script_gemini_valide.txt",
+    "bytes": 4918,
+    "words": 747,
+    "storyboardShots": 37,
+    "expandedTimelineShots": 177
+  },
+  "settings": {
+    "format": "landscape",
+    "style": "moneyradar",
+    "minutes": 6,
+    "quality": "high",
+    "music": true,
+    "thumbnail": true,
+    "qcStrict": true
+  },
+  "sourceProbe": {
+    "banksResponding": 9,
+    "banksTotal": 9,
+    "diagnosticBanques": {
+      "DuckDuckGo": 45,
+      "Bing": 25,
+      "WikimediaImages": 20,
+      "WikimediaVideo": 10,
+      "InternetArchive": 10,
+      "NASA": 2,
+      "PexelsImagesAndVideo": 0,
+      "PixabayImagesAndVideo": 0,
+      "Openverse": 0,
+      "GDELT": 0,
+      "Unsplash": 0
+    }
+  },
+  "before": {
+    "result": "QC gate refused render",
+    "durationSeconds": 336.248,
+    "mediaStageSeconds": 815,
+    "shots": 177,
+    "coveredShots": 174,
+    "distinctRealMediaFiles": 16,
+    "distinctRealMediaRatio": 0.0904,
+    "realMediaReuseMax": 1,
+    "distinctFilesAllTypes": 25,
+    "editorialBackgroundShots": 157,
+    "editorialBackgroundRatio": 0.887,
+    "aiIllustrations": 1,
+    "shotsWithoutAsset": 3,
+    "reportedSourcedAssetsBeforeFinalAudit": 18,
+    "legacyGateMetrics": {
+      "ratioMediaReel": 0.98,
+      "reuseMax": 21,
+      "fichiersDistincts": 25,
+      "ratioAbstrait": 0.02
+    },
+    "legacyGateCode": "SOURCING_DEGRADE",
+    "legacyGateReason": "The 21x repeated file was an editorial reserve background. Backgrounds were also incorrectly counted as real media: 173/177 media-real, 157 background shots. Distinct real-media ratio after audit: 16/177 (9.0%).",
+    "observedShortCircuit": "5 successive missing visuals at media elapsed 14:24; subsequent plans switched to fallback reserve.",
+    "observedAiFallback": "Pollinations returned HTTP 503 and HTTP 402; after three 402 quota responses, image generation was disabled for the run.",
+    "observedQueryDefect": "Generic chapter heading 'Développement' produced repeated Russia/China queries absent from the local narration, causing irrelevant sourcing attempts."
+  }
+}

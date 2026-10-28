@@ -1,0 +1,80 @@
+{
+  "mission": "11",
+  "run": "post-fix production attempts via index.js -> produce",
+  "date": "2026-10-28",
+  "script": {
+    "file": "data/script_gemini_valide.txt",
+    "bytes": 4918,
+    "words": 747,
+    "storyboardShots": 37,
+    "expandedTimelineShots": 177
+  },
+  "settings": {
+    "format": "landscape",
+    "style": "moneyradar",
+    "minutes": 6,
+    "quality": "high",
+    "music": true,
+    "thumbnail": true,
+    "qcStrict": true
+  },
+  "status": "INCOMPLETE — no final sourcing verdict or render",
+  "video": null,
+  "frameGrid": null,
+  "attempts": [
+    {
+      "projectId": "proj_mvs22aoc_59db279b",
+      "elapsedAtLastLog": "04:11",
+      "outcome": "process exited before sourcing completed; no final QC report or render"
+    },
+    {
+      "projectId": "proj_mvs2ac23_c92af57b",
+      "elapsedAtLastLog": "03:26",
+      "outcome": "exit 137 during sourcing; no final QC report or render"
+    },
+    {
+      "projectId": "proj_mvs2i2v2_3900e1a3",
+      "elapsedAtLastLog": "02:24",
+      "outcome": "exit 137 during sourcing; no final QC report or render"
+    },
+    {
+      "projectId": "proj_mvs2nbt9_6083c5e0",
+      "elapsedAtLastLog": "02:14",
+      "outcome": "exit 137 during sourcing; no final QC report or render",
+      "resourceTuning": [
+        "NODE_OPTIONS=--max-old-space-size=512 --max-semi-space-size=16",
+        "AFROSPEAK_THREADS=1",
+        "PREPASS_BING_MAX_SHOTS=0",
+        "IA_PARALLELE=1",
+        "MONTAGE_PARALLELE=1"
+      ]
+    }
+  ],
+  "latestPartialAudit": {
+    "projectId": "proj_mvs2nbt9_6083c5e0",
+    "status": "running when SIGKILL occurred",
+    "elapsedSeconds": 134,
+    "shotsTotal": 177,
+    "shotsWithAssets": 7,
+    "distinctFilesAllTypes": 7,
+    "distinctRealMediaFiles": 2,
+    "distinctRealMediaRatio": 0.0113,
+    "realMediaReuseMax": 1,
+    "aiIllustrations": 5,
+    "editorialBackgroundShots": 0,
+    "shotsWithoutAssetAtInterruption": 170,
+    "note": "Partial-state audit only; not the final after-sourcing metric. The pipeline had not reached its authoritative strict QC gate."
+  },
+  "productionBlocker": {
+    "processExit": 137,
+    "observation": "Four production processes were killed during the media-sourcing phase; cgroup memory.events recorded four OOM kills. No QC gate was bypassed and no degraded MP4 was shipped.",
+    "providers": "Usable candidate supply was low: most batch candidates were rejected because the search result had no verifiable title/description; AI generation intermittently returned Pollinations HTTP 402 quota errors; yt-dlp search failed; GDELT was temporarily saturated."
+  },
+  "acceptance": {
+    "strictQc": "preserved; no silent degraded render",
+    "productionEpisode": "not produced",
+    "frameGrid": "not produced",
+    "finalAfterMetrics": "unavailable because sourcing did not complete",
+    "tests": "583/583 passing, 24 suites"
+  }
+}

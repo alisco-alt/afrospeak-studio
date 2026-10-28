@@ -57,7 +57,7 @@ test('doublons massifs (même visuel > 3 plans) → SOURCING_DEGRADE', () => {
     shots: [shotReel('a'), shotReel('a'), shotReel('a'), shotReel('a'), shotReel('b'), shotReel('c')],
   });
   vrai(!v.ok, 'doit refuser');
-  vrai(/passé 4×/.test(v.message), 'message doublons : ' + v.message);
+  vrai(/réutilisé 4×/.test(v.message), 'message doublons : ' + v.message);
 });
 
 test('aucun média réel (secours/IA nus) → SOURCING_DEGRADE', () => {
@@ -79,11 +79,29 @@ test('média réel : secours, IA et plans nus exclus', () => {
   vrai(!estMediaReel(undefined));
 });
 
-test('seuils documentés et stables', () => {
+test('seuils, comptage distinct et exception éditoriale bornée', () => {
   eq(SEUILS.banquesMin, 0.5);
   eq(SEUILS.mediaReelMin, 0.5);
-  eq(SEUILS.reuseMax, 1);          // mission 6 : anti-doublons strict
-  eq(SEUILS.abstraitMax, 0.4);      // mission 6 : plafond beats non informatifs
+  eq(SEUILS.reuseMax, 1);          // aucun fichier réel réutilisé
+  eq(SEUILS.abstraitMax, 0.4);
+  eq(SEUILS.fondEditorialMax, 0.1);
+  eq(SEUILS.fondEditorialPlancherReel, 0.5);
+
+  const fond = { asset: { file: 'fond.jpg', provider: 'AfroSpeak Studio', title: 'Fond éditorial', fondLocal: true } };
+  const assezDeReels = evaluerSourcingMedia({ banquesOk: 9, banquesTotal: 9,
+    shots: [shotReel('a'), shotReel('b'), shotReel('c'), shotReel('d'), shotReel('e'), fond,
+      shotIA, shotIA, shotIA, shotIA] });
+  vrai(assezDeReels.ok, assezDeReels.message);
+  eq(assezDeReels.metrics.fichiersReelsDistincts, 5);
+  eq(assezDeReels.metrics.ratioMediaReel, 0.5);
+  eq(assezDeReels.metrics.fondsExceptions[0].autorise, true);
+
+  const pasAssezDeReels = evaluerSourcingMedia({ banquesOk: 9, banquesTotal: 9,
+    shots: [shotReel('a'), shotReel('b'), shotReel('c'), shotReel('d'), fond,
+      shotIA, shotIA, shotIA, shotIA, shotIA] });
+  vrai(!pasAssezDeReels.ok, 'l’exception ne doit pas couvrir un ratio insuffisant');
+  eq(pasAssezDeReels.code, 'SOURCING_FONDS_EDITORIAL_NON_AUTORISE');
+  eq(pasAssezDeReels.metrics.fondsExceptions[0].autorise, false);
 });
 
 test('le pipeline câble bien le garde-fou avant le montage', () => {

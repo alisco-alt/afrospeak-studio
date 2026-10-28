@@ -1,0 +1,66 @@
+Banc d'essai des banques visuelles
+
+Pexels image       generique    0 resultats  0.0s
+Pexels image       pays         0 resultats  0.0s
+Pexels image       evenement    0 resultats  0.0s
+Pexels video       generique    0 resultats  0.0s
+Pexels video       pays         0 resultats  0.0s
+Pexels video       evenement    0 resultats  0.0s
+Pixabay image      generique    0 resultats  0.0s
+Pixabay image      pays         0 resultats  0.0s
+Pixabay image      evenement    0 resultats  0.0s
+Pixabay video      generique    0 resultats  0.0s
+Pixabay video      pays         0 resultats  0.0s
+Pixabay video      evenement    0 resultats  0.0s
+Openverse          generique    0 resultats  96.3s
+Openverse          pays         0 resultats  0.0s
+Openverse          evenement    0 resultats  0.0s
+Wikimedia          generique   10 resultats  0.1s
+Wikimedia          pays        10 resultats  0.0s
+Wikimedia          evenement    0 resultats  0.0s
+Wikimedia video    generique    7 resultats  0.0s
+Wikimedia video    pays         3 resultats  0.0s
+Wikimedia video    evenement    0 resultats  0.0s
+Internet Archive   generique    5 resultats  1.9s
+Internet Archive   pays         5 resultats  1.3s
+Internet Archive   evenement    0 resultats  0.9s
+NASA               generique    2 resultats  0.4s
+NASA               pays         0 resultats  0.3s
+NASA               evenement    0 resultats  0.3s
+DuckDuckGo         generique   15 resultats  0.3s
+DuckDuckGo         pays         0 resultats  0.1s
+DuckDuckGo         evenement    0 resultats  0.1s
+Bing               generique    5 resultats  0.2s
+Bing               pays         5 resultats  0.1s
+Bing               evenement   15 resultats  0.2s
+GDELT              generique    0 resultats  12.6s
+[media] gdelt saturé durablement — source écartée pour 20 min
+GDELT              pays         0 resultats  9.9s
+GDELT              evenement    0 resultats  0.0s
+Unsplash           generique    0 resultats  0.0s
+Unsplash           pays         0 resultats  0.0s
+Unsplash           evenement    0 resultats  0.0s
+
+================ BILAN ================
+  25   Bing               generique:5  pays:5  evenement:15
+  20   Wikimedia          generique:10  pays:10  evenement:0
+  15   DuckDuckGo         generique:15  pays:0  evenement:0
+  10   Wikimedia video    generique:7  pays:3  evenement:0
+  10   Internet Archive   generique:5  pays:5  evenement:0
+   2   NASA               generique:2  pays:0  evenement:0
+   0   Pexels image       generique:0  pays:0  evenement:0
+   0   Pexels video       generique:0  pays:0  evenement:0
+   0   Pixabay image      generique:0  pays:0  evenement:0
+   0   Pixabay video      generique:0  pays:0  evenement:0
+   0   Openverse          generique:0  pays:0  evenement:0
+   0   GDELT              generique:0  pays:0  evenement:0
+   0   Unsplash           generique:0  pays:0  evenement:0
+
+SOURCES MUETTES (0 resultat sur 3 requetes) :
+  - Pexels image | generique:0 pays:0 evenement:0
+  - Pexels video | generique:0 pays:0 evenement:0
+  - Pixabay image | generique:0 pays:0 evenement:0
+  - Pixabay video | generique:0 pays:0 evenement:0
+  - Openverse | generique:0 pays:0 evenement:0
+  - GDELT | generique:0 pays:0 evenement:0
+  - Unsplash | generique:0 pays:0 evenement:0

@@ -179,8 +179,12 @@ check('le Capitole du 6 janvier reçoit une recherche d’archive datée',
 
 console.log('— Chine, Russie, Sahel, archives : scènes réellement représentatives —');
 const chine = requete({ narration: 'Vidéos accélérées des mégapoles chinoises (Shenzhen, Shanghai), trains à haute vitesse.', visual: 'Vidéos accélérées des mégapoles chinoises (Shenzhen, Shanghai).' });
-check('la Chine reçoit Shenzhen, Shanghai et le train à grande vitesse',
-  /shenzhen/i.test(chine.join(' ')) && /shanghai/i.test(chine.join(' ')) && /rail|train/i.test(chine.join(' ')));
+const developpementGenerique = requete({ sectionHeading: 'Le développement',
+  narration: 'Nos économies avancent.', visual: '' });
+check('la Chine reçoit ses scènes propres et un chapitre générique n’invente pas de géographie',
+  /shenzhen/i.test(chine.join(' ')) && /shanghai/i.test(chine.join(' '))
+    && /rail|train/i.test(chine.join(' '))
+    && !/russia|moscow|china|beijing/i.test(developpementGenerique.join(' ')));
 const russie = requete({ narration: 'La Russie fait preuve d’une résilience industrielle remarquable.', visual: '' });
 check('la Russie reçoit son industrie réelle, pas une rue générique',
   russie.some(q => /russia/i.test(q) && /industr|factor/i.test(q)));
