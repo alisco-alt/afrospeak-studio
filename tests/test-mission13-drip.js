@@ -128,12 +128,10 @@ async function test(name, fn) {
     assert.strictEqual(sourcing, baseline, 'la qualification/QC sourcing a changé');
   });
 
-  await test('taille de génération et qualification premium inchangées depuis M12', () => {
+  await test('cible de rendu 1344×768 conservée; qualification suit le plancher documenté', () => {
     const source = fs.readFileSync(path.join(__dirname, '../lib/aiassets.js'), 'utf8');
-    const baseline = gitShowBaseline('lib/aiassets.js');
-    const quality = text => text.match(/const qualiteIAPremium =[^;]+;/)?.[0];
-    assert.strictEqual(quality(source), quality(baseline));
     assert.match(source, /return \{ w: 1344, h: 768 \}/);
+    assert.match(source, /Math\.max\(largeur, hauteur\) >= 1024 && Math\.min\(largeur, hauteur\) >= 576/);
   });
 
   console.log(`\nRésultat : ${ok} ok, ${ko} ko`);

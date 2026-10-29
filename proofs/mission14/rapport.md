@@ -9,7 +9,15 @@
 
 Les déclarations `nIA`, `_iaDripReserved`, `_iaDripPending`, `_iaDripProtectedPlans`, `_iaDripPromise` et `_iaDripState` sont maintenant accessibles dans toute la fonction `run()`. Les initialisations/réaffectations de la phase média restent à leur emplacement. La couture d'assemblage reste dans le bloc 6a, où `assessment` est créé.
 
-Le worker, le QC/gate, les seuils, les profils et `p.iaDripReport` n'ont pas été modifiés.
+Le worker, le QC/gate, les seuils de mix (45 % / 70 % / 25 %), les profils et `p.iaDripReport` n'ont pas été modifiés.
+
+## Addendum — qualification premium et aspect Pollinations
+
+L'audit du run5 a confirmé que la règle source `0,9 × cible` (1210×691 pour 1344×768) excluait la source libre observée à 1015×580 et la source attendue à 1024×576. La qualification média a donc été réalignée sur la règle déjà documentée dans `docs/mission12-sourcing-qc.md` : côté long ≥1024 px **et** côté court ≥576 px. Le gate et ses ratios n'ont pas été abaissés.
+
+Pour le paysage, la requête Pollinations passe maintenant en 1344×756 (16:9), tandis que la cible de rendu/upscale studio reste 1344×768. La clé de cache inclut les dimensions de requête afin que ces nouvelles générations soient fraîches.
+
+Tests M14 : 1024×576 qualifié; 576×1024 qualifié; 1015×580 rejeté; aspect de requête 16:9 et cible d'affichage inchangée. La confirmation par image réellement renvoyée et le rerendu local restent à faire sur le quota de production, conformément à la consigne de ne pas rendre dans le sandbox.
 
 ## Garde-fou et preuve avant/après
 
@@ -21,11 +29,13 @@ Le worker, le QC/gate, les seuils, les profils et `p.iaDripReport` n'ont pas ét
 
 ## Tests
 
-La nouvelle suite `tests/test-scope.js` appelle directement le scanner et est découverte par `tests/run-tests.js`, donc par `npm test`. Run final : **594 OK / 0 KO, 26 suites**; sortie complète dans `tests.txt`.
+La nouvelle suite `tests/test-scope.js` appelle directement le scanner et est découverte par `tests/run-tests.js`, donc par `npm test`. Run final après l’addendum premium : **597 OK / 0 KO, 27 suites**; sortie complète dans `tests.txt`.
 
 ## Fichiers M14
 
 - `lib/pipeline.js` — déclarations hoistées, initialisations opérationnelles inchangées.
+- `lib/aiassets.js` — seuil premium documenté et dimensions 16:9 de requête, cible de sortie conservée.
+- `tests/test-mission14-premium.js` — trois tests du seuil source et des dimensions.
 - `scripts/check-scope.js` — scanner ESLint et whitelist minimale.
 - `tests/test-scope.js` — non-régression de portée.
 - `package.json`, `package-lock.json` — commande `check:scope` et ESLint de développement.

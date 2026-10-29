@@ -2,7 +2,7 @@
 > afrospeak-studio@1.0.0 test
 > node tests/run-tests.js
 
-✓ test-contrat-modules.js              7 ok   0.1s
+✓ test-contrat-modules.js              7 ok   0.2s
 ✓ test-agent-monteur-realisation.js   38 ok   0.1s
 ✓ test-c1-sous-titres.js              11 ok   0.1s
 ✓ test-c456-matiere-boussole.js       17 ok   0.1s
@@ -10,6 +10,7 @@
 ✓ test-media-filtres.js               27 ok   0.3s
 ✓ test-mission10.js                   10 ok   0.1s
 ✓ test-mission13-drip.js               8 ok   0.1s
+✓ test-mission14-premium.js            3 ok   0.1s
 ✓ test-mission5.js                    15 ok   0.1s
 ✓ test-mission6.js                    10 ok   0.1s
 ✓ test-mission8-qc.js                 69 ok   9.4s
@@ -19,14 +20,14 @@
 ✓ test-run-lamu-2-demarrage.js        36 ok   0.3s
 ✓ test-run-lamu-3-moteur.js           19 ok   0.1s
 ✓ test-run-lamu-coherence.js          32 ok   0.1s
-✓ test-scope.js                        1 ok   2.3s
+✓ test-scope.js                        1 ok   2.5s
 ✓ test-script-faille-generale.js      20 ok   0.2s
 ✓ test-script-import.js               32 ok   0.1s
-✓ test-sourcing.js                    10 ok   0.0s
+✓ test-sourcing.js                    10 ok   0.1s
 ✓ test-thumbnail-api.js               13 ok   0.5s
-✓ test-thumbnail.js                   55 ok   0.8s
-✓ test-ui-syntax.js                    4 ok   0.1s
+✓ test-thumbnail.js                   55 ok   0.6s
+✓ test-ui-syntax.js                    4 ok   0.0s
 ✓ test-v2-retour-run2.js              34 ok   0.1s
-✓ test-visual-grade.js                10 ok   0.2s
+✓ test-visual-grade.js                10 ok   0.1s
 
-✓ TOTAL : 594 ok, 0 ko — 26 suite(s)
+✓ TOTAL : 597 ok, 0 ko — 27 suite(s)
