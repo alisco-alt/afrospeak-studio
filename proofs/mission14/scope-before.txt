@@ -1,0 +1,19 @@
+no-undef lib/: 16 erreur(s) bloquante(s); 17 faux positifs webScraper.js document/window ignorés.
+lib/pipeline.js:3909:11 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3910:15 _iaDripPromise — '_iaDripPromise' is not defined.
+lib/pipeline.js:3916:15 _iaDripProtectedPlans — '_iaDripProtectedPlans' is not defined.
+lib/pipeline.js:3919:13 _iaDripPending — '_iaDripPending' is not defined.
+lib/pipeline.js:3919:42 _iaDripPending — '_iaDripPending' is not defined.
+lib/pipeline.js:3942:11 _iaDripPending — '_iaDripPending' is not defined.
+lib/pipeline.js:3942:40 _iaDripPending — '_iaDripPending' is not defined.
+lib/pipeline.js:3943:11 nIA — 'nIA' is not defined.
+lib/pipeline.js:3944:11 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3947:9 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3948:9 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3952:9 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3953:31 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3953:66 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3955:37 _iaDripState — '_iaDripState' is not defined.
+lib/pipeline.js:3956:68 _iaDripState — '_iaDripState' is not defined.
+
+EXIT_CODE=1 (expected failure before hoisting)

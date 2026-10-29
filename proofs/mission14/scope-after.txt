@@ -1,0 +1,7 @@
+
+> afrospeak-studio@1.0.0 check:scope
+> node scripts/check-scope.js
+
+no-undef lib/: 0 erreur(s) bloquante(s); 17 faux positifs webScraper.js document/window ignorés.
+
+EXIT_CODE=0

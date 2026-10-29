@@ -15,6 +15,7 @@
     "cles": "node scripts/configurer-cles.js",
     "test": "node tests/run-tests.js",
     "test:moteur": "node tests/run-tests.js",
+    "check:scope": "node scripts/check-scope.js",
     "produce": "node scripts/produce-local.js",
     "qc": "node scripts/quality-check.js",
     "test:qc": "node tests/test-mission8-qc.js"
@@ -45,5 +46,8 @@
     "ffprobe-static": "^3.1.0",
     "jose": "^5.10.0",
     "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }
