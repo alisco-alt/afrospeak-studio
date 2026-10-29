@@ -1,0 +1,5 @@
+[MOCK] start #1 2026-10-29T09:00:00.000Z gap=first
+[MOCK] HTTP 402 2026-10-29T09:00:00.000Z Retry-After=10s (corps=300s)
+[MOCK] cooldown=46000ms = max(10s + 5s, 46s)
+[MOCK] start #2 2026-10-29T09:00:46.000Z gap=46000ms
+[MOCK] start #3 2026-10-29T09:01:32.000Z gap=46000ms

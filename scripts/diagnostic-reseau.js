@@ -5,7 +5,7 @@
  *
  * Symptôme observé en production : le LLM (OpenRouter, Groq) répond
  * parfaitement, mais TOUTES les sources média échouent en « fetch failed »
- * — Bing, DuckDuckGo, Archive.org, Wikimedia, Pexels, Pollinations.
+ * — Bing, DuckDuckGo, Archive.org, Wikimedia, Pexels.
  *
  * Ce n'est pas cohérent avec une panne réseau : openrouter.ai est
  * joignable au même instant. Ce script sépare les causes possibles :
@@ -34,8 +34,8 @@ const CIBLES = [
   // Les deux qui FONCTIONNENT en production — témoins.
   { hote: 'openrouter.ai', url: 'https://openrouter.ai/api/v1/models', temoin: true },
   { hote: 'api.groq.com', url: 'https://api.groq.com/openai/v1/models', temoin: true },
-  // Celles qui ÉCHOUENT.
-  { hote: 'image.pollinations.ai', url: 'https://image.pollinations.ai/prompt/test?width=64&height=64' },
+  // Celles qui ÉCHOUENT. Pollinations est exclu de ce diagnostic générique :
+  // toute requête vers ce fournisseur doit passer par la file DRIP d'aiassets.
   { hote: 'commons.wikimedia.org', url: 'https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=Africa' },
   { hote: 'archive.org', url: 'https://archive.org/advancedsearch.php?q=africa&output=json&rows=1' },
   { hote: 'duckduckgo.com', url: 'https://duckduckgo.com/' },
