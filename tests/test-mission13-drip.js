@@ -94,11 +94,15 @@ async function test(name, fn) {
     assert.match(source, /retries: 0/);
   });
 
-  await test('toutes les générations Pollinations passent par la file avec token optionnel', () => {
+  await test('toutes les générations Pollinations passent par la file avec token optionnel (clé sk_ → gen+Bearer, anonyme → legacy)', () => {
     const source = fs.readFileSync(path.join(__dirname, '../lib/aiassets.js'), 'utf8');
     assert.strictEqual((source.match(/_pollinationsQueue\.request\(/g) || []).length, 1);
     assert.match(source, /IA_POLLINATIONS_TOKEN/);
-    assert.match(source, /&token=\$\{encodeURIComponent\(token\)\}/);
+    // 29/10 : le domaine historique n'honore pas les clés sk_ (402 constant,
+    // vérifié ?token= ET Bearer) → clé présente = gen.pollinations.ai + Bearer.
+    assert.match(source, /gen\.pollinations\.ai\/image\//);
+    assert.match(source, /Authorization: `Bearer \$\{token\}`/);
+    assert.match(source, /image\.pollinations\.ai\/prompt\//);
     const base = fs.readFileSync(path.join(__dirname, '../lib/pollinationsQueue.js'), 'utf8');
     assert.match(base, /ESPACEMENT_MIN_MS = 46000/);
   });
