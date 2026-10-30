@@ -372,6 +372,10 @@ async function produce(brief) {
 
     console.log();
     say.ok(`${c.b}${c.green}Vidéo prête${c.r}`);
+    if (done.result.qcAdmissionStatus === 'degraded') {
+      say.warn('Livraison dégradée, shortfall QC explicitement documenté.');
+      if (done.result.qcAdmissionReport) say.kv('Rapport de dégradation QC', done.result.qcAdmissionReport);
+    }
     say.kv('Titre', done.script.title);
     say.kv('Fichier', done.result.video);
     say.kv('Durée', `${pipeline.fmtDur(done.result.duration)}  ·  ${(done.result.size / 1e6).toFixed(1)} Mo  ·  ${done.result.width}×${done.result.height}`);
@@ -550,11 +554,38 @@ async function main() {
   if (!result && a.strict) throw new Error('Production refusée en mode strict.');
 }
 
-if (require.main === module) {
-  main().catch(e => {
-    say.err(e && e.stack ? e.stack.split('\n').slice(0, 3).join('\n') : String(e));
-    process.exit(1);
+function cliKeepsProcessAlive(argv = process.argv) {
+  return (argv || []).includes('--serve') || (argv || []).includes('--watch');
+}
+
+/** Flush stdout/stderr, puis terminer même si un worker a laissé un handle ouvert. */
+function finalizeProcess(code = process.exitCode || 0) {
+  const exitCode = Number.isInteger(Number(code)) ? Number(code) : 0;
+  let pending = 2;
+  let finished = false;
+  const exit = () => {
+    if (finished) return;
+    finished = true;
+    clearTimeout(watchdog);
+    process.exit(exitCode);
+  };
+  const watchdog = setTimeout(exit, 1200);
+  const flushed = () => { if (--pending <= 0) setImmediate(exit); };
+  for (const stream of [process.stdout, process.stderr]) {
+    try { stream.write('', flushed); } catch (error) { flushed(); }
+  }
+}
+
+function runCli(entry = main, argv = process.argv) {
+  const keepAlive = cliKeepsProcessAlive(argv);
+  return Promise.resolve().then(entry).then(() => {
+    if (!keepAlive) finalizeProcess(process.exitCode || 0);
+  }, error => {
+    say.err(error && error.stack ? error.stack.split('\n').slice(0, 3).join('\n') : String(error));
+    finalizeProcess(1);
   });
 }
 
-module.exports = { produce, pickTopics, doctor, briefFromArgs };
+if (require.main === module) runCli();
+
+module.exports = { produce, pickTopics, doctor, briefFromArgs, cliKeepsProcessAlive, finalizeProcess, runCli };
