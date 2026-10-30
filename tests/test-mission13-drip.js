@@ -125,7 +125,8 @@ async function test(name, fn) {
     const source = fs.readFileSync(path.join(__dirname, '../lib/pipeline.js'), 'utf8');
     assert.match(source, /Math\.min\(0\.75, _ratioIAConfigure\)/);
     assert.match(source, /_qcPremiumMin \+ 0\.10/);
-    assert.match(source, /const _dripTarget = Math\.min\(_iaCap/);
+    // M17 : la cible s'appuie sur le plafond de PRODUCTION (capacité − réserve d'admission).
+    assert.match(source, /const _dripTarget = Math\.min\(_iaProductionCap/);
     assert.match(source, /throw Object\.assign\(new Error\(verdict\.message\)/);
     const sourcing = fs.readFileSync(path.join(__dirname, '../lib/sourcing.js'), 'utf8');
     const baseline = gitShowBaseline('lib/sourcing.js');
