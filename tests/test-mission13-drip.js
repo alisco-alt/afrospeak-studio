@@ -117,7 +117,7 @@ async function test(name, fn) {
       'le drip ne suit pas le gel des consignes ou ne précède pas le sourcing');
     assert.match(source, /pollinationsDeadlineAt: _dripDeadlineAt/);
     assert.match(source, /deadlineMs: 35 \* 60 \* 1000/);
-    assert.match(source, /finalDistinct = finalPremiumDistinct/);
+    assert.match(source, /finalDistinct = assemblageDrip\.finalPremiumDistinct/);
     assert.match(source, /saveProject\(p\);\s*\}\s*catch \(error\)/);
   });
 
