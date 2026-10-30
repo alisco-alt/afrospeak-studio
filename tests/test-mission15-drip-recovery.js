@@ -53,7 +53,7 @@ test('drip avant/après rebuild : 19 références + 14 récupérées par index =
   assert.strictEqual(new Set(currentShots.slice(0, 33).map(shot => shot.asset.file)).size, 33);
 
   const pipeline = fs.readFileSync(path.join(__dirname, '../lib/pipeline.js'), 'utf8');
-  assert.match(pipeline, /_iaDripByIndex\.set\(planIndex, result\)/);
+  assert.match(pipeline, /_iaDripByIndex\.set\(planIndex, (?:result|alignedResult)\)/);
   assert.match(pipeline, /byIndex: _iaDripByIndex/);
   assert.match(pipeline, /iaDripRecovery\.recollerDrip/);
   assert.match(pipeline, /recoveredByIndex/);
