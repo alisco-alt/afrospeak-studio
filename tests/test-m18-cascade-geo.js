@@ -15,15 +15,15 @@ function test(name, fn) {
   await test('les paliers locaux, ancrés, croisés et identitaires sont ordonnés et dédupliqués', () => {
     const paliers = conformity.geoQueryPaliers({ subject: 'community meeting outdoors',
       geoTopic: 'Africa', contexte: {}, queries: ['community meeting outdoors', 'community meeting outdoors'] });
-    assert.deepEqual(paliers.map(p => p.nom), ['local', 'ancre', 'tokens', 'identitaire']);
+    assert.deepEqual(paliers.map(p => p.nom), ['local', 'ancre', 'identitaire']);
     assert.deepEqual(paliers[0].queries, ['community meeting outdoors']);
-    assert.ok(paliers[2].queries.includes('community Africa'));
-    assert.ok(paliers[2].queries.includes('meeting African'));
+    assert.ok(!paliers.some(p => p.nom === 'tokens'));
+    assert.ok(paliers[1].queries.includes('community meeting outdoors Africa'));
     assert.equal(new Set(paliers.flatMap(p => p.queries.map(q => q.toLowerCase()))).size,
       paliers.reduce((n, p) => n + p.queries.length, 0));
     const country = conformity.geoQueryPaliers({ subject: 'school children', geoTopic: 'Côte d’Ivoire',
       contexte: { pays: 'Côte d’Ivoire', ville: 'Abidjan' }, queries: ['school children'] });
-    assert.ok(country[3].queries.some(q => /Abidjan|Cote d'Ivoire|Ivory Coast/i.test(q)));
+    assert.ok(country[2].queries.some(q => /Abidjan|Cote d'Ivoire|Ivory Coast/i.test(q)));
   });
 
   await test('search suit P1→P4, s’arrête au quota, garde un budget total borné et purge avant le palier', async () => {
@@ -35,7 +35,6 @@ function test(name, fn) {
       const paliers = [
         { nom: 'local', queries: ['community meeting outdoors'] },
         { nom: 'ancre', queries: ['community meeting outdoors Africa'] },
-        { nom: 'tokens', queries: ['community Africa', 'meeting Africa'] },
         { nom: 'identitaire', queries: ['Abidjan Côte d’Ivoire'] },
       ];
       let audit;
@@ -52,10 +51,10 @@ function test(name, fn) {
       assert.equal(result, null);
       assert.equal(events[0], 'purge');
       assert.deepEqual(events.slice(1), paliers.flatMap(p => p.queries));
-      assert.deepEqual(Object.keys(audit.paliers), ['local', 'ancre', 'tokens', 'identitaire']);
+      assert.deepEqual(Object.keys(audit.paliers), ['local', 'ancre', 'identitaire']);
       const sumBudget = Object.values(audit.paliers).reduce((sum, item) => sum + item.budgetMs, 0);
       assert.ok(sumBudget <= 1200, `budget paliers ${sumBudget} > 1200 ms`);
-      assert.equal(audit.paliers.tokens.queries, 2);
+      assert.equal(audit.paliers.ancre.queries, 1);
 
       const quickEvents = [];
       let quickAudit;
