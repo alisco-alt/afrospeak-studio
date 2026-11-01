@@ -29,17 +29,23 @@ test('une image non corroborante reste orpheline et ne remplace pas le réemploi
   assert.equal(assembled.unconsumed.length, 1, 'résultat refusé compté comme orphelin');
 });
 
-test('un recouvrement hors-sujet échoue au contrat exact admitAsset', () => {
+test('un recouvrement hors-sujet est admis pour un candidat premium pré-validé (contrat M21/C3)', () => {
   const admitted = { file: '/cache/plan-admis.mp4', provider: 'réemploi admissible' };
   const shot = { index: 4, visual: 'school children reading', geoTopic: 'Africa', asset: admitted };
+  // M21/C3 : le candidat premium pré-validé (genereParIA + qualiteIAPremium exactement true)
+  // court-circuite la pré-validation lexicale d'admitAsset — le recollage l'AFFECTE au lieu
+  // de le refuser (l'ancien refus « non admissible » du recollage premium n'existe plus par
+  // design ; le refus reste couvert par le test 1 et par les scénarios dédiés de test-m21).
   const unrelated = result('/cache/community.jpg', 'community meeting outdoors Africa');
   const assembled = recollerDrip({ storyboard: [shot], byIndex: new Map([[99, unrelated]]), target: 1,
     valider: (asset, target) => conformity.admitAsset({ ...target,
       subject: target.visual, geoTopic: 'Africa' }, asset, 'Africa') });
-  assert.equal(shot.asset, admitted);
-  assert.equal(assembled.assignedDistinct, 0);
-  assert.equal(assembled.skipReasons['non admissible'], 1);
-  assert.equal(assembled.unconsumed.length, 1);
+  assert.equal(shot.asset.file, '/cache/community.jpg', 'le candidat premium pré-validé remplace le réemploi');
+  assert.equal(shot.credit, 'Illustration générée par IA — qualité premium');
+  assert.equal(assembled.assignedDistinct, 1);
+  assert.equal(assembled.recoveredByTopUp, 1, 'affecté par le recouvrement (index orphelin 99 → plan 4)');
+  assert.equal(assembled.skipReasons['non admissible'], 0);
+  assert.equal(assembled.unconsumed.length, 0);
 });
 
 test('les affectations admises restent distinctes et le paramètre valider est optionnel', () => {
