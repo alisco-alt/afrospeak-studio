@@ -43,7 +43,7 @@ function test(name, fn) {
         geoPaliers: paliers, tries: 1, limit: 8, segmentBudgetMs: 1200,
         searchFn: async (query, options) => {
           events.push(query);
-          assert.ok(options.segmentBudgetMs > 0 && options.segmentBudgetMs <= 1200);
+          assert.ok(options.segmentBudgetMs >= 3000 && options.segmentBudgetMs <= 36000);
           return [];
         },
         onPlanAudit: value => { audit = value; },
@@ -53,7 +53,7 @@ function test(name, fn) {
       assert.deepEqual(events.slice(1), paliers.flatMap(p => p.queries));
       assert.deepEqual(Object.keys(audit.paliers), ['local', 'ancre', 'identitaire']);
       const sumBudget = Object.values(audit.paliers).reduce((sum, item) => sum + item.budgetMs, 0);
-      assert.ok(sumBudget <= 1200, `budget paliers ${sumBudget} > 1200 ms`);
+      assert.ok(sumBudget <= 36000, `budget paliers ${sumBudget} > 36000 ms`);
       assert.equal(audit.paliers.ancre.queries, 1);
 
       const quickEvents = [];
@@ -79,7 +79,8 @@ function test(name, fn) {
         geoPaliers: [{ nom: 'local', queries: ['slow query'] }, { nom: 'ancre', queries: [] }],
         tries: 1, segmentBudgetMs: 60, searchFn: async () => new Promise(() => {}),
       });
-      assert.ok(Date.now() - t0 < 300, 'le palier lent est borné par son budget');
+      const elapsed = Date.now() - t0;
+      assert.ok(elapsed >= 2800 && elapsed < 4500, `le plancher 3000 ms borne le palier (${elapsed} ms)`);
     } finally { util.purgerCircuit = previousPurge; }
   });
 
