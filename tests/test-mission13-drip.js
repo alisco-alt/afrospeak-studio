@@ -129,8 +129,26 @@ async function test(name, fn) {
     assert.match(source, /const _dripTarget = Math\.min\(_iaProductionCap/);
     assert.match(source, /throw Object\.assign\(new Error\(verdict\.message\)/);
     const sourcing = fs.readFileSync(path.join(__dirname, '../lib/sourcing.js'), 'utf8');
+    // M23 (arbitrage 02/11) : le QC mix éditorial (spec M23 C5) modifie sciemment ce
+    // fichier → le tripwire « identique à M12 » devient un CONTRAT : les seuils hérités
+    // restent byte-identiques, les ajouts M23 sont présents, et l'application du mix
+    // reste OPT-IN (blocage seulement quand le pipeline passe les seuils explicitement).
     const baseline = gitShowBaseline('lib/sourcing.js');
-    assert.strictEqual(sourcing, baseline, 'la qualification/QC sourcing a changé');
+    for (const cle of ['banquesMin', 'mediaReelMin', 'aiPremiumMin', 'visuelsDistinctsMin',
+      'reuseMax', 'abstraitMax', 'fondEditorialMax', 'fondEditorialPlancherReel']) {
+      const motif = new RegExp(cle + ':\\s*[0-9.]+');
+      const attendu = baseline.match(motif);
+      const actuel = sourcing.match(motif);
+      assert.ok(attendu && actuel, `seuil ${cle} introuvable`);
+      assert.strictEqual(actuel[0], attendu[0], `seuil hérité modifié : ${cle}`);
+    }
+    assert.match(sourcing, /reelEditorialMin: 0\.40, presseArchiveMin: 0\.15, stockMax: 0\.50/,
+      'seuils mix M23 (documentaire) absents');
+    assert.match(sourcing, /reelEditorialMin: 0, presseArchiveMin: 0, stockMax: 1/,
+      'seuils mix M23 (essai) absents');
+    assert.match(sourcing,
+      /const enforceMix = \['reelEditorialMin', 'presseArchiveMin', 'stockMax'\]\s+\.some\(key => Object\.prototype\.hasOwnProperty\.call\(seuils, key\)\)/,
+      'application du mix non opt-in (blocage silencieux)');
   });
 
   await test('cible de rendu 1344×768 conservée; qualification suit le plancher documenté', () => {
