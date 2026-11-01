@@ -82,7 +82,7 @@ async function pexelsSearch() {
   };
 
   try {
-    await test('Openverse simulé à 10 s aboutit sous le plafond 15 s sans ralentir une réponse rapide', async () => {
+    await test('le budget Openverse M23 coupe une recherche lente à 4 s sans ralentir une réponse rapide', async () => {
       mode = 'slow'; fetchCount = 0;
       const audit = {};
       const start = Date.now();
@@ -92,17 +92,15 @@ async function pexelsSearch() {
       });
       const elapsed = Date.now() - start;
       assert.equal(fetchCount, 1);
-      assert.equal(audit.providers[0].candidates, 1, 'la banque lente retourne un résultat admis');
-      assert.equal(found.length, 1);
-      assert(elapsed >= 9_500 && elapsed < 14_500, `latence attendue ~10 s, reçue ${elapsed} ms`);
+      assert.equal(found.length, 0, 'une recherche au-delà du budget est arrêtée');
+      assert(elapsed >= 3_500 && elapsed < 6_000, `latence attendue autour de 4 s, reçue ${elapsed} ms`);
       mode = 'fast';
       const fastStart = Date.now();
       const fastFound = await media.search('African city community', { providers: ['openverse'], limit: 5 });
       assert(Date.now() - fastStart < 1_000, 'une réponse rapide ne patiente pas jusqu’au nouveau plafond');
       assert.equal(fastFound.length, 1);
-      assert.match(mediaSource, /SOURCING_BANK_TIMEOUT_MS\) \|\| 15000/);
-      assert.match(mediaSource, /_BANK_TIMEOUT_MS \+ 1000/);
-      assert.match(mediaSource, /Math\.min\(20000, Math\.max\(_BANK_TIMEOUT_MS \+ 250/);
+      assert.match(mediaSource, /openverse: 4000/);
+      assert.match(mediaSource, /const hardMs = budgetMs/);
     });
 
     await test('10 erreurs réseau consécutives ouvrent toujours le coupe-circuit fournisseur', async () => {
@@ -161,7 +159,7 @@ async function pexelsSearch() {
           'chaque reset média purge aussi le circuit domaine');
       }
       assert.match(pipelineSource, /circuits fournisseurs et domaines réinitialisés post-batch/);
-      assert.match(mediaSource, /Number\.isFinite\(n\) \? Math\.max\(0, Math\.min\(2, n\)\) : 1/);
+      assert.match(mediaSource, /Number\.isFinite\(n\) \? Math\.max\(0, Math\.min\(1, n\)\) : 1/);
       assert.match(mediaSource, /const transport = \/abort\|timeout\|timed out\|fetch failed\|ECONN/);
     });
   } finally {
