@@ -1,0 +1,143 @@
+[
+  {
+    "id": "shot-01",
+    "shot": "Los Angeles street",
+    "topic": "Crise du fentanyl aux États-Unis",
+    "query": "Los Angeles Philadelphie street",
+    "admission": "ADMITTED",
+    "hits": [
+      "angeles",
+      "street"
+    ]
+  },
+  {
+    "id": "shot-02",
+    "shot": "Philadelphia avenue",
+    "topic": "Crise du fentanyl aux États-Unis",
+    "query": "Philadelphie Philadelphia avenue hagards",
+    "admission": "ADMITTED",
+    "hits": [
+      "philadelphia",
+      "avenue"
+    ]
+  },
+  {
+    "id": "shot-03",
+    "shot": "African parliament building",
+    "topic": "Gouvernance en Afrique",
+    "query": "African parliament building governments",
+    "admission": "ADMITTED",
+    "hits": [
+      "african",
+      "parliament",
+      "building"
+    ]
+  },
+  {
+    "id": "shot-04",
+    "shot": "Government official address",
+    "topic": "Politique publique",
+    "query": "Devant Government official address",
+    "admission": "ADMITTED",
+    "hits": [
+      "government",
+      "official",
+      "address"
+    ]
+  },
+  {
+    "id": "shot-05",
+    "shot": "Nairobi street market",
+    "topic": "Économie kényane",
+    "query": "Nairobi Kenya street market",
+    "admission": "ADMITTED",
+    "hits": [
+      "nairobi",
+      "street",
+      "market"
+    ]
+  },
+  {
+    "id": "shot-06",
+    "shot": "Dakar port harbor",
+    "topic": "Commerce maritime ouest-africain",
+    "query": "Dakar Sénégal port harbor",
+    "admission": "ADMITTED",
+    "hits": [
+      "dakar",
+      "port",
+      "harbor"
+    ]
+  },
+  {
+    "id": "shot-07",
+    "shot": "Addis Ababa African Union",
+    "topic": "Diplomatie africaine",
+    "query": "Addis-Abeba Addis Ababa African",
+    "admission": "ADMITTED",
+    "hits": [
+      "addis",
+      "ababa",
+      "african"
+    ]
+  },
+  {
+    "id": "shot-08",
+    "shot": "Oil refinery pipeline",
+    "topic": "Industrie pétrolière",
+    "query": "Oil refinery pipeline raffinerie",
+    "admission": "ADMITTED",
+    "hits": [
+      "refinery",
+      "pipeline"
+    ]
+  },
+  {
+    "id": "shot-09",
+    "shot": "Fishermen on wooden boat",
+    "topic": "Pêche artisanale",
+    "query": "Fishermen wooden boat pêcheurs",
+    "admission": "ADMITTED",
+    "hits": [
+      "fishermen",
+      "wooden",
+      "boat"
+    ]
+  },
+  {
+    "id": "shot-10",
+    "shot": "Solar panels farm",
+    "topic": "Énergie renouvelable",
+    "query": "Solar panels farm milliers",
+    "admission": "ADMITTED",
+    "hits": [
+      "solar",
+      "panels",
+      "farm"
+    ]
+  },
+  {
+    "id": "shot-11",
+    "shot": "Abidjan skyline lagoon",
+    "topic": "Urbanisation en Côte d Ivoire",
+    "query": "Abidjan Plateau skyline lagoon",
+    "admission": "ADMITTED",
+    "hits": [
+      "abidjan",
+      "skyline",
+      "lagoon"
+    ]
+  },
+  {
+    "id": "shot-12",
+    "shot": "Johannesburg financial district",
+    "topic": "Finance en Afrique du Sud",
+    "query": "Johannesburg financial district tours",
+    "admission": "ADMITTED",
+    "hits": [
+      "johannesburg",
+      "financial",
+      "district"
+    ]
+  }
+]
