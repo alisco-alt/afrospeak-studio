@@ -1,0 +1,149 @@
+[
+  {
+    "nom": "sub_impact",
+    "tStart": 0,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 1)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 0.15,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 1)"
+  },
+  {
+    "nom": "tick",
+    "tStart": 3.85,
+    "duree": 0.28,
+    "gain": 0.4,
+    "description": "Tick sur amorce audio J-cut (plan 4)"
+  },
+  {
+    "nom": "whoosh_heavy",
+    "tStart": 5.64,
+    "duree": 0.65,
+    "gain": 0.6,
+    "description": "Whoosh lourd sur transition whip/cut (plan 5)"
+  },
+  {
+    "nom": "riser",
+    "tStart": 7.66,
+    "duree": 0.85,
+    "gain": 0.55,
+    "description": "Riser avant insert motion (plan 7)"
+  },
+  {
+    "nom": "sub_impact",
+    "tStart": 8.26,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 7)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 8.41,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 7)"
+  },
+  {
+    "nom": "riser",
+    "tStart": 10.43,
+    "duree": 0.85,
+    "gain": 0.55,
+    "description": "Riser avant insert motion (plan 9)"
+  },
+  {
+    "nom": "sub_impact",
+    "tStart": 11.03,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 9)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 11.18,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 9)"
+  },
+  {
+    "nom": "tick",
+    "tStart": 14.88,
+    "duree": 0.28,
+    "gain": 0.4,
+    "description": "Tick sur amorce audio J-cut (plan 12)"
+  },
+  {
+    "nom": "riser",
+    "tStart": 15.92,
+    "duree": 0.85,
+    "gain": 0.55,
+    "description": "Riser avant insert motion (plan 13)"
+  },
+  {
+    "nom": "sub_impact",
+    "tStart": 16.52,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 13)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 16.67,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 13)"
+  },
+  {
+    "nom": "riser",
+    "tStart": 18.69,
+    "duree": 0.85,
+    "gain": 0.55,
+    "description": "Riser avant insert motion (plan 15)"
+  },
+  {
+    "nom": "sub_impact",
+    "tStart": 19.29,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 15)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 19.44,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 15)"
+  },
+  {
+    "nom": "riser",
+    "tStart": 21.66,
+    "duree": 0.85,
+    "gain": 0.55,
+    "description": "Riser avant insert motion (plan 17)"
+  },
+  {
+    "nom": "sub_impact",
+    "tStart": 22.26,
+    "duree": 1.1,
+    "gain": 0.9,
+    "description": "Sub-bass impact sur apparition graphique (plan 17)"
+  },
+  {
+    "nom": "pop_accent",
+    "tStart": 22.41,
+    "duree": 0.25,
+    "gain": 0.45,
+    "description": "Pop accent sur libellé (plan 17)"
+  },
+  {
+    "nom": "tick",
+    "tStart": 26.07,
+    "duree": 0.28,
+    "gain": 0.4,
+    "description": "Tick sur amorce audio J-cut (plan 20)"
+  }
+]
