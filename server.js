@@ -203,7 +203,7 @@ app.get('/api/config', (req, res) => ok(res, {
   },
   feeds: sources.FEEDS,
   capabilities: {
-    llm: require('./lib/ai').hasLLM(),
+    llm: llm.hasLLM(),
     social: Object.keys(social.PLATFORMS),
     tts: tts.availableProviders(),
     mediaProviders: {
