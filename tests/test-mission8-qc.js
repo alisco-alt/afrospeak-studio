@@ -45,6 +45,7 @@ async function main() {
   }
   await test('largeur de sous-titre verticale débordante refusée', () => assert(qc.captionIssues([{start:0,end:3,text:'Une phrase trop large pour mobile'}],3,{fontRatio:.041,safeMargin:.08,outline:true,width:1080,height:1920}).length));
   await test('cues verticales segmentées dans la zone sûre', () => { const c=dense.cuesFor('Le port se développe et les routes aussi.',0,4,16);assert.equal(qc.captionIssues(c,4,{fontRatio:.041,safeMargin:.08,outline:true,width:1080,height:1920}).length,0); });
+  await test('cues horizontales segmentées dans la zone sûre (P2 5.2)', () => { const c=dense.cuesFor('Le port se développe et les routes aussi.',0,4,16); assert.equal(qc.captionIssues(c,4,{fontRatio:.038,safeMargin:.08,outline:true,width:1920,height:1080}).length,0); });
   await test('marges insuffisantes refusées', () => assert(qc.captionIssues(fixture().cues,6,{fontRatio:.038,safeMargin:.01,outline:true}).length));
   await test('OCR indisponible échoue fermé', () => { const f = fixture(); f.ocr.available = false; assert.equal(qc.evaluate(f).status, 'fail'); });
   await test('OCR watermark bloquant', () => { const f = fixture(); f.ocr.stockHits=['Getty Images']; assert.equal(qc.evaluate(f).status, 'fail'); });
