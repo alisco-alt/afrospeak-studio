@@ -186,7 +186,7 @@ app.use('/output', express.static(DIRS.output, {
 
 app.use('/cache', express.static(DIRS.cache));
 
-const ok = (res, data) => res.json({ ok: true, ...data });
+const ok = util.httpOk;
 const fail = (res, e, code = 500) => {
   log.error(e && e.message ? e.message : e);
   res.status(code).json({ ok: false, error: (e && e.message) || String(e) });
