@@ -1,0 +1,234 @@
+{
+ "id": "af-mauritanie",
+ "title": "Mauritanie : la diaspora appelÃ©e Ã  investir",
+ "template": "cinematic",
+ "fps": 30,
+ "durationInFrames": 2100,
+ "brand": {
+  "logo": "brand/logo.png",
+  "mark": "brand/logo-mark.png",
+  "showLogo": true,
+  "watermark": true
+ },
+ "sources": [
+  {
+   "label": "Presse",
+   "value": "RFI Afrique, 22/11/2026"
+  },
+  {
+   "label": "Institutions",
+   "value": "FIDA Â· Banque mondiale Â· Forum des diasporas (oct. 2026)"
+  }
+ ],
+ "beats": [
+  {
+   "kind": "title",
+   "image": "img/mr/market.jpg",
+   "kicker": "MAURITANIE",
+   "text": "LA DIASPORA APPELEE A INVESTIR",
+   "vo": "La Mauritanie compte sur sa diaspora.",
+   "at": 0,
+   "_t": 0.0
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/airport.jpg",
+   "cam": "dolly-in",
+   "kb": "in",
+   "caption": "500 000 MAURITANIENS Ã€ L'Ã‰TRANGER",
+   "vo": "Cinq cent mille Mauritaniens vivent Ã  l'Ã©tranger.",
+   "at": 102,
+   "_t": 3.402
+  },
+  {
+   "kind": "stat",
+   "image": "img/mr/port.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "95",
+     "size": 170
+    },
+    {
+     "text": "millions de dollars",
+     "size": 54
+    }
+   ],
+   "source": "Transferts de la diaspora, FIDA 2025",
+   "vo": "L'an dernier, ils ont transfÃ©rÃ© prÃ¨s de quatre-vingt-quinze millions de dollars.",
+   "at": 207,
+   "_t": 6.9
+  },
+  {
+   "kind": "stat",
+   "image": "img/mr/flag.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "0,8 %",
+     "size": 150
+    },
+    {
+     "text": "du PIB national",
+     "size": 54
+    }
+   ],
+   "source": "Banque mondiale, exercice 2025",
+   "vo": "Selon la Banque mondiale, cela reprÃ©sente zÃ©ro virgule huit pour cent du PIB.",
+   "at": 356,
+   "_t": 11.862
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/market.jpg",
+   "cam": "drift",
+   "kb": "pan-left",
+   "caption": "SURTOUT DE LA CONSOMMATION",
+   "vo": "Mais cet argent part surtout dans la consommation directe.",
+   "at": 519,
+   "_t": 17.304
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/port.jpg",
+   "cam": "dolly-in",
+   "kb": "out",
+   "caption": "PAS DANS LES PROJETS",
+   "vo": "Pas dans les projets qui construisent le pays.",
+   "at": 639,
+   "_t": 21.306
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/ghazouani.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "UNE PRIORITÃ‰ DU PRÃ‰SIDENT",
+   "vo": "Le prÃ©sident Ghazouani en a fait une prioritÃ©.",
+   "at": 738,
+   "_t": 24.588
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/market.jpg",
+   "cam": "dolly-in",
+   "kb": "pan-right",
+   "caption": "TRANSFORMER L'Ã‰PARGNE",
+   "vo": "Objectif : transformer l'Ã©pargne de la diaspora en investissements.",
+   "at": 848,
+   "_t": 28.278
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/port.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "IL EST RENTRÃ‰ D'EUROPE",
+   "vo": "Un exemple : Mohamed AmmÃ©, rentrÃ© d'Europe il y a dix ans.",
+   "at": 996,
+   "_t": 33.216
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/market.jpg",
+   "cam": "dolly-in",
+   "kb": "out",
+   "caption": "POISSON FRAIS VERS L'EUROPE",
+   "vo": "Il exporte du poisson frais vers l'Espagne et la France.",
+   "at": 1134,
+   "_t": 37.794
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/airport.jpg",
+   "cam": "drift",
+   "kb": "pan-left",
+   "caption": "VÃ‰HICULES IMPORTÃ‰S D'EUROPE",
+   "vo": "Et il importe des vÃ©hicules d'Allemagne, d'Espagne et de Belgique.",
+   "at": 1251,
+   "_t": 41.7
+  },
+  {
+   "kind": "stat",
+   "image": "img/mr/ghazouani.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "LA CONDITION",
+     "size": 62
+    },
+    {
+     "text": "la sÃ©curitÃ© juridique",
+     "size": 48
+    }
+   ],
+   "source": "Mohamed AmmÃ©, entrepreneur de la diaspora",
+   "vo": "Sa condition, Ã  l'Ã‰tat : garantir la sÃ©curitÃ© juridique.",
+   "at": 1385,
+   "_t": 46.158
+  },
+  {
+   "kind": "footage",
+   "image": "img/mr/flag.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "SEPT MESURES EN OCTOBRE",
+   "vo": "En octobre, le forum des diasporas a proposÃ© sept mesures.",
+   "at": 1532,
+   "_t": 51.072
+  },
+  {
+   "kind": "stat",
+   "image": "img/mr/market.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "3 PISTES",
+     "size": 90
+    },
+    {
+     "text": "conseil national Â· fonds Â· sukuk garantis",
+     "size": 44
+    }
+   ],
+   "source": "Forum des diasporas mauritaniennes, octobre 2026",
+   "vo": "Un conseil national, un fonds d'investissement, et des sukuk garantis par l'Ã‰tat.",
+   "at": 1679,
+   "_t": 55.962
+  },
+  {
+   "kind": "stat",
+   "image": "img/mr/port.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "L'ENJEU",
+     "size": 72
+    },
+    {
+     "text": "passer des transferts Ã  l'investissement",
+     "size": 46
+    }
+   ],
+   "source": "Croissance mauritanienne estimÃ©e Ã  4,4 % en 2026 (RFI)",
+   "vo": "L'enjeu tient en une phrase : passer des transferts Ã  l'investissement.",
+   "at": 1845,
+   "_t": 61.5
+  },
+  {
+   "kind": "outro",
+   "image": "img/mr/flag.jpg",
+   "cam": "static",
+   "caption": "LA QUESTION",
+   "tagline": "Et vous, qu'en feriez-vous ?",
+   "vo": "Et vous, que feriez-vous de cet argent ?",
+   "at": 1986,
+   "_t": 66.198
+  }
+ ]
+}
