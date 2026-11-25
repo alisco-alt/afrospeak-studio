@@ -1,0 +1,148 @@
+{
+  "$schema": "./clueprint.schema.json",
+  "id": "afrospeak-news",
+  "label": "AfroSpeak â€” dossier Ã©conomie / sociÃ©tÃ©",
+  "version": "1.0.0",
+  "canvas": {
+    "primary": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "safe": {
+      "top": 160,
+      "bottom": 420,
+      "left": 80,
+      "right": 80
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Montserrat-Black.ttf",
+      "size": 96,
+      "tracking": -1,
+      "case": "upper"
+    },
+    "title": {
+      "family": "Montserrat-Bold.ttf",
+      "size": 72,
+      "tracking": -0.5
+    },
+    "body": {
+      "family": "Montserrat-Bold.ttf",
+      "size": 56,
+      "lineHeight": 1.22
+    },
+    "label": {
+      "family": "Montserrat-Bold.ttf",
+      "size": 36,
+      "case": "upper",
+      "tracking": 2
+    },
+    "caption": {
+      "family": "Montserrat-Bold.ttf",
+      "size": 54,
+      "maxLines": 2,
+      "maxCharsPerLine": 30
+    }
+  },
+  "colors": {
+    "bg0": "#050403",
+    "bg1": "#120C05",
+    "text": "#F7F3EA",
+    "dim": "#C9B998",
+    "accent": "#FFB020",
+    "accent2": "#FF7A1A",
+    "panel": "rgba(16,11,5,0.72)",
+    "stroke": "rgba(255,176,32,0.26)"
+  },
+  "motion": {
+    "easing": "outCubic",
+    "captionIn": {
+      "type": "rise",
+      "px": 18,
+      "ms": 220
+    },
+    "elementIn": {
+      "type": "fade-up",
+      "px": 14,
+      "ms": 260,
+      "staggerMs": 70
+    },
+    "imageZoom": {
+      "min": 1.02,
+      "max": 1.09,
+      "easing": "linear"
+    },
+    "transitions": {
+      "default": "cut",
+      "soft": "fade",
+      "softMs": 180
+    }
+  },
+  "pacing": {
+    "shotSeconds": [
+      3.5,
+      6.5
+    ],
+    "maxWordsPerCaption": 7,
+    "beatOnSentence": true
+  },
+  "voice": {
+    "engine": "edge-tts",
+    "voice": "fr-FR-DeniseNeural",
+    "rate": "+8%",
+    "pitch": "-3Hz",
+    "pauseBetweenBeatsMs": 250,
+    "sentencePauseMs": 220,
+    "reference": "Money Radar (Ã©chantillon CEO 22/11) : F0 mÃ©diane 193 Hz, 189 mots/min, 13 % de silence",
+    "note": "Denise +8% = 200 Hz / 173 mots-min. -3Hz rapproche la mÃ©diane (195 Hz). L'expressivitÃ© (p10-p90 147-267 Hz) reste hors de portÃ©e d'edge-tts."
+  },
+  "audio": {
+    "music": {
+      "source": "procedural",
+      "mood": "ecodoc",
+      "gainDb": -21,
+      "ducking": true
+    },
+    "sfx": {
+      "onCut": null,
+      "onNumberReveal": "sub-drop"
+    }
+  },
+  "branding": {
+    "logo": "brand/logo.png",
+    "mark": "brand/logo-mark.png",
+    "logoPlacement": "top-right",
+    "logoHeight": 96,
+    "logoMargin": {
+      "top": 96,
+      "right": 40
+    }
+  },
+  "content": {
+    "lanes": [
+      "Ã©conomie",
+      "finance",
+      "industrie",
+      "Ã©nergie",
+      "agriculture",
+      "tech"
+    ],
+    "forbidden": [
+      "fait divers sans enjeu Ã©conomique",
+      "sensationnalisme",
+      "chiffre non sourcÃ©"
+    ],
+    "requireSource": true,
+    "minSources": 2
+  },
+  "lint": {
+    "failOnCaptionOverflow": true,
+    "failOnCaptionOver3Lines": true,
+    "failOnMissingImage": true,
+    "failOnImageBelowCanvas": true,
+    "failOnEmptyBeat": true,
+    "failOnUnbalancedBeats": true,
+    "maxCaptionChars": 60
+  }
+}
