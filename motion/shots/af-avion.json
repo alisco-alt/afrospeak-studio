@@ -1,0 +1,184 @@
+{
+ "id": "af-avion",
+ "title": "Abidjanâ€“Paris : l'alliance Air France / Air CÃ´te d'Ivoire",
+ "template": "cinematic",
+ "fps": 30,
+ "durationInFrames": 2091,
+ "brand": {
+  "logo": "brand/logo.png",
+  "mark": "brand/logo-mark.png",
+  "showLogo": true,
+  "watermark": true
+ },
+ "sources": [
+  {
+   "label": "Presse",
+   "value": "Jeune Afrique, 20/10/2026"
+  },
+  {
+   "label": "CommuniquÃ©",
+   "value": "Air CÃ´te d'Ivoire, 19/10/2026"
+  }
+ ],
+ "beats": [
+  {
+   "kind": "title",
+   "image": "img/af/afci.jpg",
+   "kicker": "L'ALLIANCE QUI CHANGE LA LIGNE",
+   "text": "ABIDJANâ€“PARIS",
+   "vo": "Le 19 octobre, Air France et Air CÃ´te d'Ivoire annoncent une alliance commerciale.",
+   "at": 0,
+   "_t": 0.0
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/af.jpg",
+   "cam": "dolly-in",
+   "kb": "in",
+   "caption": "UN PARTAGE DE CODES",
+   "vo": "ConcrÃ¨tement, un partage de codes : Air France pose son numÃ©ro sur les vols ivoiriens.",
+   "at": 187,
+   "_t": 6.246
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/abj.jpg",
+   "cam": "drift",
+   "kb": "out",
+   "caption": "AUCUN VOL AJOUTÃ‰",
+   "vo": "Sans ajouter un seul vol entre Paris et Abidjan.",
+   "at": 392,
+   "_t": 13.068
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/corsair.jpg",
+   "cam": "dolly-in",
+   "kb": "pan-left",
+   "caption": "UN SEUL CONCURRENT : CORSAIR",
+   "vo": "Sur cette ligne, il ne reste qu'un concurrent direct : Corsair.",
+   "at": 533,
+   "_t": 17.754
+  },
+  {
+   "kind": "stat",
+   "image": "img/af/afci.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "2",
+     "size": 150
+    },
+    {
+     "text": "alliÃ©es"
+    },
+    {
+     "text": "1 seule",
+     "size": 64
+    }
+   ],
+   "source": "Air France Â· Air CÃ´te d'Ivoire Â· Corsair",
+   "vo": "Deux compagnies alliÃ©es face Ã  une seule.",
+   "at": 710,
+   "_t": 23.664
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/af.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "CONCLU LE 16 OCTOBRE",
+   "vo": "L'accord a Ã©tÃ© conclu le 16 octobre, et rÃ©vÃ©lÃ© trois jours plus tard.",
+   "at": 833,
+   "_t": 27.774
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/abj.jpg",
+   "cam": "dolly-in",
+   "kb": "pan-right",
+   "caption": "APRÃˆS L'Ã‰CHEC TAP",
+   "vo": "Quelques jours plus tÃ´t, Air France perdait TAP Air Portugal au profit de Lufthansa.",
+   "at": 1009,
+   "_t": 33.636
+  },
+  {
+   "kind": "stat",
+   "image": "img/af/corsair.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "3",
+     "size": 150
+    },
+    {
+     "text": "compagnies"
+    },
+    {
+     "text": "2 camps",
+     "size": 64
+    }
+   ],
+   "source": "Parisâ€“Abidjan : alliance contre Corsair",
+   "vo": "Trois compagnies, deux camps : d'un cÃ´tÃ© l'alliance, de l'autre Corsair.",
+   "at": 1194,
+   "_t": 39.81
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/af.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "UN BILLET, DEUX COMPAGNIES",
+   "vo": "Un partage de codes, c'est un billet unique vendu sur deux compagnies diffÃ©rentes.",
+   "at": 1380,
+   "_t": 45.984
+  },
+  {
+   "kind": "footage",
+   "image": "img/af/abj.jpg",
+   "cam": "drift",
+   "kb": "pan-left",
+   "caption": "AUCUNE BAISSE ANNONCÃ‰E",
+   "vo": "Ã€ ce stade, aucune baisse de tarif n'a Ã©tÃ© annoncÃ©e sur la ligne.",
+   "at": 1566,
+   "_t": 52.206
+  },
+  {
+   "kind": "stat",
+   "image": "img/af/corsair.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "CE QU'IL FAUT",
+     "size": 64
+    },
+    {
+     "text": "RETENIR",
+     "size": 64
+    },
+    {
+     "text": "2 alliÃ©s Â· 1 concurrent Â· 1 prix",
+     "size": 40
+    }
+   ],
+   "source": "Parisâ€“Abidjan, octobre 2026",
+   "vo": "Deux alliÃ©s, un concurrent, et une seule question : le prix.",
+   "at": 1731,
+   "_t": 57.684
+  },
+  {
+   "kind": "outro",
+   "image": "img/af/abj.jpg",
+   "cam": "static",
+   "caption": "LA QUESTION",
+   "tagline": "Qui fixe le prix ?",
+   "vo": "La question qui reste : sans concurrence, qui fixe le prix du billet ?",
+   "at": 1901,
+   "_t": 63.378
+  }
+ ]
+}
