@@ -1,0 +1,184 @@
+{
+ "id": "af-aes-v3",
+ "title": "AES : le Sahel ne demande plus la permission",
+ "template": "cinematic",
+ "fps": 30,
+ "durationInFrames": 1633,
+ "brand": {
+  "logo": "brand/logo.png",
+  "mark": "brand/logo-mark.png",
+  "showLogo": true,
+  "watermark": true
+ },
+ "sources": [
+  {
+   "label": "Presse",
+   "value": "L'Observateur Â· Benin Web TV Â· Mali Actu, 14-20/11/2026"
+  },
+  {
+   "label": "Officiel",
+   "value": "RÃ©union ministÃ©rielle AES, Ouagadougou, 13/11/2026"
+  }
+ ],
+ "beats": [
+  {
+   "kind": "title",
+   "image": "img/aes/ouaga.jpg",
+   "kicker": "ALLIANCE DES Ã‰TATS DU SAHEL",
+   "text": "LE SAHEL NE DEMANDE PLUS LA PERMISSION",
+   "vo": "Ils ne demandent plus la permission. Ils construisent.",
+   "at": 0,
+   "_t": 0.0
+  },
+  {
+   "kind": "video",
+   "video": "vid/aes/aes_salle.mp4",
+   "startFrom": 0.4,
+   "cam": "static",
+   "caption": "OUAGADOUGOU, 13 NOVEMBRE",
+   "vo": "Le 13 novembre, Ã  Ouagadougou, le Mali, le Burkina et le Niger ont signÃ© quatre textes.",
+   "at": 134,
+   "_t": 4.482
+  },
+  {
+   "kind": "stat",
+   "image": "img/aes/goita.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "4",
+     "size": 200
+    },
+    {
+     "text": "textes fondateurs",
+     "size": 60
+    }
+   ],
+   "source": "Sommet ministÃ©riel de Ouagadougou â€” RTB",
+   "vo": "Quatre textes fondateurs, dont une convention sur les retraites.",
+   "at": 339,
+   "_t": 11.292
+  },
+  {
+   "kind": "video",
+   "video": "vid/aes/aes_chefs.mp4",
+   "startFrom": 0.4,
+   "cam": "static",
+   "caption": "COTISER ICI, TRAVAILLER LÃ€, TOUCHER AILLEURS",
+   "vo": "Demain : cotiser au Mali, travailler au Burkina, toucher sa retraite au Niger.",
+   "at": 477,
+   "_t": 15.894
+  },
+  {
+   "kind": "stat",
+   "image": "img/aes/niamey.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "CHAQUE ANNÃ‰E",
+     "size": 80
+    },
+    {
+     "text": "compte, quel que soit le pays",
+     "size": 50
+    }
+   ],
+   "source": "Primature du Burkina Faso",
+   "vo": "Chaque annÃ©e cotisÃ©e compte, quel que soit le pays.",
+   "at": 652,
+   "_t": 21.744
+  },
+  {
+   "kind": "footage",
+   "image": "img/aes/goita.jpg",
+   "cam": "dolly-in",
+   "kb": "in",
+   "caption": "LE MALI AVANCE",
+   "vo": "Le Mali avance.",
+   "at": 771,
+   "_t": 25.698
+  },
+  {
+   "kind": "footage",
+   "image": "img/aes/traore.jpg",
+   "cam": "dolly-in",
+   "kb": "in",
+   "caption": "LE BURKINA AVANCE",
+   "vo": "Le Burkina avance.",
+   "at": 841,
+   "_t": 28.02
+  },
+  {
+   "kind": "footage",
+   "image": "img/aes/tchiani.jpg",
+   "cam": "dolly-in",
+   "kb": "in",
+   "caption": "LE NIGER AVANCE",
+   "vo": "Le Niger avance.",
+   "at": 918,
+   "_t": 30.606
+  },
+  {
+   "kind": "video",
+   "video": "vid/aes/aes_table.mp4",
+   "startFrom": 0.4,
+   "cam": "static",
+   "caption": "UN MÃŠME CADRE POUR LE TRAVAILLEUR",
+   "vo": "Contrats, visas, permis : un mÃªme cadre pour le travailleur migrant.",
+   "at": 989,
+   "_t": 32.976
+  },
+  {
+   "kind": "stat",
+   "image": "img/aes/bamako.jpg",
+   "cam": "static",
+   "statPanel": "dark",
+   "lines": [
+    {
+     "text": "PAS ENCORE",
+     "size": 104
+    },
+    {
+     "text": "une fÃ©dÃ©ration",
+     "size": 60
+    }
+   ],
+   "source": "La libre installation et les diplÃ´mes restent Ã  nÃ©gocier",
+   "vo": "Attention : ce n'est pas encore une fÃ©dÃ©ration.",
+   "at": 1144,
+   "_t": 38.13
+  },
+  {
+   "kind": "footage",
+   "image": "img/aes/ouaga.jpg",
+   "cam": "drift",
+   "kb": "in",
+   "caption": "LA LIBRE INSTALLATION RESTE Ã€ NÃ‰GOCIER",
+   "vo": "La libre installation et la reconnaissance des diplÃ´mes restent Ã  nÃ©gocier.",
+   "at": 1257,
+   "_t": 41.892
+  },
+  {
+   "kind": "footage",
+   "image": "img/aes/bamako.jpg",
+   "cam": "drift",
+   "kb": "pan-left",
+   "caption": "MAIS LE CAP EST FIXÃ‰",
+   "vo": "Mais le cap est fixÃ©, et il est politique.",
+   "at": 1404,
+   "_t": 46.806
+  },
+  {
+   "kind": "outro",
+   "image": "img/aes/traore.jpg",
+   "cam": "static",
+   "caption": "LA QUESTION",
+   "tagline": "Cette fÃ©dÃ©ration, vous y croyez ?",
+   "vo": "Et vous, croyez-vous Ã  cette fÃ©dÃ©ration ?",
+   "at": 1512,
+   "_t": 50.4
+  }
+ ]
+}
