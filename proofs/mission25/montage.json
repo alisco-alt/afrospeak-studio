@@ -1,0 +1,583 @@
+{
+  "version": "25.0",
+  "profile": "money_radar_pro",
+  "totalDuration": 30,
+  "planCount": 22,
+  "averageDuration": 1.36,
+  "stats": {
+    "jCutsCount": 3,
+    "lCutsCount": 2,
+    "multiCouchesCount": 11,
+    "multiCouchesRatio": 0.5,
+    "motionInsertsCount": 3,
+    "providerDistribution": {
+      "remotion_engine": 5,
+      "wikimedia_commons": 6,
+      "archives_dailymotion": 6,
+      "presse_documentation": 5
+    }
+  },
+  "storyboard": [
+    {
+      "index": 0,
+      "id": "shot-01",
+      "start": 0,
+      "duration": 1.61,
+      "narration": "1,4 milliard d habitants.",
+      "kind": "carton_motion",
+      "transition": "whip",
+      "cameraMotion": "kenburns-zoom-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": {
+          "template": "DataPulse",
+          "props": {
+            "value": 30,
+            "suffix": "%",
+            "label": "DES MINERAIS DE LA PLANÈTE",
+            "sublabel": "Ressources concentrées en Afrique"
+          }
+        },
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "remotion_engine",
+        "type": "carton_motion",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 1,
+      "id": "shot-02",
+      "start": 1.61,
+      "duration": 1.16,
+      "narration": "30 % des minerais de la planète.",
+      "kind": "archive_photo",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-left",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 2,
+      "id": "shot-03",
+      "start": 2.77,
+      "duration": 1.36,
+      "narration": "Et moins de 3 % de la richesse mondiale.",
+      "kind": "archive_video",
+      "transition": "cut",
+      "cameraMotion": "kenburns-zoom-out",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 3,
+      "id": "shot-04",
+      "start": 4.13,
+      "duration": 1.61,
+      "narration": "Bienvenue dans le paradoxe africain.",
+      "kind": "presse_capture",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-right",
+      "audioLeadMs": 280,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "presse_documentation",
+        "type": "presse_capture",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 4,
+      "id": "shot-05",
+      "start": 5.74,
+      "duration": 1.16,
+      "narration": "Chaque année, le continent exporte ses matières premières brutes…",
+      "kind": "archive_photo",
+      "transition": "whip",
+      "cameraMotion": "whip-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 5,
+      "id": "shot-06",
+      "start": 6.9,
+      "duration": 1.36,
+      "narration": "et importe des produits finis à prix d or.",
+      "kind": "archive_video",
+      "transition": "dissolve",
+      "cameraMotion": "kenburns-zoom-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 6,
+      "id": "shot-07",
+      "start": 8.26,
+      "duration": 1.61,
+      "narration": "Cobalt, or, lithium : la valeur part, les emplois restent ailleurs.",
+      "kind": "carton_motion",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-left",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": {
+          "template": "RouteMap",
+          "props": {
+            "origin": "RDC / GUINÉE",
+            "destination": "CENTRES INDUSTRIELS",
+            "resource": "COBALT, OR, LITHIUM BRUTS"
+          }
+        },
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "remotion_engine",
+        "type": "carton_motion",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 7,
+      "id": "shot-08",
+      "start": 9.87,
+      "duration": 1.16,
+      "narration": "Pendant ce temps, dix multinationales contrôlent les trois",
+      "kind": "presse_capture",
+      "transition": "cut",
+      "cameraMotion": "kenburns-zoom-out",
+      "audioLeadMs": 0,
+      "audioTailMs": 450,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "presse_documentation",
+        "type": "presse_capture",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 8,
+      "id": "shot-09",
+      "start": 11.03,
+      "duration": 1.36,
+      "narration": "quarts du commerce mondial des minerais africains.",
+      "kind": "carton_motion",
+      "transition": "whip",
+      "cameraMotion": "kenburns-pan-right",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "remotion_engine",
+        "type": "carton_motion",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 9,
+      "id": "shot-10",
+      "start": 12.39,
+      "duration": 1.61,
+      "narration": "Ce n est pas une malédiction.",
+      "kind": "archive_photo",
+      "transition": "cut",
+      "cameraMotion": "whip-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 10,
+      "id": "shot-11",
+      "start": 14,
+      "duration": 1.16,
+      "narration": "C est une architecture — et une architecture, ça se renverse.",
+      "kind": "archive_video",
+      "transition": "dissolve",
+      "cameraMotion": "kenburns-zoom-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 11,
+      "id": "shot-12",
+      "start": 15.16,
+      "duration": 1.36,
+      "narration": "1,4 milliard d habitants.",
+      "kind": "presse_capture",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-left",
+      "audioLeadMs": 280,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "presse_documentation",
+        "type": "presse_capture",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 12,
+      "id": "shot-13",
+      "start": 16.52,
+      "duration": 1.61,
+      "narration": "30 % des minerais de la planète.",
+      "kind": "archive_photo",
+      "transition": "whip",
+      "cameraMotion": "kenburns-zoom-out",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": {
+          "template": "HeadlineHighlighter",
+          "props": {
+            "newspaper": "FINANCIAL TIMES",
+            "headline": "MINERAIS : DIX MULTINATIONALES CONTRÔLENT LE MARCHÉ",
+            "highlightText": "DIX MULTINATIONALES CONTRÔLENT LE MARCHÉ"
+          }
+        },
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 13,
+      "id": "shot-14",
+      "start": 18.13,
+      "duration": 1.16,
+      "narration": "Et moins de 3 % de la richesse mondiale.",
+      "kind": "archive_video",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-right",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 14,
+      "id": "shot-15",
+      "start": 19.29,
+      "duration": 1.36,
+      "narration": "Bienvenue dans le paradoxe africain.",
+      "kind": "carton_motion",
+      "transition": "cut",
+      "cameraMotion": "whip-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "remotion_engine",
+        "type": "carton_motion",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 15,
+      "id": "shot-16",
+      "start": 20.65,
+      "duration": 1.61,
+      "narration": "Chaque année, le continent exporte ses matières premières brutes…",
+      "kind": "presse_capture",
+      "transition": "dissolve",
+      "cameraMotion": "kenburns-zoom-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "presse_documentation",
+        "type": "presse_capture",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 16,
+      "id": "shot-17",
+      "start": 22.26,
+      "duration": 1.16,
+      "narration": "et importe des produits finis à prix d or.",
+      "kind": "carton_motion",
+      "transition": "whip",
+      "cameraMotion": "kenburns-pan-left",
+      "audioLeadMs": 0,
+      "audioTailMs": 450,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "remotion_engine",
+        "type": "carton_motion",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 17,
+      "id": "shot-18",
+      "start": 23.42,
+      "duration": 1.36,
+      "narration": "Cobalt, or, lithium : la valeur part, les emplois restent ailleurs.",
+      "kind": "archive_photo",
+      "transition": "cut",
+      "cameraMotion": "kenburns-zoom-out",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 18,
+      "id": "shot-19",
+      "start": 24.78,
+      "duration": 1.61,
+      "narration": "Pendant ce temps, dix multinationales contrôlent les trois",
+      "kind": "archive_video",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-right",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 19,
+      "id": "shot-20",
+      "start": 26.39,
+      "duration": 1.16,
+      "narration": "quarts du commerce mondial des minerais africains.",
+      "kind": "presse_capture",
+      "transition": "cut",
+      "cameraMotion": "whip-in",
+      "audioLeadMs": 320,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "presse_documentation",
+        "type": "presse_capture",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 20,
+      "id": "shot-21",
+      "start": 27.55,
+      "duration": 1.36,
+      "narration": "Ce n est pas une malédiction.",
+      "kind": "archive_photo",
+      "transition": "whip",
+      "cameraMotion": "kenburns-zoom-in",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": true,
+      "layerConfig": {
+        "bg": {
+          "filter": "blur(12px) brightness(0.65)",
+          "speed": 0.8
+        },
+        "foreground": "subject-focus",
+        "finish": {
+          "grain": 0.18,
+          "vignette": 0.35,
+          "lut": "moneyradar-dark"
+        }
+      },
+      "asset": {
+        "provider": "wikimedia_commons",
+        "type": "archive_photo",
+        "justification": "matiere réelle prioritaire"
+      }
+    },
+    {
+      "index": 21,
+      "id": "shot-22",
+      "start": 28.91,
+      "duration": 1.09,
+      "narration": "C est une architecture — et une architecture, ça se renverse.",
+      "kind": "archive_video",
+      "transition": "cut",
+      "cameraMotion": "kenburns-pan-left",
+      "audioLeadMs": 0,
+      "audioTailMs": 0,
+      "multiCouches": false,
+      "layerConfig": null,
+      "asset": {
+        "provider": "archives_dailymotion",
+        "type": "archive_video",
+        "justification": "matiere réelle prioritaire"
+      }
+    }
+  ]
+}

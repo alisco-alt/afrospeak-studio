@@ -1,0 +1,19 @@
+{
+  "file": "proofs/mission25/test-30s-AVANT.mp4",
+  "duration": 30,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "videoCodec": "h264",
+  "audioCodec": "aac",
+  "pixFmt": "yuv420p",
+  "mode": "PIPELINE_TEMOIN_AVANT",
+  "layers": [
+    "single_slide_ia"
+  ],
+  "stats": {
+    "shots": 4,
+    "motion": 0,
+    "sfx": 0
+  }
+}
